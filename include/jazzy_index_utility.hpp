@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace bucket_index {
+namespace jazzy {
 
 namespace detail {
 
@@ -17,5 +17,4 @@ template <typename T>
 
 }  // namespace detail
 
-}  // namespace bucket_index
-
+}  // namespace jazzy

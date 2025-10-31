@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(quantile_index LANGUAGES CXX)
+project(jazzy_index LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -7,13 +7,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
 
-add_library(quantile_index INTERFACE)
-target_include_directories(quantile_index INTERFACE
+add_library(jazzy_index INTERFACE)
+target_include_directories(jazzy_index INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-option(BUILD_TESTS "Build QuantileIndex unit and property tests" ON)
-option(BUILD_BENCHMARKS "Build QuantileIndex benchmark suite" ON)
+option(BUILD_TESTS "Build JazzyIndex unit and property tests" ON)
+option(BUILD_BENCHMARKS "Build JazzyIndex benchmark suite" ON)
 
 if(BUILD_TESTS OR BUILD_BENCHMARKS)
     include(FetchContent)
@@ -27,17 +27,17 @@ if(BUILD_TESTS)
     )
     FetchContent_MakeAvailable(rapidcheck)
 
-    add_executable(quantile_index_tests
+    add_executable(jazzy_index_tests
         tests/unit_tests.cpp
         tests/property_tests.cpp
     )
-    target_link_libraries(quantile_index_tests PRIVATE quantile_index rapidcheck)
-    target_include_directories(quantile_index_tests PRIVATE
+    target_link_libraries(jazzy_index_tests PRIVATE jazzy_index rapidcheck)
+    target_include_directories(jazzy_index_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/tests
     )
 
     enable_testing()
-    add_test(NAME quantile_index_tests COMMAND quantile_index_tests)
+    add_test(NAME jazzy_index_tests COMMAND jazzy_index_tests)
 endif()
 
 if(BUILD_BENCHMARKS)
@@ -50,11 +50,11 @@ if(BUILD_BENCHMARKS)
     set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(benchmark)
 
-    add_executable(quantile_index_benchmarks
+    add_executable(jazzy_index_benchmarks
         benchmarks/benchmark_main.cpp
     )
-    target_link_libraries(quantile_index_benchmarks PRIVATE quantile_index benchmark::benchmark)
-    target_include_directories(quantile_index_benchmarks PRIVATE
+    target_link_libraries(jazzy_index_benchmarks PRIVATE jazzy_index benchmark::benchmark)
+    target_include_directories(jazzy_index_benchmarks PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
     )
 endif()

@@ -1,6 +1,7 @@
-#include "quantile_index.hpp"
+#include "jazzy_index.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -11,14 +12,14 @@ void run_property_tests();
 namespace {
 
 template <typename T, std::size_t Segments = 256>
-bucket_index::QuantileIndex<T, Segments> build_index(const std::vector<T>& data) {
-    bucket_index::QuantileIndex<T, Segments> index;
+jazzy::JazzyIndex<T, Segments> build_index(const std::vector<T>& data) {
+    jazzy::JazzyIndex<T, Segments> index;
     index.build(data.data(), data.data() + data.size());
     return index;
 }
 
 template <typename T, std::size_t Segments = 256>
-bool expect_found(const bucket_index::QuantileIndex<T, Segments>& index,
+bool expect_found(const jazzy::JazzyIndex<T, Segments>& index,
                   const std::vector<T>& data,
                   const T& value) {
     const T* result = index.find(value);
@@ -29,7 +30,7 @@ bool expect_found(const bucket_index::QuantileIndex<T, Segments>& index,
 }
 
 template <typename T, std::size_t Segments = 256>
-bool expect_missing(const bucket_index::QuantileIndex<T, Segments>& index,
+bool expect_missing(const jazzy::JazzyIndex<T, Segments>& index,
                     const std::vector<T>& data,
                     const T& value) {
     const T* result = index.find(value);
@@ -38,7 +39,7 @@ bool expect_missing(const bucket_index::QuantileIndex<T, Segments>& index,
 
 bool test_empty_index() {
     std::vector<int> data;
-    bucket_index::QuantileIndex<int> index;
+    jazzy::JazzyIndex<int> index;
     index.build(data.data(), data.data());
     return expect_missing(index, data, 42);
 }
@@ -73,12 +74,17 @@ bool test_duplicate_values() {
     return expect_missing(index, data, 3);
 }
 
-bool test_float_values() {
-    std::vector<float> data{0.5f, 0.75f, 1.0f, 2.5f, 2.5f, 5.0f};
-    auto index = build_index<float, 64>(data);
-    return expect_found(index, data, 0.5f) &&
-           expect_found(index, data, 2.5f) &&
-           expect_missing(index, data, 3.0f);
+bool test_uint64_values() {
+    std::vector<std::uint64_t> data{0ull,
+                                    42ull,
+                                    1'000ull,
+                                    1'000'000ull,
+                                    (1ull << 32),
+                                    (1ull << 40)};
+    auto index = build_index<std::uint64_t, 64>(data);
+    return expect_found(index, data, 0ull) &&
+           expect_found(index, data, (1ull << 40)) &&
+           expect_missing(index, data, (1ull << 40) + 1);
 }
 
 struct test_case {
@@ -94,7 +100,7 @@ int main() {
         {"single element hit/miss", test_single_element},
         {"uniform sequence lookups", test_uniform_sequence},
         {"duplicate values", test_duplicate_values},
-        {"float values", test_float_values},
+        {"uint64_t values", test_uint64_values},
     };
 
     for (const auto& t : tests) {

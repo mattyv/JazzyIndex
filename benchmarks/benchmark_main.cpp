@@ -1,5 +1,7 @@
 #include <benchmark/benchmark.h>
 
+#include <cstdint>
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
@@ -14,13 +16,14 @@ void register_uniform_suite(std::size_t size) {
         return;
     }
 
-    auto data = std::make_shared<std::vector<float>>(qi::bench::make_uniform_values(size));
-    const float mid_target = (*data)[data->size() / 2];
-    const float end_target = data->back();
-    const float miss_target = end_target + 1.0f;
+    auto data = std::make_shared<std::vector<std::uint64_t>>(qi::bench::make_uniform_values(size));
+    const std::uint64_t mid_target = (*data)[data->size() / 2];
+    const std::uint64_t end_target = data->back();
+    const std::uint64_t miss_target =
+        end_target == std::numeric_limits<std::uint64_t>::max() ? end_target : end_target + 1;
 
     const std::string base =
-        "QuantileIndex/Uniform/S" + std::to_string(Segments) + "/N" + std::to_string(size);
+        "JazzyIndex/Uniform/S" + std::to_string(Segments) + "/N" + std::to_string(size);
 
     benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
                                  [data, mid_target](benchmark::State& state) {
@@ -68,13 +71,13 @@ void register_distribution_suite(const std::string& name,
         return;
     }
 
-    auto data = std::make_shared<std::vector<float>>(generator(size));
+    auto data = std::make_shared<std::vector<std::uint64_t>>(generator(size));
     if (data->empty()) {
         return;
     }
 
-    const float target = (*data)[data->size() / 3];
-    const std::string base = "QuantileIndex/" + name + "/S" + std::to_string(Segments) +
+    const std::uint64_t target = (*data)[data->size() / 3];
+    const std::string base = "JazzyIndex/" + name + "/S" + std::to_string(Segments) +
                              "/N" + std::to_string(size);
 
     benchmark::RegisterBenchmark((base + "/Found").c_str(),

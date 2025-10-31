@@ -10,9 +10,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "quantile_index_utility.hpp"  // detail::clamp_value and arithmetic trait
+#include "jazzy_index_utility.hpp"  // detail::clamp_value and arithmetic trait
 
-namespace bucket_index {
+namespace jazzy {
 
 namespace detail {
 
@@ -237,16 +237,16 @@ template <typename T>
 }  // namespace detail
 
 template <typename T, std::size_t NumSegments = 256, typename Compare = std::less<>>
-class QuantileIndex {
+class JazzyIndex {
     static_assert(detail::is_strictly_arithmetic_v<T>,
-                  "QuantileIndex expects arithmetic value types.");
+                  "JazzyIndex expects arithmetic value types.");
     static_assert(NumSegments > 0 && NumSegments <= 4096,
                   "NumSegments must be in range [1, 4096]");
 
 public:
-    QuantileIndex() = default;
+    JazzyIndex() = default;
 
-    QuantileIndex(const T* first, const T* last, Compare comp = Compare{}) {
+    JazzyIndex(const T* first, const T* last, Compare comp = Compare{}) {
         build(first, last, comp);
     }
 
@@ -490,4 +490,4 @@ private:
     std::array<detail::Segment<T>, NumSegments> segments_{};
 };
 
-}  // namespace bucket_index
+}  // namespace jazzy

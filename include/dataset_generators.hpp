@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <limits>
 #include <numeric>
 #include <random>
 #include <vector>
@@ -9,59 +11,70 @@
 namespace dataset {
 
 constexpr unsigned kSeed = 42u;
-constexpr float kExponentialScale = 1.0f;
+constexpr double kExponentialScale = 1.0;
 constexpr std::size_t kClusterCount = 5;
-constexpr float kClusterSpread = 0.02f;
-constexpr float kLognormalMean = 0.0f;
-constexpr float kLognormalSigma = 0.9f;
+constexpr double kClusterSpread = 0.02;
+constexpr double kLognormalMean = 0.0;
+constexpr double kLognormalSigma = 0.9;
 constexpr double kZipfA = 1.2;
 constexpr std::size_t kZipfMax = 1'000'000;
-constexpr float kMixedRatio = 0.5f;
+constexpr double kMixedRatio = 0.5;
 
-inline std::vector<float> finalize_samples(std::vector<float>&& samples,
-                                           float min_value,
-                                           float max_value) {
+inline std::vector<std::uint64_t> finalize_samples(std::vector<double>&& samples,
+                                                   std::uint64_t min_value,
+                                                   std::uint64_t max_value) {
     if (samples.empty()) {
-        return samples;
+        return {};
     }
 
     std::sort(samples.begin(), samples.end());
-    float prev = std::clamp(samples.front(), min_value, max_value);
-    samples[0] = prev;
+    std::vector<std::uint64_t> result(samples.size());
+
+    const double min_d = static_cast<double>(min_value);
+    const double max_d = static_cast<double>(max_value);
+
+    double clamped = std::clamp(samples.front(), min_d, max_d);
+    std::uint64_t prev = static_cast<std::uint64_t>(std::llround(clamped));
+    prev = std::clamp(prev, min_value, max_value);
+    result[0] = prev;
+
     for (std::size_t idx = 1; idx < samples.size(); ++idx) {
-        float value = std::clamp(samples[idx], min_value, max_value);
-        if (value < prev) {
-            value = prev;
+        double value = std::clamp(samples[idx], min_d, max_d);
+        if (value < static_cast<double>(prev)) {
+            value = static_cast<double>(prev);
         }
-        samples[idx] = value;
-        prev = value;
+        std::uint64_t current =
+            static_cast<std::uint64_t>(std::llround(value));
+        current = std::clamp(current, prev, max_value);
+        result[idx] = current;
+        prev = current;
     }
-    return samples;
+    return result;
 }
 
-inline std::vector<float> generate_exponential(std::size_t size,
-                                               float scale,
-                                               unsigned seed,
-                                               float min_value,
-                                               float max_value) {
+inline std::vector<std::uint64_t> generate_exponential(std::size_t size,
+                                                       double scale,
+                                                       unsigned seed,
+                                                       std::uint64_t min_value,
+                                                       std::uint64_t max_value) {
     std::mt19937_64 rng(seed);
-    std::exponential_distribution<float> dist(1.0f / std::max(scale, 1e-6f));
-    std::vector<float> samples(size);
+    std::exponential_distribution<double> dist(1.0 / std::max(scale, 1e-6));
+    std::vector<double> samples(size);
     for (auto& value : samples) {
         value = dist(rng);
     }
     return finalize_samples(std::move(samples), min_value, max_value);
 }
 
-inline std::vector<float> generate_clustered(std::size_t size,
-                                             std::size_t cluster_count,
-                                             float cluster_spread,
-                                             unsigned seed,
-                                             float min_value,
-                                             float max_value) {
+inline std::vector<std::uint64_t> generate_clustered(std::size_t size,
+                                                     std::size_t cluster_count,
+                                                     double cluster_spread,
+                                                     unsigned seed,
+                                                     std::uint64_t min_value,
+                                                     std::uint64_t max_value) {
     cluster_count = std::max<std::size_t>(cluster_count, 1);
     std::mt19937_64 rng(seed);
-    std::vector<float> samples;
+    std::vector<double> samples;
     samples.reserve(size);
 
     const std::size_t base = size / cluster_count;
@@ -72,11 +85,11 @@ inline std::vector<float> generate_clustered(std::size_t size,
         if (chunk == 0) {
             continue;
         }
-        const float center = cluster_count == 1
-                                 ? 0.0f
-                                 : static_cast<float>(cluster) /
-                                       static_cast<float>(cluster_count - 1);
-        std::normal_distribution<float> dist(center, std::max(cluster_spread, 1e-4f));
+        const double center = cluster_count == 1
+                                  ? 0.0
+                                  : static_cast<double>(cluster) /
+                                        static_cast<double>(cluster_count - 1);
+        std::normal_distribution<double> dist(center, std::max(cluster_spread, 1e-4));
         for (std::size_t idx = 0; idx < chunk; ++idx) {
             samples.push_back(dist(rng));
         }
@@ -89,27 +102,27 @@ inline std::vector<float> generate_clustered(std::size_t size,
     return finalize_samples(std::move(samples), min_value, max_value);
 }
 
-inline std::vector<float> generate_lognormal(std::size_t size,
-                                             float mean,
-                                             float sigma,
-                                             unsigned seed,
-                                             float min_value,
-                                             float max_value) {
+inline std::vector<std::uint64_t> generate_lognormal(std::size_t size,
+                                                     double mean,
+                                                     double sigma,
+                                                     unsigned seed,
+                                                     std::uint64_t min_value,
+                                                     std::uint64_t max_value) {
     std::mt19937_64 rng(seed);
-    std::lognormal_distribution<float> dist(mean, std::max(sigma, 1e-3f));
-    std::vector<float> samples(size);
+    std::lognormal_distribution<double> dist(mean, std::max(sigma, 1e-3));
+    std::vector<double> samples(size);
     for (auto& value : samples) {
         value = dist(rng);
     }
     return finalize_samples(std::move(samples), min_value, max_value);
 }
 
-inline std::vector<float> generate_zipf(std::size_t size,
-                                        double a,
-                                        std::size_t max_rank,
-                                        unsigned seed,
-                                        float min_value,
-                                        float clamp_upper) {
+inline std::vector<std::uint64_t> generate_zipf(std::size_t size,
+                                                double a,
+                                                std::size_t max_rank,
+                                                unsigned seed,
+                                                std::uint64_t min_value,
+                                                std::uint64_t clamp_upper) {
     max_rank = std::max<std::size_t>(max_rank, 1);
     std::vector<double> weights(max_rank);
     for (std::size_t idx = 0; idx < max_rank; ++idx) {
@@ -119,42 +132,66 @@ inline std::vector<float> generate_zipf(std::size_t size,
     std::discrete_distribution<std::size_t> dist(weights.begin(), weights.end());
     std::mt19937_64 rng(seed);
 
-    std::vector<float> samples(size);
+    std::vector<double> samples(size);
     for (auto& value : samples) {
-        value = static_cast<float>(dist(rng) + 1);
+        value = static_cast<double>(dist(rng) + 1);
     }
 
     return finalize_samples(std::move(samples), min_value, clamp_upper);
 }
 
-inline std::vector<float> generate_mixed(std::size_t size,
-                                         float exponential_ratio,
-                                         float exp_scale,
-                                         std::size_t cluster_count,
-                                         float cluster_spread,
-                                         unsigned seed,
-                                         float min_value,
-                                         float max_value) {
-    exponential_ratio = std::clamp(exponential_ratio, 0.0f, 1.0f);
-    const std::size_t exp_size =
-        exponential_ratio <= 0.0f ? 0 : std::max<std::size_t>(1, static_cast<std::size_t>(size * exponential_ratio));
+inline std::vector<std::uint64_t> generate_mixed(std::size_t size,
+                                                 double exponential_ratio,
+                                                 double exp_scale,
+                                                 std::size_t cluster_count,
+                                                 double cluster_spread,
+                                                 unsigned seed,
+                                                 std::uint64_t min_value,
+                                                 std::uint64_t max_value) {
+    exponential_ratio = std::clamp(exponential_ratio, 0.0, 1.0);
+    const std::size_t exp_size = exponential_ratio <= 0.0
+                                     ? 0
+                                     : std::max<std::size_t>(1, static_cast<std::size_t>(size * exponential_ratio));
     const std::size_t cluster_size = size > exp_size ? size - exp_size : 0;
 
-    std::vector<float> samples;
+    std::vector<double> samples;
     samples.reserve(size);
 
     if (exp_size > 0) {
-        auto exp_samples = generate_exponential(exp_size, exp_scale, seed, min_value, max_value);
-        samples.insert(samples.end(), exp_samples.begin(), exp_samples.end());
+        std::mt19937_64 exp_rng(seed);
+        std::exponential_distribution<double> exp_dist(1.0 / std::max(exp_scale, 1e-6));
+        for (std::size_t i = 0; i < exp_size; ++i) {
+            samples.push_back(exp_dist(exp_rng));
+        }
     }
     if (cluster_size > 0) {
-        auto cluster_samples =
-            generate_clustered(cluster_size, cluster_count, cluster_spread, seed + 1, min_value, max_value);
-        samples.insert(samples.end(), cluster_samples.begin(), cluster_samples.end());
+        const std::size_t adjusted_cluster_count = std::max<std::size_t>(cluster_count, 1);
+        std::mt19937_64 cluster_rng(seed + 1);
+
+        const std::size_t base = cluster_size / adjusted_cluster_count;
+        const std::size_t remainder = cluster_size % adjusted_cluster_count;
+
+        for (std::size_t cluster = 0; cluster < adjusted_cluster_count; ++cluster) {
+            const std::size_t chunk = base + (cluster < remainder ? 1 : 0);
+            if (chunk == 0) {
+                continue;
+            }
+            const double center = adjusted_cluster_count == 1
+                                      ? 0.0
+                                      : static_cast<double>(cluster) /
+                                            static_cast<double>(adjusted_cluster_count - 1);
+            std::normal_distribution<double> cluster_dist(center, std::max(cluster_spread, 1e-4));
+            for (std::size_t idx = 0; idx < chunk; ++idx) {
+                samples.push_back(cluster_dist(cluster_rng));
+            }
+        }
+
+        if (samples.empty()) {
+            samples.push_back(static_cast<double>(min_value));
+        }
     }
 
     return finalize_samples(std::move(samples), min_value, max_value);
 }
 
 }  // namespace dataset
-
