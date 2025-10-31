@@ -1,4 +1,4 @@
-# Jazzy Index
+my# Jazzy Index
 
 A fast, adaptive learned index for sorted arrays that predicts element positions instead of searching blindly.
 
@@ -270,7 +270,7 @@ tests/
 
 ## Contributing
 
-This is a research/educational project extracted from the `early-exit-find` codebase. Contributions, bug reports, and performance data from real-world workloads are welcome.
+Contributions, bug reports, and performance data from real-world workloads are welcome.
 
 ## License
 
