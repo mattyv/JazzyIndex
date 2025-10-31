@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import platform
+import subprocess
 from collections import defaultdict
 from math import ceil
 from pathlib import Path
@@ -51,6 +53,42 @@ SCENARIO_LABELS = {
     "FoundEnd": "Found (end)",
     "NotFound": "Not found",
 }
+
+
+def get_cpu_name() -> str:
+    """Get the CPU name for the current platform."""
+    system = platform.system()
+    try:
+        if system == "Darwin":
+            # macOS
+            result = subprocess.run(
+                ["sysctl", "-n", "machdep.cpu.brand_string"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            return result.stdout.strip()
+        elif system == "Linux":
+            # Linux
+            with open("/proc/cpuinfo", "r") as f:
+                for line in f:
+                    if "model name" in line:
+                        return line.split(":")[1].strip()
+        elif system == "Windows":
+            # Windows
+            result = subprocess.run(
+                ["wmic", "cpu", "get", "name"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            lines = result.stdout.strip().split("\n")
+            if len(lines) > 1:
+                return lines[1].strip()
+    except Exception:
+        pass
+    # Fallback to platform info
+    return f"{platform.system()} {platform.machine()}"
 
 
 def parse_benchmark_name(name: str) -> BenchmarkKey:
@@ -194,7 +232,9 @@ def plot(grouped: Dict[str, Dict[str, Dict[int, List[Tuple[int, float]]]]], outp
         if any(scenario in grouped[d] for d in grouped)
     ]
 
+    cpu_name = get_cpu_name()
     fig.suptitle("JazzyIndex Lookup Performance", fontsize=16, fontweight="bold")
+    fig.text(0.99, 0.95, cpu_name, ha="right", va="top", fontsize=9, color="gray", transform=fig.transFigure)
     fig.subplots_adjust(bottom=0.18, top=0.90)
     fig.legend(
         handles=segment_handles,
@@ -235,8 +275,8 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        required=True,
-        help="Destination PNG (will be overwritten).",
+        default=Path("benchmarks/jazzy_benchmarks.png"),
+        help="Destination PNG (will be overwritten). Default: benchmarks/jazzy_benchmarks.png",
     )
     args = parser.parse_args()
 
