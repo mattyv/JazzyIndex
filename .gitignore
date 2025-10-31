@@ -1,0 +1,14 @@
+# Build artifacts
+build/
+cmake-build*/
+
+# macOS metadata
+.DS_Store
+
+# CMake caches
+CMakeCache.txt
+CMakeFiles/
+Testing/
+Makefile
+cmake_install.cmake
+
