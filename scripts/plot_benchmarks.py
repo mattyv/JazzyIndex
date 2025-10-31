@@ -19,7 +19,7 @@ from typing import Dict, List, Tuple
 
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from matplotlib.ticker import FuncFormatter
+from matplotlib.ticker import FuncFormatter, LogLocator
 
 
 BenchmarkKey = Tuple[str, str, int, int]
@@ -153,10 +153,10 @@ def plot(grouped: Dict[str, Dict[str, Dict[int, List[Tuple[int, float]]]]], outp
         ax.set_title(distribution, fontsize=12, fontweight="bold")
         ax.set_xscale("log")
         ax.set_yscale("log")
-        ax.yaxis.set_major_formatter(FuncFormatter(lambda val, _: f"{val:.1f}"))
-        ax.yaxis.get_offset_text().set_visible(False)
+        ax.yaxis.set_major_locator(LogLocator(base=10.0, subs=(1.0, 2.0, 5.0), numticks=15))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda val, _: f"{int(val)}" if val >= 1 else f"{val:.1f}"))
         ax.grid(True, which="both", linestyle="--", linewidth=0.6, alpha=0.4)
-        ax.tick_params(which="both", labelsize=9)
+        ax.tick_params(which="both", labelsize=9, labelleft=True)
 
     # Axis labels for outer edges only
     for ax in axes[-1, :]:
@@ -195,13 +195,13 @@ def plot(grouped: Dict[str, Dict[str, Dict[int, List[Tuple[int, float]]]]], outp
     ]
 
     fig.suptitle("JazzyIndex Lookup Performance", fontsize=16, fontweight="bold")
-    fig.subplots_adjust(bottom=0.16, top=0.90)
+    fig.subplots_adjust(bottom=0.18, top=0.90)
     fig.legend(
         handles=segment_handles,
         labels=[handle.get_label() for handle in segment_handles],
         title="Segments",
         loc="upper center",
-        bbox_to_anchor=(0.5, 0.03),
+        bbox_to_anchor=(0.5, 0.04),
         ncol=len(segment_handles),
         fontsize=9,
         title_fontsize=10,
@@ -212,13 +212,13 @@ def plot(grouped: Dict[str, Dict[str, Dict[int, List[Tuple[int, float]]]]], outp
             labels=[handle.get_label() for handle in scenario_handles],
             title="Scenarios",
             loc="upper center",
-            bbox_to_anchor=(0.5, 0.08),
+            bbox_to_anchor=(0.5, 0.10),
             ncol=max(1, len(scenario_handles)),
             fontsize=9,
             title_fontsize=10,
         )
 
-    fig.tight_layout(rect=(0.02, 0.15, 0.98, 0.88))
+    fig.tight_layout(rect=(0.02, 0.18, 0.98, 0.88))
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output, dpi=150)
     plt.close(fig)
