@@ -1,0 +1,195 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: ${{ matrix.os }} - ${{ matrix.compiler }} - ${{ matrix.build_type }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        compiler: [gcc, clang]
+        build_type: [Debug, Release]
+        exclude:
+          # Exclude GCC on macOS (use Clang as default)
+          - os: macos-latest
+            compiler: gcc
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build lcov
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install cmake ninja lcov
+
+    - name: Set up compiler (GCC)
+      if: matrix.compiler == 'gcc' && runner.os == 'Linux'
+      run: |
+        echo "CC=gcc" >> $GITHUB_ENV
+        echo "CXX=g++" >> $GITHUB_ENV
+
+    - name: Set up compiler (Clang)
+      if: matrix.compiler == 'clang'
+      run: |
+        echo "CC=clang" >> $GITHUB_ENV
+        echo "CXX=clang++" >> $GITHUB_ENV
+
+    - name: Configure CMake
+      run: |
+        cmake -B build \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DBUILD_TESTS=ON \
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Build
+      run: cmake --build build --parallel
+
+    - name: Run legacy tests
+      working-directory: build
+      run: ./jazzy_index_tests_legacy
+
+    - name: Run Google Test suite
+      working-directory: build
+      run: ./jazzy_index_tests
+
+    - name: Run CTest
+      working-directory: build
+      run: ctest --output-on-failure --verbose
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build lcov
+
+    - name: Configure with coverage
+      run: |
+        cmake -B build_coverage \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=Coverage \
+          -DBUILD_TESTS=ON \
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Build with coverage
+      run: cmake --build build_coverage --parallel
+
+    - name: Run tests
+      working-directory: build_coverage
+      run: ctest --output-on-failure
+
+    - name: Generate coverage report
+      working-directory: build_coverage
+      run: |
+        lcov --capture --directory . --output-file coverage.info
+        lcov --remove coverage.info \
+          '/usr/*' \
+          '*/build_coverage/_deps/*' \
+          '*/tests/*' \
+          --output-file coverage_filtered.info
+        lcov --list coverage_filtered.info
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./build_coverage/coverage_filtered.info
+        fail_ci_if_error: false
+        verbose: true
+
+  sanitizers:
+    name: Sanitizers (${{ matrix.sanitizer }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [address, undefined, thread]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build
+
+    - name: Set up compiler with sanitizer
+      run: |
+        echo "CC=clang" >> $GITHUB_ENV
+        echo "CXX=clang++" >> $GITHUB_ENV
+
+    - name: Configure with ${{ matrix.sanitizer }} sanitizer
+      run: |
+        SANITIZER_FLAG="-fsanitize=${{ matrix.sanitizer }} -fno-omit-frame-pointer -g"
+        cmake -B build_sanitizer \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_CXX_FLAGS="${SANITIZER_FLAG}" \
+          -DCMAKE_EXE_LINKER_FLAGS="${SANITIZER_FLAG}" \
+          -DBUILD_TESTS=ON \
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Build with sanitizer
+      run: cmake --build build_sanitizer --parallel
+
+    - name: Run tests with ${{ matrix.sanitizer }} sanitizer
+      working-directory: build_sanitizer
+      run: ctest --output-on-failure
+
+  benchmarks:
+    name: Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build python3 python3-pip python3-venv
+
+    - name: Configure CMake
+      run: |
+        cmake -B build \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_TESTS=OFF \
+          -DBUILD_BENCHMARKS=ON
+
+    - name: Build benchmarks
+      run: cmake --build build --parallel
+
+    - name: Run benchmarks
+      working-directory: build
+      run: ./jazzy_index_benchmarks --benchmark_min_time=0.1s
+
+    - name: Archive benchmark results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results
+        path: build/jazzy_benchmarks.json
+        if-no-files-found: ignore

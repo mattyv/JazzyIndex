@@ -41,6 +41,16 @@ cmake --build build --target jazzy_index_benchmarks
 Benchmarks are organised by dataset type (uniform, exponential, etc.), segment count, and query
 pattern (found, miss, random).
 
+### Plotting Benchmarks
+
+If Python 3 is available, CMake exposes a `plot_benchmarks` target that
+creates a virtual environment, runs the benchmark suite with JSON output, and
+renders `jazzy_benchmarks.png` under the build directory:
+
+```bash
+cmake --build build --target plot_benchmarks
+```
+
 ## Project Layout
 
 ```
@@ -51,6 +61,9 @@ include/
 benchmarks/
   fixtures.hpp                  # Data builders shared across benchmarks
   benchmark_main.cpp            # Google Benchmark suite
+scripts/
+  plot_benchmarks.py            # Render benchmark performance graphs
+  requirements.txt              # Python dependencies for plotting
 tests/
   unit_tests.cpp                # Deterministic correctness checks
   property_tests.cpp            # RapidCheck property-based tests
