@@ -1,4 +1,4 @@
-my# Jazzy Index
+# Jazzy Index
 
 A fast, adaptive learned index for sorted arrays that predicts element positions instead of searching blindly.
 
