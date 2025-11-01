@@ -1,5 +1,15 @@
 # Jazzy Index
 
+[![CI Tests](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml)
+[![Code Coverage](https://codecov.io/gh/mattyv/JazzyIndex/branch/main/graph/badge.svg)](https://codecov.io/gh/mattyv/JazzyIndex)
+
+**Continuous Integration Status:**
+- **Linux**: GCC 11/12, Clang 14/15 (Debug & Release)
+- **Windows**: MSVC, MinGW GCC, Clang (Debug & Release)
+- **macOS**: Clang (Debug & Release)
+- **Sanitizers**: ASAN, UBSAN, TSAN on Linux | ASAN on Windows
+- **Coverage**: Code coverage tracking with detailed reports
+
 A fast, adaptive learned index for sorted arrays that predicts element positions instead of searching blindly.
 
 ## What's a Learned Index?
