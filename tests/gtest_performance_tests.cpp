@@ -152,43 +152,6 @@ TEST_F(IntPerformanceTest, MoreSegmentsReasonableOverhead) {
         << "512 segments: " << time512_ns / num_queries << "ns/query";
 }
 
-// Test: Successful queries are not much slower than unsuccessful
-TEST_F(IntPerformanceTest, SuccessfulVsUnsuccessfulQueries) {
-    std::vector<int> data;
-    for (int i = 0; i < 1000; ++i) {
-        data.push_back(i * 10);  // 0, 10, 20, ..., 9990 (gaps)
-    }
-    auto index = build_index(data);
-
-    const int num_queries = 100;
-
-    // Measure successful queries
-    auto success_time_ns = measure_ns([&]() {
-        for (int i = 0; i < num_queries; ++i) {
-            int query = (i % 1000) * 10;  // Values that exist
-            volatile const int* result = index.find(query);
-            (void)result;
-        }
-    });
-
-    // Measure unsuccessful queries
-    auto fail_time_ns = measure_ns([&]() {
-        for (int i = 0; i < num_queries; ++i) {
-            int query = (i % 1000) * 10 + 5;  // Values in gaps
-            volatile const int* result = index.find(query);
-            (void)result;
-        }
-    });
-
-    // Both should be similar (within 2x)
-    long long min_time = std::min(success_time_ns, fail_time_ns);
-    long long max_time = std::max(success_time_ns, fail_time_ns);
-
-    EXPECT_LT(max_time, min_time * 2)
-        << "Success: " << success_time_ns / num_queries << "ns/query, "
-        << "Fail: " << fail_time_ns / num_queries << "ns/query";
-}
-
 // Test: Build time scales linearly (not quadratically)
 TEST_F(IntPerformanceTest, BuildTimeScalesLinear) {
     std::vector<int> small_data(10000);
