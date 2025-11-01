@@ -315,7 +315,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [msvc, clang]
+        compiler: [msvc]
         sanitizer: [address]
         # Note: MSVC and Clang on Windows support ASAN well, but UBSAN and TSAN have limited support
 

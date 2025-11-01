@@ -57,6 +57,7 @@ if(BUILD_TESTS)
             set_property(TARGET ${_gtest_target} PROPERTY CXX_STANDARD_REQUIRED ON)
         endif()
     endforeach()
+    # Ensure our tests see the same compatibility defines when including gtest headers
 
     # Fetch RapidCheck for property-based testing
     FetchContent_Declare(
@@ -91,6 +92,9 @@ if(BUILD_TESTS)
         GTest::gtest_main
         rapidcheck
     )
+    target_compile_definitions(jazzy_index_tests PRIVATE ${_GTEST_COMPAT_DEFS})
+    set_property(TARGET jazzy_index_tests PROPERTY CXX_STANDARD 17)
+    set_property(TARGET jazzy_index_tests PROPERTY CXX_STANDARD_REQUIRED ON)
     target_include_directories(jazzy_index_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/tests
     )
