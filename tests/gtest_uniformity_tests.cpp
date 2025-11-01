@@ -13,8 +13,8 @@
 namespace {
 
 // Standalone helper for any segment size
-template <typename T, std::size_t Segments>
-bool is_found(const jazzy::JazzyIndex<T, Segments>& index,
+template <typename IndexType, typename T>
+bool is_found(const IndexType& index,
               const std::vector<T>& data, const T& value) {
     const T* result = index.find(value);
     return result != data.data() + data.size() && *result == value;
@@ -23,8 +23,8 @@ bool is_found(const jazzy::JazzyIndex<T, Segments>& index,
 template <typename T, std::size_t Segments = 256>
 class UniformityTest : public ::testing::Test {
 protected:
-    jazzy::JazzyIndex<T, Segments> build_index(const std::vector<T>& data) {
-        jazzy::JazzyIndex<T, Segments> index;
+    jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> build_index(const std::vector<T>& data) {
+        jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> index;
         index.build(data.data(), data.data() + data.size());
         return index;
     }
@@ -95,7 +95,7 @@ TEST_F(IntUniformityTest, NonUniformSkewedData) {
         data.push_back(1000 + i * 100);  // 1000, 1100, 1200, ..., 5900
     }
 
-    jazzy::JazzyIndex<int, 64> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // Should NOT be detected as uniform
@@ -134,7 +134,7 @@ TEST_F(IntUniformityTest, NonUniformExceedsTolerance) {
         data.push_back(1000 + i * 1000);
     }
 
-    jazzy::JazzyIndex<int, 32> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<32>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // Should definitely NOT be uniform
@@ -148,7 +148,7 @@ TEST_F(IntUniformityTest, SingleSegmentAlwaysUniform) {
     std::vector<int> data(100);
     std::iota(data.begin(), data.end(), 0);
 
-    jazzy::JazzyIndex<int, 1> index;  // Only 1 segment
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<1>()> index;  // Only 1 segment
     index.build(data.data(), data.data() + data.size());
 
     // Single segment is trivially uniform
@@ -161,7 +161,7 @@ TEST_F(IntUniformityTest, TwoSegmentsUniform) {
     std::vector<int> data(100);
     std::iota(data.begin(), data.end(), 0);
 
-    jazzy::JazzyIndex<int, 2> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>()> index;
     index.build(data.data(), data.data() + data.size());
 
     EXPECT_TRUE(is_found(index.find(25), data, 25));
@@ -233,7 +233,7 @@ TEST_F(IntUniformityTest, PiecewiseUniform) {
         data.push_back(200 + i);
     }
 
-    jazzy::JazzyIndex<int, 64> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // Might or might not be detected as uniform overall
@@ -297,7 +297,7 @@ TEST_F(IntUniformityTest, ManySegmentsUniformData) {
     std::vector<int> data(1000);
     std::iota(data.begin(), data.end(), 0);
 
-    jazzy::JazzyIndex<int, 512> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<512>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // Even with many segments, should detect uniformity

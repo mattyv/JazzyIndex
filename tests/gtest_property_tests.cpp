@@ -12,7 +12,7 @@
 #include <vector>
 
 using value_type = std::uint64_t;
-using qi_index = jazzy::JazzyIndex<value_type, 256>;
+using qi_index = jazzy::JazzyIndex<value_type, jazzy::to_segment_count<256>()>;
 
 // Property: All inserted values can be found
 TEST(PropertyTests, FindsAllInsertedIntegers) {

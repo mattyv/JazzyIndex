@@ -14,8 +14,8 @@
 namespace {
 
 // Standalone helper for any segment size
-template <typename T, std::size_t Segments>
-bool is_found(const jazzy::JazzyIndex<T, Segments>& index,
+template <typename IndexType, typename T>
+bool is_found(const IndexType& index,
               const std::vector<T>& data, const T& value) {
     const T* result = index.find(value);
     return result != data.data() + data.size() && *result == value;
@@ -24,8 +24,8 @@ bool is_found(const jazzy::JazzyIndex<T, Segments>& index,
 template <typename T, std::size_t Segments = 256>
 class ErrorRecoveryTest : public ::testing::Test {
 protected:
-    jazzy::JazzyIndex<T, Segments> build_index(const std::vector<T>& data) {
-        jazzy::JazzyIndex<T, Segments> index;
+    jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> build_index(const std::vector<T>& data) {
+        jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> index;
         index.build(data.data(), data.data() + data.size());
         return index;
     }
@@ -75,7 +75,7 @@ TEST_F(IntErrorRecoveryTest, SteppedDataWithJumps) {
         data.push_back(10000 + i);
     }
 
-    jazzy::JazzyIndex<int, 64> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // Test values from each region
@@ -107,7 +107,7 @@ TEST_F(IntErrorRecoveryTest, ClusteredDataWithGaps) {
         data.push_back(i);
     }
 
-    jazzy::JazzyIndex<int, 32> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<32>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // All values in clusters should be findable
@@ -185,7 +185,7 @@ TEST_F(IntErrorRecoveryTest, SparseDataManySegments) {
     }
 
     // Use many segments for sparse data
-    jazzy::JazzyIndex<int, 512> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<512>()> index;
     index.build(data.data(), data.data() + data.size());
 
     for (int val : data) {
@@ -219,7 +219,7 @@ TEST_F(IntErrorRecoveryTest, ValuesAtSegmentBoundaries) {
     std::vector<int> data(256);
     std::iota(data.begin(), data.end(), 0);
 
-    jazzy::JazzyIndex<int, 256> index;  // 1 element per segment
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<256>()> index;  // 1 element per segment
     index.build(data.data(), data.data() + data.size());
 
     // Every value is at a boundary
@@ -245,7 +245,7 @@ TEST_F(IntErrorRecoveryTest, InversePredictions) {
     }
 
     std::sort(data.begin(), data.end());
-    jazzy::JazzyIndex<int, 16> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<16>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // Despite counter-intuitive distribution, all should be found
@@ -269,7 +269,7 @@ TEST_F(IntErrorRecoveryTest, LargeErrorRequiringWideSearch) {
         data.push_back(10000 + i);
     }
 
-    jazzy::JazzyIndex<int, 16> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<16>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // The high values will have poor predictions
@@ -287,7 +287,7 @@ TEST_F(IntErrorRecoveryTest, DuplicateHeavyData) {
         data.push_back(3);
     }
 
-    jazzy::JazzyIndex<int, 64> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>()> index;
     index.build(data.data(), data.data() + data.size());
 
     EXPECT_TRUE(is_found(index.find(1), data, 1));
@@ -305,7 +305,7 @@ TEST_F(IntErrorRecoveryTest, MaxErrorBoundSegment) {
         data[i] = i * i / 100;
     }
 
-    jazzy::JazzyIndex<int, 32> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<32>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // All should still be found via exponential search

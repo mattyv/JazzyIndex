@@ -24,19 +24,37 @@ enum class ModelType : uint8_t {
     DIRECT       // Tiny dense segments: array lookup
 };
 
+// Model selection and search tuning constants
+inline constexpr std::size_t MAX_ACCEPTABLE_LINEAR_ERROR = 8;
+// Linear models with error ≤8 are accepted immediately.
+// Keeps exponential search efficient (~3 iterations: radius 2,4,8)
+
+inline constexpr double QUADRATIC_IMPROVEMENT_THRESHOLD = 0.7;
+// Quadratic must be 30% better than linear (0.7 = 70% of linear error)
+
+inline constexpr std::size_t SEARCH_RADIUS_MARGIN = 2;
+// Extra margin added to max_error for exponential search bounds
+
+inline constexpr std::size_t MIN_SEARCH_RADIUS = 4;
+// Minimum radius for exponential search to ensure reasonable coverage
+
+inline constexpr std::size_t INITIAL_SEARCH_RADIUS = 2;
+// Starting radius for exponential search (doubles each iteration: 2,4,8,16...)
+
+inline constexpr double UNIFORMITY_TOLERANCE = 0.30;
+// Allow 30% deviation in segment spacing for uniformity detection
+
 // Segment descriptor with optimal model
 template <typename T>
 struct alignas(64) Segment {  // Cache line aligned
+    // Hot path: segment finding and prediction (grouped for cache locality)
     T min_val;
     T max_val;
-    std::size_t start_idx;
-    std::size_t end_idx;
     ModelType model_type;
     uint8_t max_error;
-    uint8_t padding[2];  // Alignment
 
-    // Model parameters
-    union {
+    // Model parameters (hot path for predict())
+    alignas(8) union {
         struct {
             double slope;
             double intercept;
@@ -50,6 +68,10 @@ struct alignas(64) Segment {  // Cache line aligned
             std::size_t constant_idx;
         } constant;
     } params;
+
+    // Warm path: clamping and bounds
+    std::size_t start_idx;
+    std::size_t end_idx;
 
     [[nodiscard]] std::size_t predict(T value) const noexcept {
         switch (model_type) {
@@ -92,31 +114,23 @@ template <typename T>
                                                    std::size_t end) noexcept {
     SegmentAnalysis<T> result{};
 
-    if (end <= start) {
+    auto make_constant = [&result, start]() {
         result.best_model = ModelType::CONSTANT;
         result.linear_b = static_cast<double>(start);
         result.max_error = 0;
         return result;
-    }
+    };
+
+    if (end <= start) 
+        return make_constant();
 
     const std::size_t n = end - start;
 
     // Check if all values are identical
-    const T first_val = data[start];
-    bool all_same = true;
-    for (std::size_t i = start + 1; i < end; ++i) {
-        if (data[i] != first_val) {
-            all_same = false;
-            break;
-        }
-    }
+    const bool all_same = (std::adjacent_find(data + start, data + end, std::not_equal_to<T>{}) == data + end);
 
-    if (all_same) {
-        result.best_model = ModelType::CONSTANT;
-        result.linear_b = static_cast<double>(start);
-        result.max_error = 0;
-        return result;
-    }
+    if (all_same) 
+        return make_constant();
 
     // Fit linear model
     const double min_val = static_cast<double>(data[start]);
@@ -124,10 +138,7 @@ template <typename T>
     const double value_range = max_val - min_val;
 
     if (value_range < std::numeric_limits<double>::epsilon()) {
-        result.best_model = ModelType::CONSTANT;
-        result.linear_b = static_cast<double>(start);
-        result.max_error = 0;
-        return result;
+        return make_constant();
     }
 
     // Linear model: index = slope * value + intercept
@@ -139,21 +150,19 @@ template <typename T>
 
     // Measure linear error
     std::size_t linear_max_error = 0;
-    std::uint64_t linear_total_error = 0;
+    double linear_total_error = 0.0;
 
     for (std::size_t i = start; i < end; ++i) {
         const double pred_double = std::fma(static_cast<double>(data[i]), slope, intercept);
-        const std::size_t predicted = static_cast<std::size_t>(pred_double);
-        const std::size_t actual = i;
-        const std::size_t error = predicted > actual ? predicted - actual : actual - predicted;
-        linear_max_error = std::max(linear_max_error, error);
+        const double error = std::abs(pred_double - static_cast<double>(i));
+        linear_max_error = std::max(linear_max_error, static_cast<std::size_t>(std::ceil(error)));
         linear_total_error += error;
     }
 
-    const double linear_mean_error = static_cast<double>(linear_total_error) / static_cast<double>(n);
+    const double linear_mean_error = linear_total_error / static_cast<double>(n);
 
     // If linear is good enough, use it
-    if (linear_max_error <= 8) {
+    if (linear_max_error <= MAX_ACCEPTABLE_LINEAR_ERROR) {
         result.best_model = ModelType::LINEAR;
         result.max_error = linear_max_error;
         result.mean_error = linear_mean_error;
@@ -201,22 +210,20 @@ template <typename T>
 
         // Measure quadratic error
         std::size_t quad_max_error = 0;
-        std::uint64_t quad_total_error = 0;
+        double quad_total_error = 0.0;
 
         for (std::size_t i = start; i < end; ++i) {
             const double x = static_cast<double>(data[i]);
             const double pred_double = std::fma(x, std::fma(x, a, b), c);
-            const std::size_t predicted = static_cast<std::size_t>(pred_double);
-            const std::size_t actual = i;
-            const std::size_t error = predicted > actual ? predicted - actual : actual - predicted;
-            quad_max_error = std::max(quad_max_error, error);
+            const double error = std::abs(pred_double - static_cast<double>(i));
+            quad_max_error = std::max(quad_max_error, static_cast<std::size_t>(std::ceil(error)));
             quad_total_error += error;
         }
 
-        const double quad_mean_error = static_cast<double>(quad_total_error) / n_double;
+        const double quad_mean_error = quad_total_error / n_double;
 
         // Choose quadratic if it's significantly better
-        if (quad_max_error < linear_max_error * 0.7) {
+        if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
             result.best_model = ModelType::QUADRATIC;
             result.quad_a = a;
             result.quad_b = b;
@@ -236,8 +243,27 @@ template <typename T>
 
 }  // namespace detail
 
-template <typename T, std::size_t NumSegments = 256, typename Compare = std::less<>>
+// Recommended segment count presets
+enum class SegmentCount : std::size_t {
+    TINY = 32,       // Very small datasets or minimal memory footprint
+    SMALL = 64,      // Small datasets (thousands of elements)
+    MEDIUM = 128,    // Medium datasets
+    LARGE = 256,     // Default: good balance for most use cases
+    XLARGE = 512,    // Large datasets with complex distributions
+    XXLARGE = 1024,  // Very large datasets requiring high precision
+    MAX = 2048       // Maximum precision for huge datasets
+};
+
+// Helper to convert std::size_t to SegmentCount for generic code
+template <std::size_t N>
+inline constexpr SegmentCount to_segment_count() {
+    return static_cast<SegmentCount>(N);
+}
+
+template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>>
 class JazzyIndex {
+    static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+
     static_assert(detail::is_strictly_arithmetic_v<T>,
                   "JazzyIndex expects arithmetic value types.");
     static_assert(NumSegments > 0 && NumSegments <= 4096,
@@ -343,43 +369,70 @@ public:
         const T* begin = base_;
 
         // Check predicted position first
-        if (predicted < size_ && equal(begin[predicted], key)) {
+        if (equal(begin[predicted], key)) {
             return begin + predicted;
         }
 
-        // Exponential search outward from prediction
-        const std::size_t max_radius = std::max<std::size_t>(seg->max_error + 2, 4);
+        // Determine search direction using one comparison
+        const bool search_left = comp_(key, begin[predicted]);
+        const std::size_t max_radius = std::max<std::size_t>(seg->max_error + detail::SEARCH_RADIUS_MARGIN, detail::MIN_SEARCH_RADIUS);
 
-        // Check immediate neighbors
-        if (predicted + 1 < seg->end_idx && equal(begin[predicted + 1], key)) {
-            return begin + predicted + 1;
-        }
-        if (predicted > seg->start_idx && equal(begin[predicted - 1], key)) {
-            return begin + predicted - 1;
-        }
+        if (search_left) {
+            // Key is less than predicted value, search leftward
+            // Track the rightmost position we've searched to avoid overlaps
+            std::size_t right_boundary = predicted;  // We've checked predicted, don't search it again
 
-        // Exponentially expand search radius: 2, 4, 8, 16...
-        for (std::size_t radius = 2; radius <= max_radius; radius <<= 1) {
-            const std::size_t left = predicted > radius ? predicted - radius : seg->start_idx;
-            const std::size_t right = std::min<std::size_t>(predicted + radius + 1, seg->end_idx);
+            // Exponentially expand leftward: check radii 1, 2, 4, 8...
+            for (std::size_t radius = 1; radius <= max_radius; radius <<= 1) {
+                const std::size_t left_pos = predicted > radius ? predicted - radius : seg->start_idx;
 
-            // Binary search in this range
-            const T* left_ptr = begin + left;
-            const T* right_ptr = begin + right;
-            const T* found = std::lower_bound(left_ptr, right_ptr, key, comp_);
+                // If left_pos >= right_boundary, no unexplored region remains
+                if (left_pos >= right_boundary) break;
 
-            if (found != right_ptr && equal(*found, key)) {
-                return found;
+                // Search the new range [left_pos, right_boundary)
+                const T* found = std::lower_bound(begin + left_pos, begin + right_boundary, key, comp_);
+                if (found != begin + right_boundary && equal(*found, key)) {
+                    return found;
+                }
+
+                right_boundary = left_pos;  // Update boundary for next iteration
             }
-        }
 
-        // Fallback: search entire segment
-        const T* seg_begin = begin + seg->start_idx;
-        const T* seg_end = begin + seg->end_idx;
-        const T* fallback = std::lower_bound(seg_begin, seg_end, key, comp_);
+            // Fallback: search any remaining unsearched left region
+            if (right_boundary > seg->start_idx) {
+                const T* found = std::lower_bound(begin + seg->start_idx, begin + right_boundary, key, comp_);
+                if (found != begin + right_boundary && equal(*found, key)) {
+                    return found;
+                }
+            }
+        } else {
+            // Key is greater than predicted value, search rightward
+            // Track the leftmost position we've searched to avoid overlaps
+            std::size_t left_boundary = predicted + 1;  // We've checked predicted, start after it
 
-        if (fallback != seg_end && equal(*fallback, key)) {
-            return fallback;
+            // Exponentially expand rightward: check radii 1, 2, 4, 8...
+            for (std::size_t radius = 1; radius <= max_radius; radius <<= 1) {
+                const std::size_t right_pos = std::min<std::size_t>(predicted + radius + 1, seg->end_idx);
+
+                // If right_pos <= left_boundary, no unexplored region remains
+                if (right_pos <= left_boundary) break;
+
+                // Search the new range [left_boundary, right_pos)
+                const T* found = std::lower_bound(begin + left_boundary, begin + right_pos, key, comp_);
+                if (found != begin + right_pos && equal(*found, key)) {
+                    return found;
+                }
+
+                left_boundary = right_pos;  // Update boundary for next iteration
+            }
+
+            // Fallback: search any remaining unsearched right region
+            if (left_boundary < seg->end_idx) {
+                const T* found = std::lower_bound(begin + left_boundary, begin + seg->end_idx, key, comp_);
+                if (found != begin + seg->end_idx && equal(*found, key)) {
+                    return found;
+                }
+            }
         }
 
         return base_ + size_;
@@ -406,7 +459,7 @@ private:
         const double expected_spacing = total_range / static_cast<double>(num_segments_);
 
         // Allow 30% deviation for uniformity detection
-        const double tolerance = expected_spacing * 0.30;
+        const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
 
         for (std::size_t i = 0; i < num_segments_; ++i) {
             const double segment_range = static_cast<double>(segments_[i].max_val) -

@@ -14,8 +14,8 @@
 namespace {
 
 // Standalone helper functions that work with any segment size
-template <typename T, std::size_t Segments>
-bool expect_found(const jazzy::JazzyIndex<T, Segments>& index,
+template <typename IndexType, typename T>
+bool expect_found(const IndexType& index,
                   const std::vector<T>& data,
                   const T& value) {
     const T* result = index.find(value);
@@ -25,8 +25,8 @@ bool expect_found(const jazzy::JazzyIndex<T, Segments>& index,
     return *result == value;
 }
 
-template <typename T, std::size_t Segments>
-bool expect_missing(const jazzy::JazzyIndex<T, Segments>& index,
+template <typename IndexType, typename T>
+bool expect_missing(const IndexType& index,
                     const std::vector<T>& data,
                     const T& value) {
     const T* result = index.find(value);
@@ -37,8 +37,8 @@ bool expect_missing(const jazzy::JazzyIndex<T, Segments>& index,
 template <typename T, std::size_t Segments = 256>
 class JazzyIndexTest : public ::testing::Test {
 protected:
-    jazzy::JazzyIndex<T, Segments> build_index(const std::vector<T>& data) {
-        jazzy::JazzyIndex<T, Segments> index;
+    jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> build_index(const std::vector<T>& data) {
+        jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> index;
         index.build(data.data(), data.data() + data.size());
         return index;
     }
@@ -91,7 +91,7 @@ TEST_F(IntIndex, UniformSequenceLookups) {
 // Test: Duplicate values
 TEST_F(IntIndex, DuplicateValues) {
     std::vector<int> data{1, 1, 1, 2, 2, 5, 5, 9};
-    jazzy::JazzyIndex<int, 128> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<128>()> index;
     index.build(data.data(), data.data() + data.size());
 
     EXPECT_TRUE(expect_found(index, data, 1));
@@ -132,7 +132,7 @@ protected:
         std::vector<int> data(1000);
         std::iota(data.begin(), data.end(), 0);
 
-        jazzy::JazzyIndex<int, Segments> index;
+        jazzy::JazzyIndex<int, jazzy::to_segment_count<Segments>()> index;
         index.build(data.data(), data.data() + data.size());
 
         // Test various lookups
@@ -203,7 +203,7 @@ TEST_F(IntIndex, RebuildIndex) {
     std::vector<int> data1{1, 2, 3, 4, 5};
     std::vector<int> data2{10, 20, 30, 40, 50};
 
-    jazzy::JazzyIndex<int, 256> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<256>()> index;
 
     // Build with first dataset
     index.build(data1.data(), data1.data() + data1.size());
