@@ -2,11 +2,14 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <functional>
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <string>
+#include <type_traits>
+#include <utility>
 #include <vector>
 #include <sys/stat.h>
 
@@ -14,6 +17,17 @@
 #include "jazzy_index_export.hpp"
 
 namespace {
+
+template <typename F, std::size_t... Segments>
+void for_each_segment_count_impl(F&& f, std::integer_sequence<std::size_t, Segments...>) {
+    (f(std::integral_constant<std::size_t, Segments>{}), ...);
+}
+
+template <typename F>
+void for_each_segment_count(F&& f) {
+    for_each_segment_count_impl(std::forward<F>(f),
+                                std::integer_sequence<std::size_t, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512>{});
+}
 
 // Baseline: std::lower_bound benchmarks for comparison
 
@@ -139,16 +153,19 @@ void register_build_suites() {
 
     for (const std::size_t size : sizes) {
         auto uniform_data = qi::bench::make_uniform_values(size);
-        register_build_benchmark<64>(size, "Uniform", uniform_data);
-        register_build_benchmark<128>(size, "Uniform", uniform_data);
-        register_build_benchmark<256>(size, "Uniform", uniform_data);
-        register_build_benchmark<512>(size, "Uniform", uniform_data);
+        for_each_segment_count([&](auto seg_tag) {
+            register_build_benchmark<decltype(seg_tag)::value>(size, "Uniform", uniform_data);
+        });
 
         auto exp_data = qi::bench::make_exponential_values(size);
-        register_build_benchmark<256>(size, "Exponential", exp_data);
+        for_each_segment_count([&](auto seg_tag) {
+            register_build_benchmark<decltype(seg_tag)::value>(size, "Exponential", exp_data);
+        });
 
         auto zipf_data = qi::bench::make_zipf_values(size);
-        register_build_benchmark<256>(size, "Zipf", zipf_data);
+        for_each_segment_count([&](auto seg_tag) {
+            register_build_benchmark<decltype(seg_tag)::value>(size, "Zipf", zipf_data);
+        });
     }
 }
 
@@ -242,10 +259,9 @@ void register_uniform_suites() {
     const std::vector<std::size_t> sizes = {100, 1'000, 10'000, 100'000, 1'000'000};
 
     for (const std::size_t size : sizes) {
-        register_uniform_suite<64>(size);
-        register_uniform_suite<128>(size);
-        register_uniform_suite<256>(size);
-        register_uniform_suite<512>(size);
+        for_each_segment_count([size](auto seg_tag) {
+            register_uniform_suite<decltype(seg_tag)::value>(size);
+        });
     }
 }
 
@@ -253,30 +269,14 @@ void register_distribution_suites() {
     const std::vector<std::size_t> sizes = {100, 10'000, 100'000, 1'000'000};
 
     for (const std::size_t size : sizes) {
-        register_distribution_suite<64>("Exponential", qi::bench::make_exponential_values, size);
-        register_distribution_suite<128>("Exponential", qi::bench::make_exponential_values, size);
-        register_distribution_suite<256>("Exponential", qi::bench::make_exponential_values, size);
-        register_distribution_suite<512>("Exponential", qi::bench::make_exponential_values, size);
-
-        register_distribution_suite<64>("Clustered", qi::bench::make_clustered_values, size);
-        register_distribution_suite<128>("Clustered", qi::bench::make_clustered_values, size);
-        register_distribution_suite<256>("Clustered", qi::bench::make_clustered_values, size);
-        register_distribution_suite<512>("Clustered", qi::bench::make_clustered_values, size);
-
-        register_distribution_suite<64>("Lognormal", qi::bench::make_lognormal_values, size);
-        register_distribution_suite<128>("Lognormal", qi::bench::make_lognormal_values, size);
-        register_distribution_suite<256>("Lognormal", qi::bench::make_lognormal_values, size);
-        register_distribution_suite<512>("Lognormal", qi::bench::make_lognormal_values, size);
-
-        register_distribution_suite<64>("Zipf", qi::bench::make_zipf_values, size);
-        register_distribution_suite<128>("Zipf", qi::bench::make_zipf_values, size);
-        register_distribution_suite<256>("Zipf", qi::bench::make_zipf_values, size);
-        register_distribution_suite<512>("Zipf", qi::bench::make_zipf_values, size);
-
-        register_distribution_suite<64>("Mixed", qi::bench::make_mixed_values, size);
-        register_distribution_suite<128>("Mixed", qi::bench::make_mixed_values, size);
-        register_distribution_suite<256>("Mixed", qi::bench::make_mixed_values, size);
-        register_distribution_suite<512>("Mixed", qi::bench::make_mixed_values, size);
+        for_each_segment_count([size](auto seg_tag) {
+            constexpr std::size_t Segments = decltype(seg_tag)::value;
+            register_distribution_suite<Segments>("Exponential", qi::bench::make_exponential_values, size);
+            register_distribution_suite<Segments>("Clustered", qi::bench::make_clustered_values, size);
+            register_distribution_suite<Segments>("Lognormal", qi::bench::make_lognormal_values, size);
+            register_distribution_suite<Segments>("Zipf", qi::bench::make_zipf_values, size);
+            register_distribution_suite<Segments>("Mixed", qi::bench::make_mixed_values, size);
+        });
     }
 }
 
@@ -296,6 +296,12 @@ bool ensure_directory_exists(const std::string& path) {
     return false;
 }
 
+template <std::size_t Segments>
+std::string export_metadata_for_segments(const std::vector<std::uint64_t>& data) {
+    auto index = qi::bench::make_index<Segments>(data);
+    return jazzy::export_index_metadata(index);
+}
+
 // Export visualization data for various index configurations
 void export_visualization_data(const std::string& output_dir) {
     std::cout << "Exporting index visualization data to " << output_dir << "..." << std::endl;
@@ -307,7 +313,7 @@ void export_visualization_data(const std::string& output_dir) {
 
     // Configuration: which distributions, sizes, and segment counts to visualize
     const std::vector<std::size_t> viz_sizes = {100, 1'000, 10'000};
-    const std::vector<std::size_t> viz_segments = {64, 128, 256, 512};
+    const std::vector<std::size_t> viz_segments = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512};
 
     struct Distribution {
         std::string name;
@@ -325,6 +331,7 @@ void export_visualization_data(const std::string& output_dir) {
     distributions.emplace_back("Zipf", [](std::size_t size) { return qi::bench::make_zipf_values(size); });
     distributions.emplace_back("Mixed", [](std::size_t size) { return qi::bench::make_mixed_values(size); });
     distributions.emplace_back("Quadratic", [](std::size_t size) { return qi::bench::make_quadratic_values(size); });
+    distributions.emplace_back("ExtremePoly", [](std::size_t size) { return qi::bench::make_extreme_polynomial_values(size); });
 
     int total_exports = 0;
     int failed_exports = 0;
@@ -340,20 +347,45 @@ void export_visualization_data(const std::string& output_dir) {
             for (const std::size_t segments : viz_segments) {
                 // Build index and export metadata
                 std::string json_data;
+                bool supported = true;
 
-                if (segments == 64) {
-                    auto index = qi::bench::make_index<64>(data);
-                    json_data = jazzy::export_index_metadata(index);
-                } else if (segments == 128) {
-                    auto index = qi::bench::make_index<128>(data);
-                    json_data = jazzy::export_index_metadata(index);
-                } else if (segments == 256) {
-                    auto index = qi::bench::make_index<256>(data);
-                    json_data = jazzy::export_index_metadata(index);
-                } else if (segments == 512) {
-                    auto index = qi::bench::make_index<512>(data);
-                    json_data = jazzy::export_index_metadata(index);
-                } else {
+                switch (segments) {
+                    case 1:
+                        json_data = export_metadata_for_segments<1>(data);
+                        break;
+                    case 2:
+                        json_data = export_metadata_for_segments<2>(data);
+                        break;
+                    case 4:
+                        json_data = export_metadata_for_segments<4>(data);
+                        break;
+                    case 8:
+                        json_data = export_metadata_for_segments<8>(data);
+                        break;
+                    case 16:
+                        json_data = export_metadata_for_segments<16>(data);
+                        break;
+                    case 32:
+                        json_data = export_metadata_for_segments<32>(data);
+                        break;
+                    case 64:
+                        json_data = export_metadata_for_segments<64>(data);
+                        break;
+                    case 128:
+                        json_data = export_metadata_for_segments<128>(data);
+                        break;
+                    case 256:
+                        json_data = export_metadata_for_segments<256>(data);
+                        break;
+                    case 512:
+                        json_data = export_metadata_for_segments<512>(data);
+                        break;
+                    default:
+                        supported = false;
+                        break;
+                }
+
+                if (!supported) {
                     continue;
                 }
 

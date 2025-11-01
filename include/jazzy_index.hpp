@@ -245,6 +245,11 @@ template <typename T>
 
 // Recommended segment count presets
 enum class SegmentCount : std::size_t {
+    SINGLE = 1,      // No segmentation: full dataset in one segment
+    MINIMAL = 2,     // Binary split: extreme coarse indexing
+    PICO = 4,        // Debugging tiny datasets; almost no segmentation
+    NANO = 8,        // Extremely small datasets; coarse segmentation
+    MICRO = 16,      // Minimal segmentation for testing larger segment sizes
     TINY = 32,       // Very small datasets or minimal memory footprint
     SMALL = 64,      // Small datasets (thousands of elements)
     MEDIUM = 128,    // Medium datasets

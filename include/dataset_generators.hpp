@@ -223,4 +223,32 @@ inline std::vector<std::uint64_t> generate_quadratic(std::size_t size,
     return result;
 }
 
+inline std::vector<std::uint64_t> generate_extreme_polynomial(std::size_t size,
+                                                                unsigned seed,
+                                                                std::uint64_t min_value,
+                                                                std::uint64_t max_value) {
+    if (size == 0) {
+        return {};
+    }
+
+    std::vector<std::uint64_t> result;
+    result.reserve(size);
+
+    // Generate extreme polynomial: x^5 creates very sharp curvature
+    // This should force quadratic models in curved regions
+    const std::uint64_t range = max_value - min_value;
+    const double size_d = static_cast<double>(size);
+
+    for (std::size_t i = 0; i < size; ++i) {
+        // Normalize to [0, 1]
+        const double t = static_cast<double>(i) / (size_d - 1.0);
+        // Apply x^5 for extreme curvature - very slow start, explosive end
+        const double normalized = std::pow(t, 5.0);
+        const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
+        result.push_back(std::min(value, max_value));
+    }
+
+    return result;
+}
+
 }  // namespace dataset
