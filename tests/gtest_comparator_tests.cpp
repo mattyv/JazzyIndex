@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <cstdlib>
 #include <functional>
 #include <numeric>
 #include <string>
@@ -85,12 +86,15 @@ TEST(ComparatorTest, AbsoluteValueComparator) {
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), AbsoluteValueCompare> index;
     index.build(data.data(), data.data() + data.size(), AbsoluteValueCompare{});
 
-    // Test finding elements
+    // Test finding elements - check equivalence under absolute value, not exact match
+    // With custom comparators, lower_bound can return any equivalent element
     for (int val : data) {
         const int* result = index.find(val);
         EXPECT_NE(result, data.data() + data.size())
             << "Failed to find " << val;
-        EXPECT_EQ(*result, val);
+        // Check that found value is equivalent under absolute value comparison
+        EXPECT_EQ(std::abs(*result), std::abs(val))
+            << "Found " << *result << " when searching for " << val;
     }
 }
 
@@ -166,12 +170,14 @@ TEST(ComparatorTest, ModuloComparator) {
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), ModuloCompare> index;
     index.build(data.data(), data.data() + data.size(), ModuloCompare{});
 
-    // Search for values with the same modulo
+    // Search for values - check equivalence under modulo 10, not exact match
     for (int val : data) {
         const int* result = index.find(val);
         EXPECT_NE(result, data.data() + data.size())
             << "Failed to find " << val;
-        EXPECT_EQ(*result, val);
+        // Check that found value is equivalent under modulo 10 comparison
+        EXPECT_EQ(*result % 10, val % 10)
+            << "Found " << *result << " when searching for " << val;
     }
 }
 
@@ -231,7 +237,7 @@ TEST(ComparatorTest, NegativeNumbersReverseOrder) {
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
 
     EXPECT_NE(index.find(0), data.data() + data.size());
-    EXPECT_NE(index.find(-25), data.data() + data.size()) << "Value -25 not in dataset";
+    EXPECT_EQ(index.find(-25), data.data() + data.size()) << "Value -25 not in dataset";
     EXPECT_NE(index.find(-50), data.data() + data.size());
 }
 

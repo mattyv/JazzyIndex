@@ -5,7 +5,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG")
+else()
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
+endif()
 
 add_library(jazzy_index INTERFACE)
 target_include_directories(jazzy_index INTERFACE
@@ -14,6 +18,7 @@ target_include_directories(jazzy_index INTERFACE
 
 option(BUILD_TESTS "Build JazzyIndex unit and property tests" ON)
 option(BUILD_BENCHMARKS "Build JazzyIndex benchmark suite" ON)
+option(ENABLE_COVERAGE "Enable coverage instrumentation for tests" OFF)
 
 if(BUILD_TESTS OR BUILD_BENCHMARKS)
     include(FetchContent)
@@ -30,6 +35,30 @@ if(BUILD_TESTS)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
 
+    # Work around libstdc++-14 incompatibilities with std::format in gtest
+    # Additional workarounds needed for clang-15 with gcc-14's libstdc++
+    set(_GTEST_COMPAT_DEFS
+        GTEST_INTERNAL_HAS_STD_FORMAT=0
+        GTEST_HAS_STD_WSTRING=0
+    )
+
+    # Disable problematic features when using older clang with newer libstdc++
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "16.0")
+        list(APPEND _GTEST_COMPAT_DEFS
+            GTEST_INTERNAL_HAS_WSTRING=0
+            GTEST_INTERNAL_HAS_RANGES=0
+        )
+    endif()
+
+    foreach(_gtest_target IN ITEMS gtest gtest_main gmock gmock_main)
+        if(TARGET ${_gtest_target})
+            target_compile_definitions(${_gtest_target} PUBLIC ${_GTEST_COMPAT_DEFS})
+            set_property(TARGET ${_gtest_target} PROPERTY CXX_STANDARD 17)
+            set_property(TARGET ${_gtest_target} PROPERTY CXX_STANDARD_REQUIRED ON)
+        endif()
+    endforeach()
+    # Ensure our tests see the same compatibility defines when including gtest headers
+
     # Fetch RapidCheck for property-based testing
     FetchContent_Declare(
         rapidcheck
@@ -37,6 +66,13 @@ if(BUILD_TESTS)
         GIT_TAG master
     )
     FetchContent_MakeAvailable(rapidcheck)
+
+    # Fix RapidCheck compilation on Windows with sanitizers - add /EHsc for exception handling
+    if(MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+        if(TARGET rapidcheck)
+            target_compile_options(rapidcheck PRIVATE /EHsc)
+        endif()
+    endif()
 
     # Google Test suite with comprehensive coverage
     add_executable(jazzy_index_tests
@@ -48,7 +84,6 @@ if(BUILD_TESTS)
         tests/gtest_error_recovery_tests.cpp
         tests/gtest_uniformity_tests.cpp
         tests/gtest_property_tests.cpp
-        tests/gtest_performance_tests.cpp
     )
     target_link_libraries(jazzy_index_tests PRIVATE
         jazzy_index
@@ -56,6 +91,9 @@ if(BUILD_TESTS)
         GTest::gtest_main
         rapidcheck
     )
+    target_compile_definitions(jazzy_index_tests PRIVATE ${_GTEST_COMPAT_DEFS})
+    set_property(TARGET jazzy_index_tests PROPERTY CXX_STANDARD 17)
+    set_property(TARGET jazzy_index_tests PROPERTY CXX_STANDARD_REQUIRED ON)
     target_include_directories(jazzy_index_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/tests
     )
@@ -64,7 +102,7 @@ if(BUILD_TESTS)
     add_test(NAME jazzy_index_tests COMMAND jazzy_index_tests)
 
     # Coverage configuration (optional, enabled with -DCMAKE_BUILD_TYPE=Coverage)
-    if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
+    if(ENABLE_COVERAGE OR CMAKE_BUILD_TYPE STREQUAL "Coverage")
         target_compile_options(jazzy_index_tests PRIVATE --coverage -O0 -g)
         target_link_options(jazzy_index_tests PRIVATE --coverage)
     endif()

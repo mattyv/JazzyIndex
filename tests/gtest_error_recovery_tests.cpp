@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <cmath>
 #include <numeric>
 #include <vector>
@@ -197,10 +198,10 @@ TEST_F(IntErrorRecoveryTest, SparseDataManySegments) {
 TEST_F(IntErrorRecoveryTest, RandomLikeData) {
     // Deterministic "random" pattern
     std::vector<int> data;
-    int seed = 12345;
+    std::uint64_t rng = 12345u;
     for (int i = 0; i < 200; ++i) {
-        seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-        data.push_back(seed % 10000);
+        rng = (rng * 1103515245u + 12345u) & 0x7fffffffULL;
+        data.push_back(static_cast<int>(rng % 10000u));
     }
     std::sort(data.begin(), data.end());
     data.erase(std::unique(data.begin(), data.end()), data.end());

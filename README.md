@@ -1,5 +1,32 @@
 # Jazzy Index
 
+[![CI Tests](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml)
+[![Code Coverage](https://codecov.io/gh/mattyv/JazzyIndex/branch/main/graph/badge.svg)](https://codecov.io/gh/mattyv/JazzyIndex)
+
+## Build & Test Status
+
+### Compiler Matrix (All run unit tests + CTest)
+
+| Platform | Compiler | Debug | Release | Sanitizers |
+|----------|----------|:-----:|:-------:|:----------:|
+| **Linux** | GCC 11 | ✅ | ✅ | - |
+| | GCC 12 | ✅ | ✅ | ASAN, UBSAN |
+| | Clang 14 | ✅ | ✅ | - |
+| | Clang 15 | ✅ | ✅ | ASAN, UBSAN, TSAN |
+| **Windows** | MSVC | ✅ | ✅ | ASAN |
+| | MinGW GCC | ✅ | ✅ | - |
+| | Clang | ✅ | ✅ | ASAN |
+| **macOS** | Clang | ✅ | ✅ | - |
+
+### Additional CI Jobs
+
+| Job | Status | Description |
+|-----|:------:|-------------|
+| **Code Coverage** | [![Coverage](https://img.shields.io/badge/coverage-tracked-brightgreen)](https://codecov.io/gh/mattyv/JazzyIndex) | Line coverage with lcov, uploaded to Codecov |
+| **Benchmarks** | [![Benchmarks](https://img.shields.io/badge/benchmarks-passing-brightgreen)](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml) | Google Benchmark suite with plot generation |
+
+**Total Test Configurations:** 16 compiler/build combinations + 5 sanitizer configurations + coverage + benchmarks = **22 CI jobs**
+
 A fast, adaptive learned index for sorted arrays that predicts element positions instead of searching blindly.
 
 ## What's a Learned Index?

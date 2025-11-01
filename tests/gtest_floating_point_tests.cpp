@@ -230,10 +230,10 @@ TEST_F(FloatTest, FloatPrecisionSequence) {
     }
     auto index = build_index(data);
 
-    // Test various points
-    EXPECT_TRUE(is_found(index.find(0.0f), data, 0.0f));
-    EXPECT_TRUE(is_found(index.find(5.0f), data, 5.0f));
-    EXPECT_TRUE(is_found(index.find(9.9f), data, 9.9f));
+    // Test various points - use actual values from the array to avoid precision issues
+    EXPECT_TRUE(is_found(index.find(data[0]), data, data[0]));   // 0.0
+    EXPECT_TRUE(is_found(index.find(data[50]), data, data[50])); // 5.0
+    EXPECT_TRUE(is_found(index.find(data[99]), data, data[99])); // 9.9
 }
 
 // Test: Quadratic floating-point growth
@@ -245,10 +245,10 @@ TEST_F(DoubleTest, QuadraticFloatingPointGrowth) {
     }
     auto index = build_index(data);
 
-    // Test some specific values
-    EXPECT_TRUE(is_found(index.find(0.0), data, 0.0));      // 0^2
-    EXPECT_TRUE(is_found(index.find(0.01), data, 0.01));    // 0.1^2
-    EXPECT_TRUE(is_found(index.find(1.0), data, 1.0));      // 1.0^2 (approximately)
+    // Test some specific values - use actual values from the array
+    EXPECT_TRUE(is_found(index.find(data[0]), data, data[0]));   // 0^2 = 0.0
+    EXPECT_TRUE(is_found(index.find(data[1]), data, data[1]));   // 0.1^2
+    EXPECT_TRUE(is_found(index.find(data[10]), data, data[10])); // 1.0^2
 }
 
 // Test: Fractional duplicates
