@@ -339,7 +339,7 @@ tests/
 
 ## Contributing
 
-This is a research/educational project extracted from the `early-exit-find` codebase. Contributions, bug reports, and performance data from real-world workloads are welcome.
+Contributions, bug reports, and performance data from real-world workloads are welcome.
 
 ## License
 
