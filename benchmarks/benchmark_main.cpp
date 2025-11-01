@@ -120,7 +120,7 @@ void register_build_benchmark(std::size_t size, const std::string& distribution,
     benchmark::RegisterBenchmark(name.c_str(),
                                  [data](benchmark::State& state) {
                                      for (auto _ : state) {
-                                         jazzy::JazzyIndex<std::uint64_t, Segments> index;
+                                         jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> index;
                                          index.build(data.data(), data.data() + data.size());
                                          benchmark::DoNotOptimize(index);
                                      }

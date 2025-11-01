@@ -24,6 +24,26 @@ enum class ModelType : uint8_t {
     DIRECT       // Tiny dense segments: array lookup
 };
 
+// Model selection and search tuning constants
+inline constexpr std::size_t MAX_ACCEPTABLE_LINEAR_ERROR = 8;
+// Linear models with error ≤8 are accepted immediately.
+// Keeps exponential search efficient (~3 iterations: radius 2,4,8)
+
+inline constexpr double QUADRATIC_IMPROVEMENT_THRESHOLD = 0.7;
+// Quadratic must be 30% better than linear (0.7 = 70% of linear error)
+
+inline constexpr std::size_t SEARCH_RADIUS_MARGIN = 2;
+// Extra margin added to max_error for exponential search bounds
+
+inline constexpr std::size_t MIN_SEARCH_RADIUS = 4;
+// Minimum radius for exponential search to ensure reasonable coverage
+
+inline constexpr std::size_t INITIAL_SEARCH_RADIUS = 2;
+// Starting radius for exponential search (doubles each iteration: 2,4,8,16...)
+
+inline constexpr double UNIFORMITY_TOLERANCE = 0.30;
+// Allow 30% deviation in segment spacing for uniformity detection
+
 // Segment descriptor with optimal model
 template <typename T>
 struct alignas(64) Segment {  // Cache line aligned
@@ -130,21 +150,19 @@ template <typename T>
 
     // Measure linear error
     std::size_t linear_max_error = 0;
-    std::uint64_t linear_total_error = 0;
+    double linear_total_error = 0.0;
 
     for (std::size_t i = start; i < end; ++i) {
         const double pred_double = std::fma(static_cast<double>(data[i]), slope, intercept);
-        const std::size_t predicted = static_cast<std::size_t>(pred_double);
-        const std::size_t actual = i;
-        const std::size_t error = predicted > actual ? predicted - actual : actual - predicted;
-        linear_max_error = std::max(linear_max_error, error);
+        const double error = std::abs(pred_double - static_cast<double>(i));
+        linear_max_error = std::max(linear_max_error, static_cast<std::size_t>(std::ceil(error)));
         linear_total_error += error;
     }
 
-    const double linear_mean_error = static_cast<double>(linear_total_error) / static_cast<double>(n);
+    const double linear_mean_error = linear_total_error / static_cast<double>(n);
 
     // If linear is good enough, use it
-    if (linear_max_error <= 8) {
+    if (linear_max_error <= MAX_ACCEPTABLE_LINEAR_ERROR) {
         result.best_model = ModelType::LINEAR;
         result.max_error = linear_max_error;
         result.mean_error = linear_mean_error;
@@ -192,22 +210,20 @@ template <typename T>
 
         // Measure quadratic error
         std::size_t quad_max_error = 0;
-        std::uint64_t quad_total_error = 0;
+        double quad_total_error = 0.0;
 
         for (std::size_t i = start; i < end; ++i) {
             const double x = static_cast<double>(data[i]);
             const double pred_double = std::fma(x, std::fma(x, a, b), c);
-            const std::size_t predicted = static_cast<std::size_t>(pred_double);
-            const std::size_t actual = i;
-            const std::size_t error = predicted > actual ? predicted - actual : actual - predicted;
-            quad_max_error = std::max(quad_max_error, error);
+            const double error = std::abs(pred_double - static_cast<double>(i));
+            quad_max_error = std::max(quad_max_error, static_cast<std::size_t>(std::ceil(error)));
             quad_total_error += error;
         }
 
-        const double quad_mean_error = static_cast<double>(quad_total_error) / n_double;
+        const double quad_mean_error = quad_total_error / n_double;
 
         // Choose quadratic if it's significantly better
-        if (quad_max_error < linear_max_error * 0.7) {
+        if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
             result.best_model = ModelType::QUADRATIC;
             result.quad_a = a;
             result.quad_b = b;
@@ -227,8 +243,27 @@ template <typename T>
 
 }  // namespace detail
 
-template <typename T, std::size_t NumSegments = 256, typename Compare = std::less<>>
+// Recommended segment count presets
+enum class SegmentCount : std::size_t {
+    TINY = 32,       // Very small datasets or minimal memory footprint
+    SMALL = 64,      // Small datasets (thousands of elements)
+    MEDIUM = 128,    // Medium datasets
+    LARGE = 256,     // Default: good balance for most use cases
+    XLARGE = 512,    // Large datasets with complex distributions
+    XXLARGE = 1024,  // Very large datasets requiring high precision
+    MAX = 2048       // Maximum precision for huge datasets
+};
+
+// Helper to convert std::size_t to SegmentCount for generic code
+template <std::size_t N>
+inline constexpr SegmentCount to_segment_count() {
+    return static_cast<SegmentCount>(N);
+}
+
+template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>>
 class JazzyIndex {
+    static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+
     static_assert(detail::is_strictly_arithmetic_v<T>,
                   "JazzyIndex expects arithmetic value types.");
     static_assert(NumSegments > 0 && NumSegments <= 4096,
@@ -339,7 +374,7 @@ public:
         }
 
         // Exponential search outward from prediction
-        const std::size_t max_radius = std::max<std::size_t>(seg->max_error + 2, 4);
+        const std::size_t max_radius = std::max<std::size_t>(seg->max_error + detail::SEARCH_RADIUS_MARGIN, detail::MIN_SEARCH_RADIUS);
 
         // Check immediate neighbors
         if (predicted + 1 < seg->end_idx && equal(begin[predicted + 1], key)) {
@@ -350,7 +385,7 @@ public:
         }
 
         // Exponentially expand search radius: 2, 4, 8, 16...
-        for (std::size_t radius = 2; radius <= max_radius; radius <<= 1) {
+        for (std::size_t radius = detail::INITIAL_SEARCH_RADIUS; radius <= max_radius; radius <<= 1) {
             const std::size_t left = predicted > radius ? predicted - radius : seg->start_idx;
             const std::size_t right = std::min<std::size_t>(predicted + radius + 1, seg->end_idx);
 
@@ -397,7 +432,7 @@ private:
         const double expected_spacing = total_range / static_cast<double>(num_segments_);
 
         // Allow 30% deviation for uniformity detection
-        const double tolerance = expected_spacing * 0.30;
+        const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
 
         for (std::size_t i = 0; i < num_segments_; ++i) {
             const double segment_range = static_cast<double>(segments_[i].max_val) -

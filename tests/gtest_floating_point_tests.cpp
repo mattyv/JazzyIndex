@@ -15,8 +15,8 @@
 namespace {
 
 // Standalone helper for any segment size
-template <typename T, std::size_t Segments>
-bool is_found(const jazzy::JazzyIndex<T, Segments>& index,
+template <typename IndexType, typename T>
+bool is_found(const IndexType& index,
               const std::vector<T>& data, const T& value) {
     const T* result = index.find(value);
     return result != data.data() + data.size() && *result == value;
@@ -25,8 +25,8 @@ bool is_found(const jazzy::JazzyIndex<T, Segments>& index,
 template <typename T, std::size_t Segments = 256>
 class FloatingPointTest : public ::testing::Test {
 protected:
-    jazzy::JazzyIndex<T, Segments> build_index(const std::vector<T>& data) {
-        jazzy::JazzyIndex<T, Segments> index;
+    jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> build_index(const std::vector<T>& data) {
+        jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> index;
         index.build(data.data(), data.data() + data.size());
         return index;
     }

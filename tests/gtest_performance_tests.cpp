@@ -15,8 +15,8 @@ namespace {
 template <typename T, std::size_t Segments = 256>
 class PerformanceTest : public ::testing::Test {
 protected:
-    jazzy::JazzyIndex<T, Segments> build_index(const std::vector<T>& data) {
-        jazzy::JazzyIndex<T, Segments> index;
+    jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> build_index(const std::vector<T>& data) {
+        jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> index;
         index.build(data.data(), data.data() + data.size());
         return index;
     }
@@ -121,8 +121,8 @@ TEST_F(IntPerformanceTest, MoreSegmentsReasonableOverhead) {
     std::vector<int> data(10000);
     std::iota(data.begin(), data.end(), 0);
 
-    jazzy::JazzyIndex<int, 64> index64;
-    jazzy::JazzyIndex<int, 512> index512;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>()> index64;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<512>()> index512;
 
     index64.build(data.data(), data.data() + data.size());
     index512.build(data.data(), data.data() + data.size());
@@ -216,7 +216,7 @@ TEST_F(IntPerformanceTest, MemoryFootprintReasonable) {
     std::vector<int> data(10000);
     std::iota(data.begin(), data.end(), 0);
 
-    jazzy::JazzyIndex<int, 256> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<256>()> index;
 
     // Index should not use excessive memory
     // Size check: sizeof(index) should be reasonable
