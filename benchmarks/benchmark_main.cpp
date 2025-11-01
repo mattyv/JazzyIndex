@@ -324,6 +324,7 @@ void export_visualization_data(const std::string& output_dir) {
     distributions.emplace_back("Lognormal", [](std::size_t size) { return qi::bench::make_lognormal_values(size); });
     distributions.emplace_back("Zipf", [](std::size_t size) { return qi::bench::make_zipf_values(size); });
     distributions.emplace_back("Mixed", [](std::size_t size) { return qi::bench::make_mixed_values(size); });
+    distributions.emplace_back("Quadratic", [](std::size_t size) { return qi::bench::make_quadratic_values(size); });
 
     int total_exports = 0;
     int failed_exports = 0;

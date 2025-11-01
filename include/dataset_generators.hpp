@@ -194,4 +194,33 @@ inline std::vector<std::uint64_t> generate_mixed(std::size_t size,
     return finalize_samples(std::move(samples), min_value, max_value);
 }
 
+inline std::vector<std::uint64_t> generate_quadratic(std::size_t size,
+                                                      unsigned seed,
+                                                      std::uint64_t min_value,
+                                                      std::uint64_t max_value) {
+    if (size == 0) {
+        return {};
+    }
+
+    std::vector<std::uint64_t> result;
+    result.reserve(size);
+
+    // Generate S-curve using tanh to create strong curvature in middle segments
+    // This creates regions where linear models fail but quadratic models work well
+    const std::uint64_t range = max_value - min_value;
+    const double size_d = static_cast<double>(size);
+
+    for (std::size_t i = 0; i < size; ++i) {
+        // Map index to [-3, 3] range for tanh (creates S-curve)
+        const double t = (static_cast<double>(i) / (size_d - 1.0)) * 6.0 - 3.0;
+        // tanh creates smooth S-curve: slow start, fast middle, slow end
+        // Map from [-1, 1] to [0, range]
+        const double normalized = (std::tanh(t) + 1.0) / 2.0;
+        const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
+        result.push_back(std::min(value, max_value));
+    }
+
+    return result;
+}
+
 }  // namespace dataset
