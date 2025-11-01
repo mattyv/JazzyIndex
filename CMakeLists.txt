@@ -31,6 +31,14 @@ if(BUILD_TESTS)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
 
+    # Work around libstdc++-14 incompatibilities with std::format in gtest
+    if(TARGET gtest)
+        target_compile_definitions(gtest PUBLIC GTEST_INTERNAL_HAS_STD_FORMAT=0)
+    endif()
+    if(TARGET gtest_main)
+        target_compile_definitions(gtest_main PUBLIC GTEST_INTERNAL_HAS_STD_FORMAT=0)
+    endif()
+
     # Fetch RapidCheck for property-based testing
     FetchContent_Declare(
         rapidcheck
