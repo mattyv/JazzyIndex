@@ -32,10 +32,20 @@ if(BUILD_TESTS)
     FetchContent_MakeAvailable(googletest)
 
     # Work around libstdc++-14 incompatibilities with std::format in gtest
+    # Additional workarounds needed for clang-15 with gcc-14's libstdc++
     set(_GTEST_COMPAT_DEFS
         GTEST_INTERNAL_HAS_STD_FORMAT=0
         GTEST_HAS_STD_WSTRING=0
     )
+
+    # Disable problematic features when using older clang with newer libstdc++
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "16.0")
+        list(APPEND _GTEST_COMPAT_DEFS
+            GTEST_INTERNAL_HAS_WSTRING=0
+            GTEST_INTERNAL_HAS_RANGES=0
+        )
+    endif()
+
     if(TARGET gtest)
         target_compile_definitions(gtest PUBLIC ${_GTEST_COMPAT_DEFS})
     endif()
@@ -56,6 +66,13 @@ if(BUILD_TESTS)
         GIT_TAG master
     )
     FetchContent_MakeAvailable(rapidcheck)
+
+    # Fix RapidCheck compilation on Windows with sanitizers - add /EHsc for exception handling
+    if(MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+        if(TARGET rapidcheck)
+            target_compile_options(rapidcheck PRIVATE /EHsc)
+        endif()
+    endif()
 
     # Google Test suite with comprehensive coverage
     add_executable(jazzy_index_tests
