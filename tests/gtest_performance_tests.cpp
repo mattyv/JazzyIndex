@@ -111,7 +111,8 @@ TEST_F(IntPerformanceTest, UniformFasterThanNonUniform) {
 
     // Uniform should be faster (or at least not significantly slower)
     // Allow for measurement noise - just check it's not 2x slower
-    EXPECT_LT(uniform_time_ns, nonuniform_time_ns * 2)
+    const long long baseline_nonuniform = std::max<long long>(nonuniform_time_ns, 1);
+    EXPECT_LT(uniform_time_ns, baseline_nonuniform * 2)
         << "Uniform: " << uniform_time_ns / num_queries << "ns/query, "
         << "Non-uniform: " << nonuniform_time_ns / num_queries << "ns/query";
 }
@@ -147,7 +148,8 @@ TEST_F(IntPerformanceTest, MoreSegmentsReasonableOverhead) {
 
     // 512 segments should not be more than 3x slower than 64
     // (log(512) / log(64) = 1.5, so with overhead factor of 2x is reasonable)
-    EXPECT_LT(time512_ns, time64_ns * 3)
+    const long long baseline64 = std::max<long long>(time64_ns, 1);
+    EXPECT_LT(time512_ns, baseline64 * 3)
         << "64 segments: " << time64_ns / num_queries << "ns/query, "
         << "512 segments: " << time512_ns / num_queries << "ns/query";
 }
@@ -169,7 +171,8 @@ TEST_F(IntPerformanceTest, BuildTimeScalesLinear) {
     });
 
     // 10x more data should not take more than 20x time (allowing overhead)
-    EXPECT_LT(large_build_ns, small_build_ns * 20)
+    const long long baseline_small = std::max<long long>(small_build_ns, 1);
+    EXPECT_LT(large_build_ns, baseline_small * 20)
         << "10k elements: " << small_build_ns / 1000 << "us, "
         << "100k elements: " << large_build_ns / 1000 << "us";
 }
@@ -226,7 +229,8 @@ TEST_F(IntPerformanceTest, DuplicatesNoSlowdown) {
     });
 
     // Duplicates should not cause significant slowdown
-    EXPECT_LT(dup_time_ns, unique_time_ns * 3)
+    const long long baseline_unique = std::max<long long>(unique_time_ns, 1);
+    EXPECT_LT(dup_time_ns, baseline_unique * 3)
         << "Unique: " << unique_time_ns / num_queries << "ns/query, "
         << "Duplicates: " << dup_time_ns / num_queries << "ns/query";
 }
@@ -287,7 +291,8 @@ TEST_F(IntPerformanceTest, QuadraticModelOverhead) {
     });
 
     // Quadratic model should not be much slower (< 2x)
-    EXPECT_LT(quad_time_ns, linear_time_ns * 2)
+    const long long baseline_linear = std::max<long long>(linear_time_ns, 1);
+    EXPECT_LT(quad_time_ns, baseline_linear * 2)
         << "Linear: " << linear_time_ns / num_queries << "ns/query, "
         << "Quadratic: " << quad_time_ns / num_queries << "ns/query";
 }
