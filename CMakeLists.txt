@@ -14,6 +14,7 @@ target_include_directories(jazzy_index INTERFACE
 
 option(BUILD_TESTS "Build JazzyIndex unit and property tests" ON)
 option(BUILD_BENCHMARKS "Build JazzyIndex benchmark suite" ON)
+option(ENABLE_COVERAGE "Enable coverage instrumentation for tests" OFF)
 
 if(BUILD_TESTS OR BUILD_BENCHMARKS)
     include(FetchContent)
@@ -64,7 +65,7 @@ if(BUILD_TESTS)
     add_test(NAME jazzy_index_tests COMMAND jazzy_index_tests)
 
     # Coverage configuration (optional, enabled with -DCMAKE_BUILD_TYPE=Coverage)
-    if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
+    if(ENABLE_COVERAGE OR CMAKE_BUILD_TYPE STREQUAL "Coverage")
         target_compile_options(jazzy_index_tests PRIVATE --coverage -O0 -g)
         target_link_options(jazzy_index_tests PRIVATE --coverage)
     endif()
