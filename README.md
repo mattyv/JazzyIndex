@@ -20,18 +20,18 @@ Here's JazzyIndex compared head-to-head with `std::lower_bound` (black X markers
 
 | Distribution | `std::lower_bound` | JazzyIndex (S=256) | **Speedup** |
 |--------------|-------------------:|-------------------:|------------:|
-| Uniform      | 272 ns | 21 ns | **12.9x** |
-| Lognormal    | 336 ns | 23 ns | **14.9x** |
-| Exponential  | 244 ns | 26 ns | **9.4x** |
-| Clustered    | 244 ns | 26 ns | **9.4x** |
-| Mixed        | 244 ns | 26 ns | **9.4x** |
-| Zipf         | 358 ns | 40 ns | **9.0x** |
+| Uniform      | 28.3 ns | 2.6 ns | **10.7x** |
+| Lognormal    | 29.5 ns | 3.2 ns | **9.1x** |
+| Exponential  | 29.5 ns | 3.8 ns | **7.7x** |
+| Clustered    | 29.5 ns | 3.8 ns | **7.7x** |
+| Mixed        | 29.5 ns | 3.8 ns | **7.7x** |
+| Zipf         | 29.4 ns | 4.7 ns | **6.3x** |
 
-*All measurements on 1,000,000 elements (Apple M2)*
+*All measurements on 1,000,000 elements (Apple M2, Release build with -O3 -march=native)*
 
-**Uniform data (bottom left):** This is where learned indexes shine. `std::lower_bound` follows the classic log(n) curve - starting at 125ns for 100 elements and climbing to 261ns for 1 million elements. JazzyIndex? Completely flat at 22-29ns across all sizes. The "Not found" queries (dotted lines) hit **5.7ns** across all dataset sizes - that's the arithmetic fast path doing pure O(1) lookups with **46x speedup**. As your dataset grows 10,000x (100 → 1M elements), `std::lower_bound` slows by 2.1x while JazzyIndex slows by only 1.3x.
+**Uniform data (bottom left):** This is where learned indexes shine. `std::lower_bound` follows the classic log(n) curve - starting at 5.8ns for 100 elements and climbing to 27.7ns for 1 million elements (4.8x slower). JazzyIndex? **Perfectly flat at 3.2ns** across all sizes. The "Not found" queries (dotted lines) hit **1.47ns** across all dataset sizes - that's the arithmetic fast path doing pure O(1) lookups with **19x speedup** over lower_bound. As your dataset grows 10,000x (100 → 1M elements), `std::lower_bound` slows by 4.8x while JazzyIndex stays constant.
 
-**Skewed distributions (everywhere else):** Here's where JazzyIndex proves it's not just a one-trick pony. On lognormal data, we see the best performance - **14.9x speedup** because the quadratic models fit the curve perfectly. Even on pathological Zipf distributions (heavy-tailed, massive clustering), JazzyIndex still delivers **9.0x speedup**. Quantile segmentation means we're only searching 1/256th of the data, so even when models can't predict perfectly, performance stays fast and consistent.
+**Skewed distributions (everywhere else):** Here's where JazzyIndex proves it's not just a one-trick pony. On lognormal data, we see **9.1x speedup** (29.5ns → 3.2ns) because the quadratic models fit the curve perfectly. Even on pathological Zipf distributions (heavy-tailed, massive clustering), JazzyIndex still delivers **6.3x speedup**. Quantile segmentation means we're only searching 1/256th of the data, so even when models can't predict perfectly, performance stays fast and consistent.
 
 The key insight: JazzyIndex doesn't just optimize for the best case. It adapts to your data's shape and maintains consistent, predictable performance across all distributions. The black X lines curving upward vs the colored lines staying flat - that's the difference between O(log n) and O(1) in action.
 
