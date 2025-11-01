@@ -143,7 +143,11 @@ template <typename T>
 
     for (std::size_t i = start; i < end; ++i) {
         const double pred_double = std::fma(static_cast<double>(data[i]), slope, intercept);
-        const std::size_t predicted = static_cast<std::size_t>(pred_double);
+        const double clamped_linear = std::clamp(
+            pred_double,
+            static_cast<double>(start),
+            static_cast<double>(end > 0 ? end - 1 : start));
+        const std::size_t predicted = static_cast<std::size_t>(clamped_linear);
         const std::size_t actual = i;
         const std::size_t error = predicted > actual ? predicted - actual : actual - predicted;
         linear_max_error = std::max(linear_max_error, error);
@@ -206,7 +210,11 @@ template <typename T>
         for (std::size_t i = start; i < end; ++i) {
             const double x = static_cast<double>(data[i]);
             const double pred_double = std::fma(x, std::fma(x, a, b), c);
-            const std::size_t predicted = static_cast<std::size_t>(pred_double);
+            const double clamped_quad = std::clamp(
+                pred_double,
+                static_cast<double>(start),
+                static_cast<double>(end > 0 ? end - 1 : start));
+            const std::size_t predicted = static_cast<std::size_t>(clamped_quad);
             const std::size_t actual = i;
             const std::size_t error = predicted > actual ? predicted - actual : actual - predicted;
             quad_max_error = std::max(quad_max_error, error);
