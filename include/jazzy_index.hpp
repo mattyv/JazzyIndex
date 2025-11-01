@@ -369,7 +369,7 @@ public:
         const T* begin = base_;
 
         // Check predicted position first
-        if (predicted < size_ && equal(begin[predicted], key)) {
+        if (equal(begin[predicted], key)) {
             return begin + predicted;
         }
 
