@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstdlib>
 #include <numeric>
 #include <vector>
 
@@ -15,6 +16,27 @@ namespace {
 template <typename T, std::size_t Segments = 256>
 class PerformanceTest : public ::testing::Test {
 protected:
+    static bool is_sanitizer_enabled() {
+#if defined(__has_feature)
+        if (__has_feature(address_sanitizer) || __has_feature(thread_sanitizer) || __has_feature(memory_sanitizer))
+            return true;
+#endif
+#if defined(__SANITIZE_ADDRESS__) || defined(__SANITIZE_THREAD__) || defined(__SANITIZE_UNDEFINED__)
+        return true;
+#endif
+#ifdef _MSC_VER
+        if (std::getenv("ASAN_OPTIONS") != nullptr || std::getenv("UBSAN_OPTIONS") != nullptr)
+            return true;
+#endif
+        return false;
+    }
+
+    void SetUp() override {
+        if (is_sanitizer_enabled()) {
+            GTEST_SKIP() << "Performance-sensitive tests are skipped under sanitizer instrumentation.";
+        }
+    }
+
     jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> build_index(const std::vector<T>& data) {
         jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> index;
         index.build(data.data(), data.data() + data.size());

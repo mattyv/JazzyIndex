@@ -5,7 +5,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
+if(MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG")
+else()
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
+endif()
 
 add_library(jazzy_index INTERFACE)
 target_include_directories(jazzy_index INTERFACE
@@ -46,18 +50,13 @@ if(BUILD_TESTS)
         )
     endif()
 
-    if(TARGET gtest)
-        target_compile_definitions(gtest PUBLIC ${_GTEST_COMPAT_DEFS})
-    endif()
-    if(TARGET gtest_main)
-        target_compile_definitions(gtest_main PUBLIC ${_GTEST_COMPAT_DEFS})
-    endif()
-    if(TARGET gmock)
-        target_compile_definitions(gmock PUBLIC ${_GTEST_COMPAT_DEFS})
-    endif()
-    if(TARGET gmock_main)
-        target_compile_definitions(gmock_main PUBLIC ${_GTEST_COMPAT_DEFS})
-    endif()
+    foreach(_gtest_target IN ITEMS gtest gtest_main gmock gmock_main)
+        if(TARGET ${_gtest_target})
+            target_compile_definitions(${_gtest_target} PUBLIC ${_GTEST_COMPAT_DEFS})
+            set_property(TARGET ${_gtest_target} PROPERTY CXX_STANDARD 17)
+            set_property(TARGET ${_gtest_target} PROPERTY CXX_STANDARD_REQUIRED ON)
+        endif()
+    endforeach()
 
     # Fetch RapidCheck for property-based testing
     FetchContent_Declare(
