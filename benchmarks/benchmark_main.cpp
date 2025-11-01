@@ -2,12 +2,16 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <fstream>
+#include <iostream>
 #include <limits>
 #include <memory>
 #include <string>
 #include <vector>
+#include <sys/stat.h>
 
 #include "fixtures.hpp"
+#include "jazzy_index_export.hpp"
 
 namespace {
 
@@ -276,9 +280,143 @@ void register_distribution_suites() {
     }
 }
 
+// Helper to create output directory
+bool ensure_directory_exists(const std::string& path) {
+    struct stat info;
+    if (stat(path.c_str(), &info) != 0) {
+        // Directory doesn't exist, try to create it
+        #ifdef _WIN32
+        return _mkdir(path.c_str()) == 0;
+        #else
+        return mkdir(path.c_str(), 0755) == 0;
+        #endif
+    } else if (info.st_mode & S_IFDIR) {
+        return true;
+    }
+    return false;
+}
+
+// Export visualization data for various index configurations
+void export_visualization_data(const std::string& output_dir) {
+    std::cout << "Exporting index visualization data to " << output_dir << "..." << std::endl;
+
+    if (!ensure_directory_exists(output_dir)) {
+        std::cerr << "Warning: Could not create directory " << output_dir << std::endl;
+        std::cerr << "Attempting to write to current directory instead." << std::endl;
+    }
+
+    // Configuration: which distributions, sizes, and segment counts to visualize
+    const std::vector<std::size_t> viz_sizes = {100, 1'000, 10'000};
+    const std::vector<std::size_t> viz_segments = {64, 128, 256, 512};
+
+    struct Distribution {
+        std::string name;
+        std::function<std::vector<std::uint64_t>(std::size_t)> generator;
+
+        Distribution(std::string n, std::function<std::vector<std::uint64_t>(std::size_t)> g)
+            : name(std::move(n)), generator(std::move(g)) {}
+    };
+
+    std::vector<Distribution> distributions;
+    distributions.emplace_back("Uniform", [](std::size_t size) { return qi::bench::make_uniform_values(size); });
+    distributions.emplace_back("Exponential", [](std::size_t size) { return qi::bench::make_exponential_values(size); });
+    distributions.emplace_back("Clustered", [](std::size_t size) { return qi::bench::make_clustered_values(size); });
+    distributions.emplace_back("Lognormal", [](std::size_t size) { return qi::bench::make_lognormal_values(size); });
+    distributions.emplace_back("Zipf", [](std::size_t size) { return qi::bench::make_zipf_values(size); });
+    distributions.emplace_back("Mixed", [](std::size_t size) { return qi::bench::make_mixed_values(size); });
+
+    int total_exports = 0;
+    int failed_exports = 0;
+
+    for (const auto& dist : distributions) {
+        for (const std::size_t size : viz_sizes) {
+            auto data = dist.generator(size);
+            if (data.empty()) {
+                std::cerr << "Warning: Empty dataset for " << dist.name << " size " << size << std::endl;
+                continue;
+            }
+
+            for (const std::size_t segments : viz_segments) {
+                // Build index and export metadata
+                std::string json_data;
+
+                if (segments == 64) {
+                    auto index = qi::bench::make_index<64>(data);
+                    json_data = jazzy::export_index_metadata(index);
+                } else if (segments == 128) {
+                    auto index = qi::bench::make_index<128>(data);
+                    json_data = jazzy::export_index_metadata(index);
+                } else if (segments == 256) {
+                    auto index = qi::bench::make_index<256>(data);
+                    json_data = jazzy::export_index_metadata(index);
+                } else if (segments == 512) {
+                    auto index = qi::bench::make_index<512>(data);
+                    json_data = jazzy::export_index_metadata(index);
+                } else {
+                    continue;
+                }
+
+                // Write to file
+                std::string filename = output_dir + "/index_" + dist.name + "_N" +
+                                     std::to_string(size) + "_S" + std::to_string(segments) + ".json";
+
+                std::ofstream out(filename);
+                if (out) {
+                    out << json_data;
+                    out.close();
+                    total_exports++;
+                    std::cout << "  Exported: " << filename << std::endl;
+                } else {
+                    std::cerr << "Error: Could not write to " << filename << std::endl;
+                    failed_exports++;
+                }
+            }
+        }
+    }
+
+    std::cout << "Visualization data export complete: " << total_exports << " files created";
+    if (failed_exports > 0) {
+        std::cout << " (" << failed_exports << " failed)";
+    }
+    std::cout << std::endl;
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
+    // Check for --visualize-index flag before benchmark initialization
+    bool visualize_mode = false;
+    std::string output_dir = "index_data";
+
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--visualize-index") {
+            visualize_mode = true;
+            // Remove this flag so benchmark library doesn't see it
+            for (int j = i; j < argc - 1; ++j) {
+                argv[j] = argv[j + 1];
+            }
+            --argc;
+            --i;
+        } else if (arg.find("--visualize-index-output=") == 0) {
+            visualize_mode = true;
+            output_dir = arg.substr(25);  // Length of "--visualize-index-output="
+            // Remove this flag
+            for (int j = i; j < argc - 1; ++j) {
+                argv[j] = argv[j + 1];
+            }
+            --argc;
+            --i;
+        }
+    }
+
+    if (visualize_mode) {
+        export_visualization_data(output_dir);
+        std::cout << "\nVisualization data exported. Now run:" << std::endl;
+        std::cout << "  python3 scripts/plot_index_structure.py " << output_dir << std::endl;
+        return 0;
+    }
+
     // Register baseline std::lower_bound benchmarks first
     register_lower_bound_suites();
 

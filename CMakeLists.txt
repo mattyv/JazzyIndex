@@ -170,6 +170,19 @@ if(BUILD_BENCHMARKS)
         )
         add_custom_target(plot_benchmarks DEPENDS ${JAZZY_BENCHMARK_PNG})
         add_dependencies(plot_benchmarks jazzy_python_env jazzy_benchmark_json)
+
+        # Index visualization target
+        set(JAZZY_INDEX_DATA_DIR ${CMAKE_BINARY_DIR}/index_data)
+        set(JAZZY_PLOT_INDEX_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/scripts/plot_index_structure.py)
+        add_custom_target(visualize_index
+            COMMAND $<TARGET_FILE:jazzy_index_benchmarks> --visualize-index
+            COMMAND ${JAZZY_VENV_PYTHON} ${JAZZY_PLOT_INDEX_SCRIPT} ${JAZZY_INDEX_DATA_DIR}
+            DEPENDS jazzy_index_benchmarks ${JAZZY_VENV_PYTHON} ${JAZZY_PLOT_INDEX_SCRIPT}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMENT "Generating index structure visualizations"
+            VERBATIM
+        )
+        add_dependencies(visualize_index jazzy_python_env)
     else()
         message(STATUS "Python interpreter not found; benchmark plotting is disabled.")
     endif()

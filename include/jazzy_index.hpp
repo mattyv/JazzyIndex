@@ -441,6 +441,10 @@ public:
     [[nodiscard]] std::size_t size() const noexcept { return size_; }
     [[nodiscard]] std::size_t num_segments() const noexcept { return num_segments_; }
 
+    // Friend declaration for export functionality
+    template <typename U, SegmentCount S, typename C>
+    friend std::string export_index_metadata(const JazzyIndex<U, S, C>& index);
+
 private:
     void detect_uniformity() noexcept {
         if (num_segments_ <= 1) {
