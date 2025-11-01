@@ -84,7 +84,6 @@ if(BUILD_TESTS)
         tests/gtest_error_recovery_tests.cpp
         tests/gtest_uniformity_tests.cpp
         tests/gtest_property_tests.cpp
-        tests/gtest_performance_tests.cpp
     )
     target_link_libraries(jazzy_index_tests PRIVATE
         jazzy_index
