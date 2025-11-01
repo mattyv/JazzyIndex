@@ -32,11 +32,21 @@ if(BUILD_TESTS)
     FetchContent_MakeAvailable(googletest)
 
     # Work around libstdc++-14 incompatibilities with std::format in gtest
+    set(_GTEST_COMPAT_DEFS
+        GTEST_INTERNAL_HAS_STD_FORMAT=0
+        GTEST_HAS_STD_WSTRING=0
+    )
     if(TARGET gtest)
-        target_compile_definitions(gtest PUBLIC GTEST_INTERNAL_HAS_STD_FORMAT=0)
+        target_compile_definitions(gtest PUBLIC ${_GTEST_COMPAT_DEFS})
     endif()
     if(TARGET gtest_main)
-        target_compile_definitions(gtest_main PUBLIC GTEST_INTERNAL_HAS_STD_FORMAT=0)
+        target_compile_definitions(gtest_main PUBLIC ${_GTEST_COMPAT_DEFS})
+    endif()
+    if(TARGET gmock)
+        target_compile_definitions(gmock PUBLIC ${_GTEST_COMPAT_DEFS})
+    endif()
+    if(TARGET gmock_main)
+        target_compile_definitions(gmock_main PUBLIC ${_GTEST_COMPAT_DEFS})
     endif()
 
     # Fetch RapidCheck for property-based testing

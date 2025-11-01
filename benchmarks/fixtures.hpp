@@ -107,9 +107,9 @@ inline std::vector<std::uint64_t> make_mixed_values(std::size_t size) {
 }
 
 template <std::size_t Segments>
-inline jazzy::JazzyIndex<std::uint64_t, Segments> make_index(
+inline jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> make_index(
     const std::vector<std::uint64_t>& values) {
-    jazzy::JazzyIndex<std::uint64_t, Segments> index;
+    jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> index;
     if (!values.empty()) {
         index.build(values.data(), values.data() + values.size());
     }

@@ -15,8 +15,8 @@
 namespace {
 
 // Standalone helper for any segment size
-template <typename T, std::size_t Segments>
-bool is_found(const jazzy::JazzyIndex<T, Segments>& index,
+template <typename IndexType, typename T>
+bool is_found(const IndexType& index,
               const std::vector<T>& data, const T& value) {
     const T* result = index.find(value);
     return result != data.data() + data.size() && *result == value;
@@ -25,8 +25,8 @@ bool is_found(const jazzy::JazzyIndex<T, Segments>& index,
 template <typename T, std::size_t Segments = 256>
 class BoundaryTest : public ::testing::Test {
 protected:
-    jazzy::JazzyIndex<T, Segments> build_index(const std::vector<T>& data) {
-        jazzy::JazzyIndex<T, Segments> index;
+    jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> build_index(const std::vector<T>& data) {
+        jazzy::JazzyIndex<T, jazzy::to_segment_count<Segments>()> index;
         index.build(data.data(), data.data() + data.size());
         return index;
     }
@@ -66,7 +66,7 @@ TEST_F(IntBoundaryTest, SegmentBoundariesExplicit) {
     std::iota(data.begin(), data.end(), 0);
 
     // Use 10 segments for easy calculation
-    jazzy::JazzyIndex<int, 10> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<10>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // Each segment should cover 100 elements
@@ -93,7 +93,7 @@ TEST_F(IntBoundaryTest, ExactQuantileSplits) {
     std::iota(data.begin(), data.end(), 0);
 
     // 256 elements with 256 segments = 1 element per segment
-    jazzy::JazzyIndex<int, 256> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<256>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // Every single element should be findable
@@ -108,7 +108,7 @@ TEST_F(IntBoundaryTest, MoreSegmentsThanDataPoints) {
     std::vector<int> data{1, 2, 3, 4, 5};
 
     // 256 segments but only 5 data points
-    jazzy::JazzyIndex<int, 256> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<256>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // Should still work correctly
@@ -157,7 +157,7 @@ TEST_F(IntBoundaryTest, FirstLastElementsPerSegment) {
     std::vector<int> data(1000);
     std::iota(data.begin(), data.end(), 100);  // Start from 100
 
-    jazzy::JazzyIndex<int, 20> index;  // 20 segments, 50 elements each
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<20>()> index;  // 20 segments, 50 elements each
     index.build(data.data(), data.data() + data.size());
 
     // Test first and last element of each theoretical segment
@@ -183,7 +183,7 @@ TEST_F(IntBoundaryTest, AdjacentValuesAtBoundaries) {
         data.push_back(i * 10);  // 0, 10, 20, ..., 990
     }
 
-    jazzy::JazzyIndex<int, 10> index;  // 10 segments, 10 elements each
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<10>()> index;  // 10 segments, 10 elements each
     index.build(data.data(), data.data() + data.size());
 
     // Test around each boundary
@@ -212,7 +212,7 @@ TEST_F(IntBoundaryTest, BoundariesWithDuplicates) {
         data.push_back(30);
     }
 
-    jazzy::JazzyIndex<int, 16> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<16>()> index;
     index.build(data.data(), data.data() + data.size());
 
     EXPECT_TRUE(is_found(index.find(10), data, 10));
@@ -228,7 +228,7 @@ TEST_F(IntBoundaryTest, BoundariesWithDuplicates) {
 TEST_F(IntBoundaryTest, SingleElementSegments) {
     std::vector<int> data{10, 20, 30, 40, 50};
 
-    jazzy::JazzyIndex<int, 5> index;  // Same number of segments as elements
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<5>()> index;  // Same number of segments as elements
     index.build(data.data(), data.data() + data.size());
 
     for (int val : data) {
@@ -262,7 +262,7 @@ TEST_F(IntBoundaryTest, SegmentRangeBoundaries) {
     std::vector<int> data(100);
     std::iota(data.begin(), data.end(), 0);
 
-    jazzy::JazzyIndex<int, 4> index;  // 4 segments: [0-24], [25-49], [50-74], [75-99]
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<4>()> index;  // 4 segments: [0-24], [25-49], [50-74], [75-99]
     index.build(data.data(), data.data() + data.size());
 
     // Test boundaries of each segment
@@ -299,7 +299,7 @@ TEST_F(IntBoundaryTest, ZeroCrossingBoundary) {
         data.push_back(i);
     }
 
-    jazzy::JazzyIndex<int, 10> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<10>()> index;
     index.build(data.data(), data.data() + data.size());
 
     // Test around zero
