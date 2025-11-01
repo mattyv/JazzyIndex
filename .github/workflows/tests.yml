@@ -7,47 +7,52 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  test:
-    name: ${{ matrix.os }} - ${{ matrix.compiler }} - ${{ matrix.build_type }}
-    runs-on: ${{ matrix.os }}
+  test-linux:
+    name: Linux - ${{ matrix.compiler }} - ${{ matrix.build_type }}
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        compiler: [gcc, clang]
+        compiler: [gcc-11, gcc-12, clang-14, clang-15]
         build_type: [Debug, Release]
-        exclude:
-          # Exclude GCC on macOS (use Clang as default)
-          - os: macos-latest
-            compiler: gcc
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install dependencies (Ubuntu)
-      if: runner.os == 'Linux'
+    - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake ninja-build lcov
 
-    - name: Install dependencies (macOS)
-      if: runner.os == 'macOS'
+    - name: Install GCC 11
+      if: matrix.compiler == 'gcc-11'
       run: |
-        brew install cmake ninja lcov
+        sudo apt-get install -y g++-11
+        echo "CC=gcc-11" >> $GITHUB_ENV
+        echo "CXX=g++-11" >> $GITHUB_ENV
 
-    - name: Set up compiler (GCC)
-      if: matrix.compiler == 'gcc' && runner.os == 'Linux'
+    - name: Install GCC 12
+      if: matrix.compiler == 'gcc-12'
       run: |
-        echo "CC=gcc" >> $GITHUB_ENV
-        echo "CXX=g++" >> $GITHUB_ENV
+        sudo apt-get install -y g++-12
+        echo "CC=gcc-12" >> $GITHUB_ENV
+        echo "CXX=g++-12" >> $GITHUB_ENV
 
-    - name: Set up compiler (Clang)
-      if: matrix.compiler == 'clang'
+    - name: Install Clang 14
+      if: matrix.compiler == 'clang-14'
       run: |
-        echo "CC=clang" >> $GITHUB_ENV
-        echo "CXX=clang++" >> $GITHUB_ENV
+        sudo apt-get install -y clang-14
+        echo "CC=clang-14" >> $GITHUB_ENV
+        echo "CXX=clang++-14" >> $GITHUB_ENV
+
+    - name: Install Clang 15
+      if: matrix.compiler == 'clang-15'
+      run: |
+        sudo apt-get install -y clang-15
+        echo "CC=clang-15" >> $GITHUB_ENV
+        echo "CXX=clang++-15" >> $GITHUB_ENV
 
     - name: Configure CMake
       run: |
@@ -60,9 +65,126 @@ jobs:
     - name: Build
       run: cmake --build build --parallel
 
-    - name: Run legacy tests
+    - name: Run Google Test suite
       working-directory: build
-      run: ./jazzy_index_tests_legacy
+      run: ./jazzy_index_tests
+
+    - name: Run CTest
+      working-directory: build
+      run: ctest --output-on-failure --verbose
+
+  test-windows:
+    name: Windows - ${{ matrix.compiler }} - ${{ matrix.build_type }}
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [msvc, gcc, clang]
+        build_type: [Debug, Release]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up MSVC
+      if: matrix.compiler == 'msvc'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Set up GCC (MinGW)
+      if: matrix.compiler == 'gcc'
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja
+
+    - name: Set up Clang
+      if: matrix.compiler == 'clang'
+      run: |
+        choco install llvm ninja -y
+        echo "CC=clang" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        echo "CXX=clang++" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Configure CMake (MSVC)
+      if: matrix.compiler == 'msvc'
+      run: |
+        cmake -B build `
+          -G Ninja `
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} `
+          -DBUILD_TESTS=ON `
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Configure CMake (MinGW)
+      if: matrix.compiler == 'gcc'
+      shell: msys2 {0}
+      run: |
+        cmake -B build \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DBUILD_TESTS=ON \
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Configure CMake (Clang)
+      if: matrix.compiler == 'clang'
+      run: |
+        cmake -B build `
+          -G Ninja `
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} `
+          -DBUILD_TESTS=ON `
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Build (MSVC/Clang)
+      if: matrix.compiler != 'gcc'
+      run: cmake --build build --parallel
+
+    - name: Build (MinGW)
+      if: matrix.compiler == 'gcc'
+      shell: msys2 {0}
+      run: cmake --build build --parallel
+
+    - name: Run tests (MSVC/Clang)
+      if: matrix.compiler != 'gcc'
+      working-directory: build
+      run: |
+        .\jazzy_index_tests.exe
+        ctest --output-on-failure --verbose
+
+    - name: Run tests (MinGW)
+      if: matrix.compiler == 'gcc'
+      shell: msys2 {0}
+      working-directory: build
+      run: |
+        ./jazzy_index_tests.exe
+        ctest --output-on-failure --verbose
+
+  test-macos:
+    name: macOS - Clang - ${{ matrix.build_type }}
+    runs-on: macos-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        brew install cmake ninja lcov
+
+    - name: Configure CMake
+      run: |
+        cmake -B build \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DBUILD_TESTS=ON \
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Build
+      run: cmake --build build --parallel
 
     - name: Run Google Test suite
       working-directory: build
@@ -118,14 +240,19 @@ jobs:
         fail_ci_if_error: false
         verbose: true
 
-  sanitizers:
-    name: Sanitizers (${{ matrix.sanitizer }})
+  sanitizers-linux:
+    name: Sanitizers - Linux - ${{ matrix.compiler }} - ${{ matrix.sanitizer }}
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
+        compiler: [gcc-12, clang-15]
         sanitizer: [address, undefined, thread]
+        exclude:
+          # Thread sanitizer doesn't work well with some compilers in CI
+          - compiler: gcc-12
+            sanitizer: thread
 
     steps:
     - name: Checkout code
@@ -136,10 +263,19 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y cmake ninja-build
 
-    - name: Set up compiler with sanitizer
+    - name: Set up GCC 12
+      if: matrix.compiler == 'gcc-12'
       run: |
-        echo "CC=clang" >> $GITHUB_ENV
-        echo "CXX=clang++" >> $GITHUB_ENV
+        sudo apt-get install -y g++-12
+        echo "CC=gcc-12" >> $GITHUB_ENV
+        echo "CXX=g++-12" >> $GITHUB_ENV
+
+    - name: Set up Clang 15
+      if: matrix.compiler == 'clang-15'
+      run: |
+        sudo apt-get install -y clang-15
+        echo "CC=clang-15" >> $GITHUB_ENV
+        echo "CXX=clang++-15" >> $GITHUB_ENV
 
     - name: Configure with ${{ matrix.sanitizer }} sanitizer
       run: |
@@ -157,7 +293,68 @@ jobs:
 
     - name: Run tests with ${{ matrix.sanitizer }} sanitizer
       working-directory: build_sanitizer
-      run: ctest --output-on-failure
+      env:
+        ASAN_OPTIONS: detect_leaks=1:check_initialization_order=1:strict_init_order=1
+        UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+        TSAN_OPTIONS: second_deadlock_stack=1
+      run: ctest --output-on-failure --verbose
+
+  sanitizers-windows:
+    name: Sanitizers - Windows - ${{ matrix.compiler }} - ${{ matrix.sanitizer }}
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [msvc, clang]
+        sanitizer: [address]
+        # Note: MSVC and Clang on Windows support ASAN well, but UBSAN and TSAN have limited support
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up MSVC
+      if: matrix.compiler == 'msvc'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Set up Clang
+      if: matrix.compiler == 'clang'
+      run: |
+        choco install llvm ninja -y
+        echo "CC=clang" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        echo "CXX=clang++" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Configure with AddressSanitizer (MSVC)
+      if: matrix.compiler == 'msvc'
+      run: |
+        cmake -B build_sanitizer `
+          -G Ninja `
+          -DCMAKE_BUILD_TYPE=Debug `
+          -DCMAKE_CXX_FLAGS="/fsanitize=address /Zi" `
+          -DCMAKE_EXE_LINKER_FLAGS="/fsanitize=address" `
+          -DBUILD_TESTS=ON `
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Configure with AddressSanitizer (Clang)
+      if: matrix.compiler == 'clang'
+      run: |
+        cmake -B build_sanitizer `
+          -G Ninja `
+          -DCMAKE_BUILD_TYPE=Debug `
+          -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer -g" `
+          -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address" `
+          -DBUILD_TESTS=ON `
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Build with sanitizer
+      run: cmake --build build_sanitizer --parallel
+
+    - name: Run tests with AddressSanitizer
+      working-directory: build_sanitizer
+      env:
+        ASAN_OPTIONS: detect_leaks=0:windows_hook_rtl_allocators=true
+      run: ctest --output-on-failure --verbose
 
   benchmarks:
     name: Benchmarks
