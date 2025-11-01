@@ -27,16 +27,14 @@ enum class ModelType : uint8_t {
 // Segment descriptor with optimal model
 template <typename T>
 struct alignas(64) Segment {  // Cache line aligned
+    // Hot path: segment finding and prediction (grouped for cache locality)
     T min_val;
     T max_val;
-    std::size_t start_idx;
-    std::size_t end_idx;
     ModelType model_type;
     uint8_t max_error;
-    uint8_t padding[2];  // Alignment
 
-    // Model parameters
-    union {
+    // Model parameters (hot path for predict())
+    alignas(8) union {
         struct {
             double slope;
             double intercept;
@@ -50,6 +48,10 @@ struct alignas(64) Segment {  // Cache line aligned
             std::size_t constant_idx;
         } constant;
     } params;
+
+    // Warm path: clamping and bounds
+    std::size_t start_idx;
+    std::size_t end_idx;
 
     [[nodiscard]] std::size_t predict(T value) const noexcept {
         switch (model_type) {
@@ -92,31 +94,23 @@ template <typename T>
                                                    std::size_t end) noexcept {
     SegmentAnalysis<T> result{};
 
-    if (end <= start) {
+    auto make_constant = [&result, start]() {
         result.best_model = ModelType::CONSTANT;
         result.linear_b = static_cast<double>(start);
         result.max_error = 0;
         return result;
-    }
+    };
+
+    if (end <= start) 
+        return make_constant();
 
     const std::size_t n = end - start;
 
     // Check if all values are identical
-    const T first_val = data[start];
-    bool all_same = true;
-    for (std::size_t i = start + 1; i < end; ++i) {
-        if (data[i] != first_val) {
-            all_same = false;
-            break;
-        }
-    }
+    const bool all_same = (std::adjacent_find(data + start, data + end, std::not_equal_to<T>{}) == data + end);
 
-    if (all_same) {
-        result.best_model = ModelType::CONSTANT;
-        result.linear_b = static_cast<double>(start);
-        result.max_error = 0;
-        return result;
-    }
+    if (all_same) 
+        return make_constant();
 
     // Fit linear model
     const double min_val = static_cast<double>(data[start]);
@@ -124,10 +118,7 @@ template <typename T>
     const double value_range = max_val - min_val;
 
     if (value_range < std::numeric_limits<double>::epsilon()) {
-        result.best_model = ModelType::CONSTANT;
-        result.linear_b = static_cast<double>(start);
-        result.max_error = 0;
-        return result;
+        return make_constant();
     }
 
     // Linear model: index = slope * value + intercept
