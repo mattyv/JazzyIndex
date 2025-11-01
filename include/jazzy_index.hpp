@@ -373,39 +373,66 @@ public:
             return begin + predicted;
         }
 
-        // Exponential search outward from prediction
+        // Determine search direction using one comparison
+        const bool search_left = comp_(key, begin[predicted]);
         const std::size_t max_radius = std::max<std::size_t>(seg->max_error + detail::SEARCH_RADIUS_MARGIN, detail::MIN_SEARCH_RADIUS);
 
-        // Check immediate neighbors
-        if (predicted + 1 < seg->end_idx && equal(begin[predicted + 1], key)) {
-            return begin + predicted + 1;
-        }
-        if (predicted > seg->start_idx && equal(begin[predicted - 1], key)) {
-            return begin + predicted - 1;
-        }
+        if (search_left) {
+            // Key is less than predicted value, search leftward
+            // Track the rightmost position we've searched to avoid overlaps
+            std::size_t right_boundary = predicted;  // We've checked predicted, don't search it again
 
-        // Exponentially expand search radius: 2, 4, 8, 16...
-        for (std::size_t radius = detail::INITIAL_SEARCH_RADIUS; radius <= max_radius; radius <<= 1) {
-            const std::size_t left = predicted > radius ? predicted - radius : seg->start_idx;
-            const std::size_t right = std::min<std::size_t>(predicted + radius + 1, seg->end_idx);
+            // Exponentially expand leftward: check radii 1, 2, 4, 8...
+            for (std::size_t radius = 1; radius <= max_radius; radius <<= 1) {
+                const std::size_t left_pos = predicted > radius ? predicted - radius : seg->start_idx;
 
-            // Binary search in this range
-            const T* left_ptr = begin + left;
-            const T* right_ptr = begin + right;
-            const T* found = std::lower_bound(left_ptr, right_ptr, key, comp_);
+                // If left_pos >= right_boundary, no unexplored region remains
+                if (left_pos >= right_boundary) break;
 
-            if (found != right_ptr && equal(*found, key)) {
-                return found;
+                // Search the new range [left_pos, right_boundary)
+                const T* found = std::lower_bound(begin + left_pos, begin + right_boundary, key, comp_);
+                if (found != begin + right_boundary && equal(*found, key)) {
+                    return found;
+                }
+
+                right_boundary = left_pos;  // Update boundary for next iteration
             }
-        }
 
-        // Fallback: search entire segment
-        const T* seg_begin = begin + seg->start_idx;
-        const T* seg_end = begin + seg->end_idx;
-        const T* fallback = std::lower_bound(seg_begin, seg_end, key, comp_);
+            // Fallback: search any remaining unsearched left region
+            if (right_boundary > seg->start_idx) {
+                const T* found = std::lower_bound(begin + seg->start_idx, begin + right_boundary, key, comp_);
+                if (found != begin + right_boundary && equal(*found, key)) {
+                    return found;
+                }
+            }
+        } else {
+            // Key is greater than predicted value, search rightward
+            // Track the leftmost position we've searched to avoid overlaps
+            std::size_t left_boundary = predicted + 1;  // We've checked predicted, start after it
 
-        if (fallback != seg_end && equal(*fallback, key)) {
-            return fallback;
+            // Exponentially expand rightward: check radii 1, 2, 4, 8...
+            for (std::size_t radius = 1; radius <= max_radius; radius <<= 1) {
+                const std::size_t right_pos = std::min<std::size_t>(predicted + radius + 1, seg->end_idx);
+
+                // If right_pos <= left_boundary, no unexplored region remains
+                if (right_pos <= left_boundary) break;
+
+                // Search the new range [left_boundary, right_pos)
+                const T* found = std::lower_bound(begin + left_boundary, begin + right_pos, key, comp_);
+                if (found != begin + right_pos && equal(*found, key)) {
+                    return found;
+                }
+
+                left_boundary = right_pos;  // Update boundary for next iteration
+            }
+
+            // Fallback: search any remaining unsearched right region
+            if (left_boundary < seg->end_idx) {
+                const T* found = std::lower_bound(begin + left_boundary, begin + seg->end_idx, key, comp_);
+                if (found != begin + seg->end_idx && equal(*found, key)) {
+                    return found;
+                }
+            }
         }
 
         return base_ + size_;
