@@ -58,6 +58,8 @@ jobs:
       run: |
         cmake -B build \
           -G Ninja \
+          -DCMAKE_C_COMPILER=$CC \
+          -DCMAKE_CXX_COMPILER=$CXX \
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
           -DBUILD_TESTS=ON \
           -DBUILD_BENCHMARKS=OFF
@@ -205,12 +207,19 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake ninja-build lcov
+        sudo apt-get install -y cmake ninja-build lcov g++-11
+
+    - name: Set up GCC for coverage
+      run: |
+        echo "CC=gcc-11" >> $GITHUB_ENV
+        echo "CXX=g++-11" >> $GITHUB_ENV
 
     - name: Configure with coverage
       run: |
         cmake -B build_coverage \
           -G Ninja \
+          -DCMAKE_C_COMPILER=$CC \
+          -DCMAKE_CXX_COMPILER=$CXX \
           -DCMAKE_BUILD_TYPE=Coverage \
           -DBUILD_TESTS=ON \
           -DBUILD_BENCHMARKS=OFF
@@ -282,6 +291,8 @@ jobs:
         SANITIZER_FLAG="-fsanitize=${{ matrix.sanitizer }} -fno-omit-frame-pointer -g"
         cmake -B build_sanitizer \
           -G Ninja \
+          -DCMAKE_C_COMPILER=$CC \
+          -DCMAKE_CXX_COMPILER=$CXX \
           -DCMAKE_BUILD_TYPE=Debug \
           -DCMAKE_CXX_FLAGS="${SANITIZER_FLAG}" \
           -DCMAKE_EXE_LINKER_FLAGS="${SANITIZER_FLAG}" \
