@@ -151,18 +151,35 @@ flowchart TD
 - **Extensive benchmarks**: Uniform, exponential, clustered, lognormal, Zipf, and mixed distributions
 - **Configurable segment count**: Template parameter for tuning space vs. speed tradeoff
 
+## Build Cost vs Query Cost
+
+Learned indexes require a one-time `build()` step to analyze the data and fit models. Here's what that costs:
+
+| Dataset Size | Build Time (S=256) | Break-even Queries |
+|--------------|-------------------:|-------------------:|
+| 1,000        | 2.3 µs             | ~100 queries       |
+| 10,000       | 6.9 µs             | ~300 queries       |
+| 100,000      | 45.1 µs            | ~1,800 queries     |
+| 1,000,000    | 413 µs (0.41 ms)   | ~17,000 queries    |
+
+**Break-even** = how many queries you need to amortize the build cost. For a 1M-element array, you save ~24ns per query (27.6ns → 3.2ns), so after ~17,000 lookups you've paid back the 413µs build time and everything after is pure profit.
+
+**More segments = slightly slower build**, but not much. Going from S=64 to S=512 on 1M elements only adds ~9µs (409µs → 419µs). The segment count mostly affects query performance, not build time.
+
+**Distribution matters for build time**: Zipf (pathological, heavy-tailed) takes 1.1ms for 1M elements vs 413µs for uniform. The quadratic model fitting works harder on skewed data, but query time stays fast (~4.7ns).
+
 ## When Should You Use This?
 
 **JazzyIndex wins when:**
 - You have large, mostly-static sorted arrays (think: database indexes, sorted logs, time-series data)
-- You're doing many lookups per dataset (index build cost amortizes)
+- You're doing **many lookups** per dataset - need ~17K queries on 1M elements to break even
 - Your data has some structure (uniform, monotonic, or clustered)
 - You care about consistent, predictable latency
 
 **Stick with `std::lower_bound` when:**
 - Your dataset is small (<1000 elements) - index overhead isn't worth it
 - Data changes frequently - rebuilding the index constantly kills performance
-- You're only doing a handful of lookups - can't amortize the build cost
+- You're only doing a handful of lookups (<100 queries) - can't amortize the 2-400µs build cost
 - You need the absolute simplest, most portable code
 
 ## Usage

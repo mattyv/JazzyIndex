@@ -110,6 +110,44 @@ void register_lower_bound_suites() {
     }
 }
 
+// Build time benchmarks
+template <std::size_t Segments>
+void register_build_benchmark(std::size_t size, const std::string& distribution,
+                               const std::vector<std::uint64_t>& data) {
+    const std::string name = "JazzyIndexBuild/" + distribution + "/S" +
+                            std::to_string(Segments) + "/N" + std::to_string(size);
+
+    benchmark::RegisterBenchmark(name.c_str(),
+                                 [data](benchmark::State& state) {
+                                     for (auto _ : state) {
+                                         jazzy::JazzyIndex<std::uint64_t, Segments> index;
+                                         index.build(data.data(), data.data() + data.size());
+                                         benchmark::DoNotOptimize(index);
+                                     }
+                                     state.counters["segments"] = Segments;
+                                     state.counters["size"] = static_cast<double>(data.size());
+                                 })
+        ->Unit(benchmark::kMicrosecond);
+}
+
+void register_build_suites() {
+    const std::vector<std::size_t> sizes = {1'000, 10'000, 100'000, 1'000'000};
+
+    for (const std::size_t size : sizes) {
+        auto uniform_data = qi::bench::make_uniform_values(size);
+        register_build_benchmark<64>(size, "Uniform", uniform_data);
+        register_build_benchmark<128>(size, "Uniform", uniform_data);
+        register_build_benchmark<256>(size, "Uniform", uniform_data);
+        register_build_benchmark<512>(size, "Uniform", uniform_data);
+
+        auto exp_data = qi::bench::make_exponential_values(size);
+        register_build_benchmark<256>(size, "Exponential", exp_data);
+
+        auto zipf_data = qi::bench::make_zipf_values(size);
+        register_build_benchmark<256>(size, "Zipf", zipf_data);
+    }
+}
+
 // JazzyIndex benchmarks
 
 template <std::size_t Segments>
@@ -244,9 +282,12 @@ int main(int argc, char** argv) {
     // Register baseline std::lower_bound benchmarks first
     register_lower_bound_suites();
 
-    // Then register JazzyIndex benchmarks
+    // Register JazzyIndex query benchmarks
     register_uniform_suites();
     register_distribution_suites();
+
+    // Register JazzyIndex build time benchmarks
+    register_build_suites();
 
     ::benchmark::Initialize(&argc, argv);
     if (::benchmark::ReportUnrecognizedArguments(argc, argv)) {
