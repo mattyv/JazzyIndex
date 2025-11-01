@@ -116,12 +116,12 @@ TEST_F(UInt64Index, LargeUInt64Values) {
     };
     auto index = build_index(data);
 
-    EXPECT_TRUE(expect_found(index, data, 0ull));
-    EXPECT_TRUE(expect_found(index, data, 42ull));
-    EXPECT_TRUE(expect_found(index, data, (1ull << 40)));
+    EXPECT_TRUE(expect_found(index, data, uint64_t{0}));
+    EXPECT_TRUE(expect_found(index, data, uint64_t{42}));
+    EXPECT_TRUE(expect_found(index, data, uint64_t{1ull << 40}));
 
-    EXPECT_TRUE(expect_missing(index, data, (1ull << 40) + 1));
-    EXPECT_TRUE(expect_missing(index, data, 100ull));
+    EXPECT_TRUE(expect_missing(index, data, uint64_t{(1ull << 40) + 1}));
+    EXPECT_TRUE(expect_missing(index, data, uint64_t{100}));
 }
 
 // Parameterized test for different segment configurations
