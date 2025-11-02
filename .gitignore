@@ -13,3 +13,5 @@ Testing/
 Makefile
 cmake_install.cmake
 
+# Documentation - ignore JSON files, keep PNG plots
+docs/images/index_data/*.json

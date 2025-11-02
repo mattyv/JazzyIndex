@@ -80,16 +80,24 @@ inline std::vector<std::uint64_t> generate_clustered(std::size_t size,
     const std::size_t base = size / cluster_count;
     const std::size_t remainder = size % cluster_count;
 
+    const double min_d = static_cast<double>(min_value);
+    const double max_d = static_cast<double>(max_value);
+    const double range = max_d - min_d;
+
     for (std::size_t cluster = 0; cluster < cluster_count; ++cluster) {
         const std::size_t chunk = base + (cluster < remainder ? 1 : 0);
         if (chunk == 0) {
             continue;
         }
-        const double center = cluster_count == 1
+        const double center_normalized = cluster_count == 1
                                   ? 0.0
                                   : static_cast<double>(cluster) /
                                         static_cast<double>(cluster_count - 1);
-        std::normal_distribution<double> dist(center, std::max(cluster_spread, 1e-4));
+        // Scale center to [min_value, max_value] range
+        const double center = min_d + center_normalized * range;
+        // Scale spread to match the value range
+        const double scaled_spread = std::max(cluster_spread, 1e-4) * range;
+        std::normal_distribution<double> dist(center, scaled_spread);
         for (std::size_t idx = 0; idx < chunk; ++idx) {
             samples.push_back(dist(rng));
         }
@@ -192,6 +200,91 @@ inline std::vector<std::uint64_t> generate_mixed(std::size_t size,
     }
 
     return finalize_samples(std::move(samples), min_value, max_value);
+}
+
+inline std::vector<std::uint64_t> generate_quadratic(std::size_t size,
+                                                      unsigned seed,
+                                                      std::uint64_t min_value,
+                                                      std::uint64_t max_value) {
+    if (size == 0) {
+        return {};
+    }
+
+    std::vector<std::uint64_t> result;
+    result.reserve(size);
+
+    // Generate S-curve using tanh to create strong curvature in middle segments
+    // This creates regions where linear models fail but quadratic models work well
+    const std::uint64_t range = max_value - min_value;
+    const double size_d = static_cast<double>(size);
+
+    for (std::size_t i = 0; i < size; ++i) {
+        // Map index to [-3, 3] range for tanh (creates S-curve)
+        const double t = (static_cast<double>(i) / (size_d - 1.0)) * 6.0 - 3.0;
+        // tanh creates smooth S-curve: slow start, fast middle, slow end
+        // Map from [-1, 1] to [0, range]
+        const double normalized = (std::tanh(t) + 1.0) / 2.0;
+        const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
+        result.push_back(std::min(value, max_value));
+    }
+
+    return result;
+}
+
+inline std::vector<std::uint64_t> generate_extreme_polynomial(std::size_t size,
+                                                                unsigned seed,
+                                                                std::uint64_t min_value,
+                                                                std::uint64_t max_value) {
+    if (size == 0) {
+        return {};
+    }
+
+    std::vector<std::uint64_t> result;
+    result.reserve(size);
+
+    // Generate extreme polynomial: x^5 creates very sharp curvature
+    // This should force quadratic models in curved regions
+    const std::uint64_t range = max_value - min_value;
+    const double size_d = static_cast<double>(size);
+
+    for (std::size_t i = 0; i < size; ++i) {
+        // Normalize to [0, 1]
+        const double t = static_cast<double>(i) / (size_d - 1.0);
+        // Apply x^5 for extreme curvature - very slow start, explosive end
+        const double normalized = std::pow(t, 5.0);
+        const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
+        result.push_back(std::min(value, max_value));
+    }
+
+    return result;
+}
+
+inline std::vector<std::uint64_t> generate_inverse_polynomial(std::size_t size,
+                                                                unsigned seed,
+                                                                std::uint64_t min_value,
+                                                                std::uint64_t max_value) {
+    if (size == 0) {
+        return {};
+    }
+
+    std::vector<std::uint64_t> result;
+    result.reserve(size);
+
+    // Generate inverse polynomial: 1 - (1-x)^5 creates strong curvature
+    // Fast start (steep slope), slow end (flat) - opposite of x^5
+    const std::uint64_t range = max_value - min_value;
+    const double size_d = static_cast<double>(size);
+
+    for (std::size_t i = 0; i < size; ++i) {
+        // Normalize to [0, 1]
+        const double t = static_cast<double>(i) / (size_d - 1.0);
+        // Apply 1 - (1-t)^5 for inverse curvature - fast start, slow end
+        const double normalized = 1.0 - std::pow(1.0 - t, 5.0);
+        const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
+        result.push_back(std::min(value, max_value));
+    }
+
+    return result;
 }
 
 }  // namespace dataset

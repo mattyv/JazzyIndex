@@ -159,17 +159,70 @@ if(BUILD_BENCHMARKS)
         )
         add_custom_target(jazzy_benchmark_json DEPENDS ${JAZZY_BENCHMARK_JSON})
 
-        set(JAZZY_BENCHMARK_PNG ${CMAKE_BINARY_DIR}/jazzy_benchmarks.png)
+        set(JAZZY_DOCS_BENCHMARKS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/docs/images/benchmarks)
+        set(JAZZY_BENCHMARK_PNG ${JAZZY_DOCS_BENCHMARKS_DIR}/jazzy_benchmarks.png)
         add_custom_command(
             OUTPUT ${JAZZY_BENCHMARK_PNG}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${JAZZY_DOCS_BENCHMARKS_DIR}
             COMMAND ${JAZZY_VENV_PYTHON} ${JAZZY_PLOT_SCRIPT} --input ${JAZZY_BENCHMARK_JSON} --output ${JAZZY_BENCHMARK_PNG}
             DEPENDS ${JAZZY_BENCHMARK_JSON} ${JAZZY_PLOT_SCRIPT} ${JAZZY_VENV_PYTHON}
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMENT "Generating JazzyIndex benchmark plots"
+            COMMENT "Generating JazzyIndex benchmark plots in docs/images/benchmarks/"
             VERBATIM
         )
         add_custom_target(plot_benchmarks DEPENDS ${JAZZY_BENCHMARK_PNG})
         add_dependencies(plot_benchmarks jazzy_python_env jazzy_benchmark_json)
+
+        # Full benchmark suite (up to 1M keys)
+        set(JAZZY_BENCHMARK_FULL_JSON ${CMAKE_BINARY_DIR}/jazzy_benchmarks_full.json)
+        add_custom_command(
+            OUTPUT ${JAZZY_BENCHMARK_FULL_JSON}
+            COMMAND $<TARGET_FILE:jazzy_index_benchmarks> --full-benchmarks --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_FULL_JSON}
+            DEPENDS jazzy_index_benchmarks
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMENT "Running JazzyIndex full benchmarks (up to 1M keys, JSON output)"
+            VERBATIM
+        )
+        add_custom_target(jazzy_benchmark_full_json DEPENDS ${JAZZY_BENCHMARK_FULL_JSON})
+
+        set(JAZZY_BENCHMARK_FULL_PNG ${JAZZY_DOCS_BENCHMARKS_DIR}/jazzy_benchmarks_full.png)
+        add_custom_command(
+            OUTPUT ${JAZZY_BENCHMARK_FULL_PNG}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${JAZZY_DOCS_BENCHMARKS_DIR}
+            COMMAND ${JAZZY_VENV_PYTHON} ${JAZZY_PLOT_SCRIPT} --input ${JAZZY_BENCHMARK_FULL_JSON} --output ${JAZZY_BENCHMARK_FULL_PNG}
+            DEPENDS ${JAZZY_BENCHMARK_FULL_JSON} ${JAZZY_PLOT_SCRIPT} ${JAZZY_VENV_PYTHON}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMENT "Generating JazzyIndex full benchmark plots in docs/images/benchmarks/"
+            VERBATIM
+        )
+        add_custom_target(plot_benchmarks_full DEPENDS ${JAZZY_BENCHMARK_FULL_PNG})
+        add_dependencies(plot_benchmarks_full jazzy_python_env jazzy_benchmark_full_json)
+
+        # Index visualization target (outputs to committed docs/images/index_data/)
+        set(JAZZY_INDEX_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/docs/images/index_data)
+        set(JAZZY_PLOT_INDEX_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/scripts/plot_index_structure.py)
+        add_custom_target(visualize_index
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${JAZZY_INDEX_DATA_DIR}
+            COMMAND $<TARGET_FILE:jazzy_index_benchmarks> --visualize-index
+            COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/index_data ${JAZZY_INDEX_DATA_DIR}
+            COMMAND ${JAZZY_VENV_PYTHON} ${JAZZY_PLOT_INDEX_SCRIPT} ${JAZZY_INDEX_DATA_DIR}
+            DEPENDS jazzy_index_benchmarks ${JAZZY_VENV_PYTHON} ${JAZZY_PLOT_INDEX_SCRIPT}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMENT "Generating index structure visualizations in docs/images/index_data/"
+            VERBATIM
+        )
+        add_dependencies(visualize_index jazzy_python_env)
+
+        # Documentation plots target (generates plots into committed docs/images/ directory)
+        set(JAZZY_DOCS_PLOT_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_docs_plots.sh)
+        add_custom_target(generate_docs_plots
+            COMMAND ${JAZZY_DOCS_PLOT_SCRIPT}
+            DEPENDS jazzy_index_benchmarks
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMENT "Generating documentation plots into docs/images/"
+            VERBATIM
+        )
+        add_dependencies(generate_docs_plots jazzy_python_env)
     else()
         message(STATUS "Python interpreter not found; benchmark plotting is disabled.")
     endif()

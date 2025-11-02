@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <functional>
 #include <limits>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -25,8 +26,8 @@ enum class ModelType : uint8_t {
 };
 
 // Model selection and search tuning constants
-inline constexpr std::size_t MAX_ACCEPTABLE_LINEAR_ERROR = 8;
-// Linear models with error ≤8 are accepted immediately.
+inline constexpr std::size_t MAX_ACCEPTABLE_LINEAR_ERROR = 2;
+// Linear models with error ≤MAX_ACCEPTABLE_LINEAR_ERROR are accepted immediately.
 // Keeps exponential search efficient (~3 iterations: radius 2,4,8)
 
 inline constexpr double QUADRATIC_IMPROVEMENT_THRESHOLD = 0.7;
@@ -82,7 +83,7 @@ struct alignas(64) Segment {  // Cache line aligned
                 return static_cast<std::size_t>(pred);
             }
             case ModelType::QUADRATIC: {
-                const auto x = static_cast<double>(value);
+                const double x = static_cast<double>(value);
                 const double pred = std::fma(x,
                                             std::fma(x, params.quadratic.a, params.quadratic.b),
                                             params.quadratic.c);
@@ -133,8 +134,8 @@ template <typename T>
         return make_constant();
 
     // Fit linear model
-    const auto min_val = static_cast<double>(data[start]);
-    const auto max_val = static_cast<double>(data[end - 1]);
+    const double min_val = static_cast<double>(data[start]);
+    const double max_val = static_cast<double>(data[end - 1]);
     const double value_range = max_val - min_val;
 
     if (value_range < std::numeric_limits<double>::epsilon()) {
@@ -170,56 +171,67 @@ template <typename T>
     }
 
     // Try quadratic model: index = a*value^2 + b*value + c
-    // Use least squares fitting
-    double sum_x = 0.0;
-    double sum_x2 = 0.0;
-    double sum_x3 = 0.0;
-    double sum_x4 = 0.0;
-    double sum_y = 0.0;
-    double sum_xy = 0.0;
-    double sum_x2y = 0.0;
+    // Use least squares fitting with normalization for numerical stability
+    double sum_x = 0.0, sum_x2 = 0.0, sum_x3 = 0.0, sum_x4 = 0.0;
+    double sum_y = 0.0, sum_xy = 0.0, sum_x2y = 0.0;
+
+    // Normalize x values to [0, 1] range for better numerical stability
+    const double x_min = min_val;
+    const double x_scale = value_range > 0.0 ? value_range : 1.0;
 
     for (std::size_t i = start; i < end; ++i) {
-        const auto x = static_cast<double>(data[i]);
-        const auto y = static_cast<double>(i);
-        const double x2 = x * x;
-        const double x3 = x2 * x;
+        const double x_normalized = (static_cast<double>(data[i]) - x_min) / x_scale;
+        const double y = static_cast<double>(i);
+        const double x2 = x_normalized * x_normalized;
+        const double x3 = x2 * x_normalized;
         const double x4 = x2 * x2;
 
-        sum_x += x;
+        sum_x += x_normalized;
         sum_x2 += x2;
         sum_x3 += x3;
         sum_x4 += x4;
         sum_y += y;
-        sum_xy += x * y;
+        sum_xy += x_normalized * y;
         sum_x2y += x2 * y;
     }
 
-    const auto n_double = static_cast<double>(n);
+    const double n_double = static_cast<double>(n);
 
-    // Solve normal equations (simplified for speed, may not be perfect)
-    const double denom = n_double * (sum_x2 * sum_x4 - sum_x3 * sum_x3) -
-                        sum_x * (sum_x * sum_x4 - sum_x2 * sum_x3) +
-                        sum_x2 * (sum_x * sum_x3 - sum_x2 * sum_x2);
+    // Solve normal equations using Cramer's rule for 3x3 system
+    // System: [Σx⁴  Σx³  Σx²] [a]   [Σx²y]
+    //         [Σx³  Σx²  Σx ] [b] = [Σxy ]
+    //         [Σx²  Σx   n  ] [c]   [Σy  ]
 
-    if (std::abs(denom) > 1e-10) {
-        const double a = (n_double * (sum_x2y * sum_x2 - sum_xy * sum_x3) -
-                         sum_x * (sum_xy * sum_x2 - sum_y * sum_x3) +
-                         sum_x2 * (sum_xy * sum_x - sum_y * sum_x2)) / denom;
+    // Determinant of coefficient matrix
+    const double det = sum_x4 * (sum_x2 * n_double - sum_x * sum_x)
+                     - sum_x3 * (sum_x3 * n_double - sum_x * sum_x2)
+                     + sum_x2 * (sum_x3 * sum_x - sum_x2 * sum_x2);
 
-        const double b = (n_double * (sum_x4 * sum_xy - sum_x3 * sum_x2y) -
-                         sum_x * (sum_x3 * sum_xy - sum_x2 * sum_x2y) +
-                         sum_x2 * (sum_x2 * sum_xy - sum_x * sum_x2y)) / denom;
+    if (std::abs(det) > 1e-10) {
+        // Cramer's rule for a, b, c
+        const double det_a = sum_x2y * (sum_x2 * n_double - sum_x * sum_x)
+                           - sum_xy * (sum_x3 * n_double - sum_x * sum_x2)
+                           + sum_y * (sum_x3 * sum_x - sum_x2 * sum_x2);
 
-        const double c = (sum_y - a * sum_x2 - b * sum_x) / n_double;
+        const double det_b = sum_x4 * (sum_xy * n_double - sum_y * sum_x)
+                           - sum_x3 * (sum_x2y * n_double - sum_y * sum_x2)
+                           + sum_x2 * (sum_x2y * sum_x - sum_xy * sum_x2);
 
-        // Measure quadratic error
+        const double det_c = sum_x4 * (sum_x2 * sum_y - sum_x * sum_xy)
+                           - sum_x3 * (sum_x3 * sum_y - sum_x * sum_x2y)
+                           + sum_x2 * (sum_x3 * sum_xy - sum_x2 * sum_x2y);
+
+        const double a = det_a / det;
+        const double b = det_b / det;
+        const double c = det_c / det;
+
+        // Measure quadratic error using normalized x
         std::size_t quad_max_error = 0;
         double quad_total_error = 0.0;
 
         for (std::size_t i = start; i < end; ++i) {
-            const auto x = static_cast<double>(data[i]);
-            const double pred_double = std::fma(x, std::fma(x, a, b), c);
+            const double x_normalized = (static_cast<double>(data[i]) - x_min) / x_scale;
+            const double pred_double = std::fma(x_normalized, std::fma(x_normalized, a, b), c);
             const double error = std::abs(pred_double - static_cast<double>(i));
             quad_max_error = std::max(quad_max_error, static_cast<std::size_t>(std::ceil(error)));
             quad_total_error += error;
@@ -228,11 +240,15 @@ template <typename T>
         const double quad_mean_error = quad_total_error / n_double;
 
         // Choose quadratic if it's significantly better
-        if (static_cast<double>(quad_max_error) < static_cast<double>(linear_max_error) * QUADRATIC_IMPROVEMENT_THRESHOLD) {
+        if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
             result.best_model = ModelType::QUADRATIC;
-            result.quad_a = a;
-            result.quad_b = b;
-            result.quad_c = c;
+            // Transform coefficients from normalized space back to original space
+            // Original: index = a*x_norm^2 + b*x_norm + c, where x_norm = (x - x_min) / x_scale
+            // Want: index = a'*x^2 + b'*x + c'
+            const double x_scale_sq = x_scale * x_scale;
+            result.quad_a = a / x_scale_sq;
+            result.quad_b = b / x_scale - 2.0 * a * x_min / x_scale_sq;
+            result.quad_c = a * x_min * x_min / x_scale_sq - b * x_min / x_scale + c;
             result.max_error = quad_max_error;
             result.mean_error = quad_mean_error;
             return result;
@@ -249,7 +265,12 @@ template <typename T>
 }  // namespace detail
 
 // Recommended segment count presets
-enum class SegmentCount : std::uint16_t {
+enum class SegmentCount : std::size_t {
+    SINGLE = 1,      // No segmentation: full dataset in one segment
+    MINIMAL = 2,     // Binary split: extreme coarse indexing
+    PICO = 4,        // Debugging tiny datasets; almost no segmentation
+    NANO = 8,        // Extremely small datasets; coarse segmentation
+    MICRO = 16,      // Minimal segmentation for testing larger segment sizes
     TINY = 32,       // Very small datasets or minimal memory footprint
     SMALL = 64,      // Small datasets (thousands of elements)
     MEDIUM = 128,    // Medium datasets
@@ -261,18 +282,16 @@ enum class SegmentCount : std::uint16_t {
 
 // Helper to convert std::size_t to SegmentCount for generic code
 template <std::size_t N>
-constexpr SegmentCount to_segment_count() {
+inline constexpr SegmentCount to_segment_count() {
     return static_cast<SegmentCount>(N);
 }
 
-template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, bool EnableBoundsCheck = true>
+template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>>
 class JazzyIndex {
-    static constexpr std::size_t NUM_SEGMENTS = static_cast<std::size_t>(Segments);
+    static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
 
-    static_assert(detail::IS_STRICTLY_ARITHMETIC_V<T>,
-                  "JazzyIndex expects arithmetic value types.");
-    static_assert(NUM_SEGMENTS > 0 && NUM_SEGMENTS <= 4096,
-                  "NUM_SEGMENTS must be in range [1, 4096]");
+    static_assert(NumSegments > 0 && NumSegments <= 4096,
+                  "NumSegments must be in range [1, 4096]");
 
 public:
     JazzyIndex() = default;
@@ -307,7 +326,7 @@ public:
         }
 
         // Build quantile-based segments
-        const std::size_t actual_segments = std::min(NUM_SEGMENTS, size_);
+        const std::size_t actual_segments = std::min(NumSegments, size_);
         num_segments_ = actual_segments;
 
         for (std::size_t i = 0; i < actual_segments; ++i) {
@@ -353,15 +372,11 @@ public:
             return base_;
         }
 
-        // Bounds check - early exit for out-of-range queries
-        // When enabled: ~1.5ns for out-of-bounds (95% faster than lower_bound)
-        // When disabled: ~15% faster for found queries, but ~5x slower for out-of-bounds
-        if constexpr (EnableBoundsCheck) {
-            const T& first_value = base_[0];
-            const T& last_value = base_[size_ - 1];
-            if (comp_(key, first_value) || comp_(last_value, key)) {
-                return base_ + size_;
-            }
+        // Bounds check
+        const T& first_value = base_[0];
+        const T& last_value = base_[size_ - 1];
+        if (comp_(key, first_value) || comp_(last_value, key)) {
+            return base_ + size_;
         }
 
         // Find segment using binary search
@@ -450,6 +465,10 @@ public:
     [[nodiscard]] std::size_t size() const noexcept { return size_; }
     [[nodiscard]] std::size_t num_segments() const noexcept { return num_segments_; }
 
+    // Friend declaration for export functionality
+    template <typename U, SegmentCount S, typename C>
+    friend std::string export_index_metadata(const JazzyIndex<U, S, C>& index);
+
 private:
     void detect_uniformity() noexcept {
         if (num_segments_ <= 1) {
@@ -496,7 +515,7 @@ private:
         // Fast path: O(1) arithmetic lookup for uniform data
         if (is_uniform_) {
             const double offset = static_cast<double>(value) - static_cast<double>(min_);
-            auto seg_idx = static_cast<std::size_t>(offset * segment_scale_);
+            std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
 
             // Clamp to valid range
             if (seg_idx >= num_segments_) {
@@ -549,7 +568,7 @@ private:
     std::size_t num_segments_{0};
     bool is_uniform_{false};
     double segment_scale_{0.0};
-    std::array<detail::Segment<T>, NUM_SEGMENTS> segments_{};
+    std::array<detail::Segment<T>, NumSegments> segments_{};
 };
 
 }  // namespace jazzy

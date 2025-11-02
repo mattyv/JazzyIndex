@@ -33,7 +33,7 @@ A fast, adaptive learned index for sorted arrays that predicts element positions
 
 Traditional binary search is elegant: `O(log n)` comparisons, works on any sorted data, no preprocessing needed. But here's the thing - it treats your data like a black box. It doesn't care if you're searching a million evenly-spaced integers or a Zipf distribution with massive clustering. Every lookup does the same `log(n)` comparisons, making the same number of unpredictable branches, touching the same number of cache lines.
 
-**JazzyIndex takes a different approach:** what if we learned the distribution of your data during indexing, and used that knowledge to predict where elements should be? Instead of always doing 20-ish comparisons on a million-element array, maybe we could predict "the value 50,000 is probably around index 50,000" and check there first.
+**JazzyIndex takes a different approach:** what if we learned the distribution of your data during indexing, and used that knowledge to predict where elements should be? Instead of always doing 20-ish comparisons on a million-element array, maybe we could predict "the value 50,000 is probably around index 57,803" and check there first.
 
 That's a learned index. Build a lightweight model of your data's distribution, use it to predict positions, then verify the prediction with a small local search.
 
@@ -41,24 +41,26 @@ That's a learned index. Build a lightweight model of your data's distribution, u
 
 Here's JazzyIndex compared head-to-head with `std::lower_bound` (black X markers) across various data distributions:
 
-![JazzyIndex vs std::lower_bound Benchmark Results](benchmarks/jazzy_benchmarks.png)
+![JazzyIndex vs std::lower_bound Benchmark Results](docs/images/benchmarks/jazzy_benchmarks_medium.png)
+
+*Medium segment counts (16-128) - the sweet spot for most workloads. See [BENCHMARKS.md](docs/BENCHMARKS.md) for detailed analysis.*
 
 **The numbers tell the story:**
 
 | Distribution | `std::lower_bound` | JazzyIndex (S=256) | **Speedup** |
 |--------------|-------------------:|-------------------:|------------:|
-| Uniform      | 28.3 ns | 2.6 ns | **10.7x** |
-| Lognormal    | 29.5 ns | 3.2 ns | **9.1x** |
-| Exponential  | 29.5 ns | 3.8 ns | **7.7x** |
-| Clustered    | 29.5 ns | 3.8 ns | **7.7x** |
-| Mixed        | 29.5 ns | 3.8 ns | **7.7x** |
-| Zipf         | 29.4 ns | 4.7 ns | **6.3x** |
+| Uniform      | 17.4 ns | 3.2 ns | **5.4x** |
+| Lognormal    | 17.4 ns | 3.2 ns | **5.4x** |
+| Exponential  | 17.4 ns | 3.2 ns | **5.4x** |
+| Clustered    | 17.3 ns | 3.5 ns | **4.9x** |
+| Mixed        | 17.3 ns | 3.2 ns | **5.4x** |
+| Zipf         | 18.6 ns | 3.2 ns | **5.8x** |
 
-*All measurements on 1,000,000 elements (Apple M2, Release build with -O3 -march=native)*
+*All measurements on 10,000 elements (Apple M2, Release build with -O3 -march=native)*
 
-**Uniform data (bottom left):** This is where learned indexes shine. `std::lower_bound` follows the classic log(n) curve - starting at 5.8ns for 100 elements and climbing to 27.7ns for 1 million elements (4.8x slower). JazzyIndex? **Perfectly flat at 3.2ns** across all sizes. The "Not found" queries (dotted lines) hit **1.47ns** across all dataset sizes - that's the arithmetic fast path doing pure O(1) lookups with **19x speedup** over lower_bound. As your dataset grows 10,000x (100 → 1M elements), `std::lower_bound` slows by 4.8x while JazzyIndex stays constant.
+**Uniform data (bottom left):** This is where learned indexes shine. `std::lower_bound` follows the classic log(n) curve - growing logarithmically with dataset size. JazzyIndex? **Consistently flat around 3.2ns** across all sizes. The "Not found" queries (dash-dot lines) hit even lower latencies - that's the arithmetic fast path doing pure O(1) lookups. As your dataset grows, `std::lower_bound` slows proportionally with log(n) while JazzyIndex stays constant.
 
-**Skewed distributions (everywhere else):** Here's where JazzyIndex proves it's not just a one-trick pony. On lognormal data, we see **9.1x speedup** (29.5ns → 3.2ns) because the quadratic models fit the curve perfectly. Even on pathological Zipf distributions (heavy-tailed, massive clustering), JazzyIndex still delivers **6.3x speedup**. Quantile segmentation means we're only searching 1/256th of the data, so even when models can't predict perfectly, performance stays fast and consistent.
+**Skewed distributions (everywhere else):** Here's where JazzyIndex proves it's not just a one-trick pony. On lognormal, exponential, and mixed distributions, we see **5.4x speedup** (17.4ns → 3.2ns) because the adaptive models fit the curves well. Even on pathological Zipf distributions (heavy-tailed, massive clustering), JazzyIndex still delivers **5.8x speedup**. Quantile segmentation means we're only searching 1/256th of the data, so even when models can't predict perfectly, performance stays fast and consistent.
 
 The key insight: JazzyIndex doesn't just optimize for the best case. It adapts to your data's shape and maintains consistent, predictable performance across all distributions. The black X lines curving upward vs the colored lines staying flat - that's the difference between O(log n) and O(1) in action.
 
@@ -104,7 +106,7 @@ When you call `build()`, here's what happens:
 
 1. **Partition into quantiles**: Divide the array into N segments of equal element count (default: 256 segments). This is simple arithmetic - segment `i` spans indices `[i×size/N, (i+1)×size/N)`.
 
-2. **Analyze each segment**: For every segment, fit linear and quadratic models using least-squares regression. Measure the maximum prediction error for each model. If linear error is ≤8 elements, use linear (it's faster). If quadratic reduces error by 30%+, use quadratic (it's worth the extra computation). If all values are identical, use constant.
+2. **Analyze each segment**: For every segment, fit linear and quadratic models using least-squares regression. Measure the maximum prediction error for each model. If linear error is ≤2 elements, use linear (it's faster). If quadratic reduces error by 30%+, use quadratic (it's worth the extra computation). If all values are identical, use constant.
 
 3. **Detect uniformity**: Check if segments are evenly spaced in value range (±30% tolerance). If so, we can skip segment lookup entirely and use arithmetic: `segment_index = (value - min) × num_segments / (max - min)`. This is the "fast path" you see in uniform data benchmarks.
 
@@ -169,14 +171,50 @@ flowchart TD
 
 **Why not one big model?** Fitting a single model to complex distributions requires high-degree polynomials or piecewise functions, which are expensive to evaluate and prone to overfitting. Segmentation gives us locality: simple models that capture local behavior, with automatic adaptation to distribution changes across the array.
 
+## Index Structure Visualization
+
+Here's what the learned index actually looks like internally. Each visualization shows:
+- **Black dots**: Your actual data points (key-value pairs)
+- **Red lines**: LINEAR models (cost: 1 FMA)
+- **Blue lines**: QUADRATIC models (cost: 3 FMA)
+- **Green lines**: CONSTANT models (cost: 0)
+- **Beige bands**: ±max_error prediction bounds
+- **Gray dashed lines**: Segment boundaries
+
+### Extreme Polynomial Distribution (x⁵)
+
+![ExtremePoly Index Structure](docs/images/visualizations/index_ExtremePoly_N1000_S8.png)
+
+With only 8 segments, you can clearly see adaptive model selection in action:
+- **Flat beginning**: 2 CONSTANT models (green) where all values are nearly identical
+- **Gentle middle**: 1 LINEAR model (red) for the gradually increasing section
+- **Explosive end**: 5 QUADRATIC models (blue) handling the steep x⁵ curve
+
+The error bounds (beige bands) show prediction accuracy - narrower bands mean faster queries. Notice how the quadratic models keep error bounds tight even through the extreme curvature at the end.
+
+**Want to see more?** Check out [VISUALIZATIONS.md](docs/VISUALIZATIONS.md) for detailed explanations and examples across all 9 distributions.
+
+**Generate all visualizations:** Run `cmake --build build --target visualize_index` to create plots for all 9 distributions × 10 segment counts × multiple sizes = 270+ visualization plots in [docs/images/index_data/](docs/images/index_data/).
+
+## Detailed Documentation
+
+JazzyIndex comes with comprehensive technical documentation:
+
+- **[BENCHMARKS.md](docs/BENCHMARKS.md)** - Performance analysis across all distributions and segment counts, with detailed plots split by segment groups (low/medium/high). Includes segment selection guide and memory footprint calculations.
+
+- **[VISUALIZATIONS.md](docs/VISUALIZATIONS.md)** - Learn to read index structure plots. Understand what error bounds mean, how model selection works, and see examples from Uniform (ideal case) to Zipf (heavy-tailed challenge).
+
+- **[MODEL_SELECTION.md](docs/MODEL_SELECTION.md)** - Deep technical dive into the mathematics: least-squares fitting, Cramer's rule for quadratics, input normalization, and the rationale behind selection thresholds like `MAX_ACCEPTABLE_LINEAR_ERROR = 2` and `QUADRATIC_IMPROVEMENT_THRESHOLD = 0.7`.
+
 ## Features
 
 - **Header-only library** (`include/jazzy_index.hpp`) with minimal dependencies
 - **Adaptive model selection**: Automatically chooses constant/linear/quadratic per segment
 - **Graceful degradation**: Fast on uniform data, consistent on skewed data
 - **Comprehensive testing**: Unit tests + RapidCheck property-based tests for correctness
-- **Extensive benchmarks**: Uniform, exponential, clustered, lognormal, Zipf, and mixed distributions
+- **Extensive benchmarks**: 9 distributions tested (Uniform, Exponential, Clustered, Lognormal, Zipf, Mixed, Quadratic, ExtremePoly, InversePoly)
 - **Configurable segment count**: Template parameter for tuning space vs. speed tradeoff
+- **Rich visualization**: Index structure plots showing model selection and error bounds
 
 ## Build Cost vs Query Cost
 
@@ -272,18 +310,27 @@ cmake --build build --target jazzy_index_benchmarks
 ```
 
 Benchmarks are organized by:
-- **Distribution**: Uniform, exponential, clustered, lognormal, Zipf, mixed
-- **Segment count**: 64, 128, 256, 512
+- **Distribution**: Uniform, Exponential, Clustered, Lognormal, Zipf, Mixed, Quadratic (S-curve), ExtremePoly (x⁵), InversePoly (1-(1-x)⁵)
+- **Segment count**: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512
 - **Dataset size**: 100 to 1,000,000 elements
-- **Query pattern**: Found (beginning), FoundMiddle, FoundEnd, NotFound
+- **Query pattern**: FoundMiddle, FoundEnd, NotFound
 
 ### Plotting Benchmarks
 
-If Python 3 is available, CMake exposes a `plot_benchmarks` target that creates a virtual environment, runs the full benchmark suite with JSON output, and renders the performance graph:
+If Python 3 is available, CMake exposes plotting targets that create a virtual environment, run benchmarks with JSON output, and render performance graphs:
 
 ```bash
+# Quick benchmarks (up to 10K elements)
 cmake --build build --target plot_benchmarks
-# Output: build/jazzy_benchmarks.png and build/jazzy_benchmarks.json
+# Output: docs/images/benchmarks/jazzy_benchmarks_{low,medium,high}.png
+
+# Full benchmarks (up to 1M elements, takes 15-30 minutes)
+cmake --build build --target plot_benchmarks_full
+# Output: docs/images/benchmarks/jazzy_benchmarks_full_{low,medium,high}.png
+
+# Generate all documentation plots (performance + visualizations)
+cmake --build build --target generate_docs_plots
+# Output: docs/images/benchmarks/*.png and docs/images/visualizations/*.png
 ```
 
 ## Tuning and Tradeoffs
@@ -367,18 +414,34 @@ JazzyIndex prioritizes simplicity and robustness. No exotic models, no complex o
 
 ```
 include/
-  jazzy_index.hpp              # Core index implementation
-  jazzy_index_utility.hpp      # Arithmetic trait & clamp helper
-  dataset_generators.hpp        # Distribution generators for tests & benchmarks
+  jazzy_index.hpp                 # Core index implementation
+  jazzy_index_utility.hpp         # Arithmetic trait & clamp helper
+  dataset_generators.hpp          # Distribution generators (9 distributions)
 benchmarks/
-  fixtures.hpp                  # Data builders shared across benchmarks
-  benchmark_main.cpp            # Google Benchmark suite
+  fixtures.hpp                    # Data builders shared across benchmarks
+  benchmark_main.cpp              # Google Benchmark suite (9 distributions × 10 segment counts)
 scripts/
-  plot_benchmarks.py            # Render benchmark performance graphs
-  requirements.txt              # Python dependencies for plotting
+  plot_benchmarks.py              # Render performance graphs (split into low/medium/high)
+  plot_index_structure.py         # Generate index structure visualizations
+  generate_docs_plots.sh          # Generate all documentation plots
+  requirements.txt                # Python dependencies for plotting
 tests/
-  unit_tests.cpp                # Deterministic correctness checks
-  property_tests.cpp            # RapidCheck property-based tests
+  gtest_unit_tests.cpp            # Core functionality tests
+  gtest_model_tests.cpp           # Model selection and fitting tests
+  gtest_boundary_tests.cpp        # Edge case handling
+  gtest_floating_point_tests.cpp  # Floating-point robustness
+  gtest_comparator_tests.cpp      # Custom comparator tests
+  gtest_error_recovery_tests.cpp  # Error recovery and fallback tests
+  gtest_uniformity_tests.cpp      # Uniform detection tests
+  gtest_property_tests.cpp        # RapidCheck property-based tests
+docs/
+  BENCHMARKS.md                   # Detailed performance analysis
+  VISUALIZATIONS.md               # Guide to reading index structure plots
+  MODEL_SELECTION.md              # Mathematical details of model fitting
+  images/
+    benchmarks/                   # Performance plots (committed)
+    visualizations/               # Showcase index structure plots (5 curated)
+    index_data/                   # All index structure plots (270+ plots)
 ```
 
 ## Contributing

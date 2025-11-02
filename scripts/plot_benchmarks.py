@@ -27,14 +27,34 @@ from matplotlib.ticker import FuncFormatter, LogLocator
 # Key format: (implementation, distribution, scenario, segments/None, size)
 BenchmarkKey = Tuple[str, str, str, int, int]
 
-SEGMENT_ORDER = [64, 128, 256, 512]
+SEGMENT_ORDER = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+
+# Segment groups for split plotting
+SEGMENT_GROUPS = {
+    'low': [1, 2, 4, 8],
+    'medium': [16, 32, 64, 128],
+    'high': [256, 512]
+}
+
 SEGMENT_COLORS = {
+    1: "#9467bd",    # purple
+    2: "#8c564b",    # brown
+    4: "#e377c2",    # pink
+    8: "#7f7f7f",    # gray
+    16: "#bcbd22",   # olive
+    32: "#17becf",   # cyan
     64: "#1f77b4",   # blue
     128: "#ff7f0e",  # orange
     256: "#2ca02c",  # green
     512: "#d62728",  # red
 }
 SEGMENT_MARKERS = {
+    1: "v",
+    2: "<",
+    4: ">",
+    8: "p",
+    16: "*",
+    32: "h",
     64: "o",
     128: "s",
     256: "^",
@@ -48,10 +68,16 @@ LOWER_BOUND_LINEWIDTH = 2.5
 
 SCENARIO_ORDER = ["Found", "FoundMiddle", "FoundEnd", "NotFound"]
 SCENARIO_STYLES = {
-    "Found": "-",
-    "FoundMiddle": "--",
-    "FoundEnd": "-.",
-    "NotFound": ":",
+    "Found": "-",           # Solid line
+    "FoundMiddle": "--",    # Dashed line
+    "FoundEnd": ":",        # Dotted line
+    "NotFound": "-.",       # Dash-dot line
+}
+SCENARIO_LINE_WIDTHS = {
+    "Found": 2.5,
+    "FoundMiddle": 2.5,
+    "FoundEnd": 2.5,
+    "NotFound": 2.5,
 }
 SCENARIO_LABELS = {
     "Found": "Found",
@@ -177,7 +203,8 @@ def scenario_sort_key(scenario: str) -> Tuple[int, str]:
         return (len(SCENARIO_ORDER), scenario)
 
 
-def plot(grouped, output: Path) -> None:
+def plot_segment_group(grouped, output: Path, segment_list: List[int], group_name: str) -> None:
+    """Plot benchmarks for a specific group of segment counts."""
     distributions = sorted(grouped)
     if not distributions:
         raise ValueError("No benchmark results were found in the input file.")
@@ -202,11 +229,16 @@ def plot(grouped, output: Path) -> None:
             for impl_key, points in sorted(by_impl.items()):
                 if not points:
                     continue
+
+                impl, seg_or_baseline = impl_key
+
+                # Filter: only plot if segment is in our group (or it's LowerBound)
+                if impl == "JazzyIndex" and seg_or_baseline not in segment_list:
+                    continue
+
                 points.sort(key=lambda item: item[0])
                 sizes = [size for size, _ in points]
                 times = [time for _, time in points]
-
-                impl, seg_or_baseline = impl_key
 
                 if impl == "LowerBound":
                     # Plot std::lower_bound as thick black line
@@ -228,11 +260,12 @@ def plot(grouped, output: Path) -> None:
                     if color is None:
                         color = plt.get_cmap("tab10")(SEGMENT_ORDER.index(segments) % 10)
                     marker = SEGMENT_MARKERS.get(segments, "o")
+                    linewidth = SCENARIO_LINE_WIDTHS.get(scenario, 2.0)
                     ax.plot(
                         sizes,
                         times,
                         marker=marker,
-                        linewidth=2.0,
+                        linewidth=linewidth,
                         markersize=5.5,
                         color=color,
                         linestyle=linestyle,
@@ -257,7 +290,7 @@ def plot(grouped, output: Path) -> None:
     for unused_ax in axes.flatten()[len(distributions) :]:
         unused_ax.axis("off")
 
-    # Create legend handles
+    # Create legend handles (only for segments in this group)
     segment_handles = [
         Line2D(
             [0],
@@ -269,7 +302,7 @@ def plot(grouped, output: Path) -> None:
             markersize=6,
             label=f"JI S={seg}",
         )
-        for seg in SEGMENT_ORDER
+        for seg in segment_list
     ]
 
     # Add std::lower_bound handle
@@ -291,7 +324,7 @@ def plot(grouped, output: Path) -> None:
             [0],
             color="black",
             linestyle=SCENARIO_STYLES.get(scenario, "-"),
-            linewidth=2.0,
+            linewidth=SCENARIO_LINE_WIDTHS.get(scenario, 2.0),
             label=SCENARIO_LABELS.get(scenario, scenario),
         )
         for scenario in SCENARIO_ORDER
@@ -299,7 +332,8 @@ def plot(grouped, output: Path) -> None:
     ]
 
     cpu_name = get_cpu_name()
-    fig.suptitle("JazzyIndex vs std::lower_bound Performance", fontsize=16, fontweight="bold")
+    title = f"JazzyIndex vs std::lower_bound Performance - {group_name.title()} Segments"
+    fig.suptitle(title, fontsize=16, fontweight="bold")
     fig.text(0.99, 0.95, cpu_name, ha="right", va="top", fontsize=9, color="gray", transform=fig.transFigure)
     fig.subplots_adjust(bottom=0.18, top=0.90)
     fig.legend(
@@ -328,6 +362,18 @@ def plot(grouped, output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output, dpi=150)
     plt.close(fig)
+
+
+def plot(grouped, output: Path) -> None:
+    """Generate plots split by segment count groups."""
+    # Generate output paths for each segment group
+    output_stem = output.stem
+    output_dir = output.parent
+    output_suffix = output.suffix
+
+    for group_name, segment_list in SEGMENT_GROUPS.items():
+        group_output = output_dir / f"{output_stem}_{group_name}{output_suffix}"
+        plot_segment_group(grouped, group_output, segment_list, group_name)
 
 
 def main() -> None:
