@@ -27,14 +27,26 @@ from matplotlib.ticker import FuncFormatter, LogLocator
 # Key format: (implementation, distribution, scenario, segments/None, size)
 BenchmarkKey = Tuple[str, str, str, int, int]
 
-SEGMENT_ORDER = [64, 128, 256, 512]
+SEGMENT_ORDER = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 SEGMENT_COLORS = {
+    1: "#9467bd",    # purple
+    2: "#8c564b",    # brown
+    4: "#e377c2",    # pink
+    8: "#7f7f7f",    # gray
+    16: "#bcbd22",   # olive
+    32: "#17becf",   # cyan
     64: "#1f77b4",   # blue
     128: "#ff7f0e",  # orange
     256: "#2ca02c",  # green
     512: "#d62728",  # red
 }
 SEGMENT_MARKERS = {
+    1: "v",
+    2: "<",
+    4: ">",
+    8: "p",
+    16: "*",
+    32: "h",
     64: "o",
     128: "s",
     256: "^",

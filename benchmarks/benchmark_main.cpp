@@ -18,6 +18,9 @@
 
 namespace {
 
+// Global flag to control benchmark dataset sizes
+static bool use_full_benchmarks = false;
+
 template <typename F, std::size_t... Segments>
 void for_each_segment_count_impl(F&& f, std::integer_sequence<std::size_t, Segments...>) {
     (f(std::integral_constant<std::size_t, Segments>{}), ...);
@@ -112,13 +115,22 @@ void register_lower_bound_distribution_suite(const std::string& name,
 }
 
 void register_lower_bound_suites() {
-    const std::vector<std::size_t> sizes = {100, 1'000, 10'000, 100'000, 1'000'000};
+    std::vector<std::size_t> sizes = {100, 1'000, 10'000};
+    if (use_full_benchmarks) {
+        sizes.push_back(100'000);
+        sizes.push_back(1'000'000);
+    }
 
     for (const std::size_t size : sizes) {
         register_lower_bound_uniform_suite(size);
     }
 
-    const std::vector<std::size_t> dist_sizes = {100, 10'000, 100'000, 1'000'000};
+    std::vector<std::size_t> dist_sizes = {100, 10'000};
+    if (use_full_benchmarks) {
+        dist_sizes.push_back(100'000);
+        dist_sizes.push_back(1'000'000);
+    }
+
     for (const std::size_t size : dist_sizes) {
         register_lower_bound_distribution_suite("Exponential", qi::bench::make_exponential_values, size);
         register_lower_bound_distribution_suite("Clustered", qi::bench::make_clustered_values, size);
@@ -149,7 +161,11 @@ void register_build_benchmark(std::size_t size, const std::string& distribution,
 }
 
 void register_build_suites() {
-    const std::vector<std::size_t> sizes = {1'000, 10'000, 100'000, 1'000'000};
+    std::vector<std::size_t> sizes = {1'000, 10'000};
+    if (use_full_benchmarks) {
+        sizes.push_back(100'000);
+        sizes.push_back(1'000'000);
+    }
 
     for (const std::size_t size : sizes) {
         auto uniform_data = qi::bench::make_uniform_values(size);
@@ -256,7 +272,11 @@ void register_distribution_suite(const std::string& name,
 }
 
 void register_uniform_suites() {
-    const std::vector<std::size_t> sizes = {100, 1'000, 10'000, 100'000, 1'000'000};
+    std::vector<std::size_t> sizes = {100, 1'000, 10'000};
+    if (use_full_benchmarks) {
+        sizes.push_back(100'000);
+        sizes.push_back(1'000'000);
+    }
 
     for (const std::size_t size : sizes) {
         for_each_segment_count([size](auto seg_tag) {
@@ -266,7 +286,11 @@ void register_uniform_suites() {
 }
 
 void register_distribution_suites() {
-    const std::vector<std::size_t> sizes = {100, 10'000, 100'000, 1'000'000};
+    std::vector<std::size_t> sizes = {100, 10'000};
+    if (use_full_benchmarks) {
+        sizes.push_back(100'000);
+        sizes.push_back(1'000'000);
+    }
 
     for (const std::size_t size : sizes) {
         for_each_segment_count([size](auto seg_tag) {
@@ -332,6 +356,7 @@ void export_visualization_data(const std::string& output_dir) {
     distributions.emplace_back("Mixed", [](std::size_t size) { return qi::bench::make_mixed_values(size); });
     distributions.emplace_back("Quadratic", [](std::size_t size) { return qi::bench::make_quadratic_values(size); });
     distributions.emplace_back("ExtremePoly", [](std::size_t size) { return qi::bench::make_extreme_polynomial_values(size); });
+    distributions.emplace_back("InversePoly", [](std::size_t size) { return qi::bench::make_inverse_polynomial_values(size); });
 
     int total_exports = 0;
     int failed_exports = 0;
@@ -417,7 +442,7 @@ void export_visualization_data(const std::string& output_dir) {
 }  // namespace
 
 int main(int argc, char** argv) {
-    // Check for --visualize-index flag before benchmark initialization
+    // Check for custom flags before benchmark initialization
     bool visualize_mode = false;
     std::string output_dir = "index_data";
 
@@ -435,6 +460,14 @@ int main(int argc, char** argv) {
             visualize_mode = true;
             output_dir = arg.substr(25);  // Length of "--visualize-index-output="
             // Remove this flag
+            for (int j = i; j < argc - 1; ++j) {
+                argv[j] = argv[j + 1];
+            }
+            --argc;
+            --i;
+        } else if (arg == "--full-benchmarks") {
+            use_full_benchmarks = true;
+            // Remove this flag so benchmark library doesn't see it
             for (int j = i; j < argc - 1; ++j) {
                 argv[j] = argv[j + 1];
             }

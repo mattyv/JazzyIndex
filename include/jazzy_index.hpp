@@ -25,8 +25,8 @@ enum class ModelType : uint8_t {
 };
 
 // Model selection and search tuning constants
-inline constexpr std::size_t MAX_ACCEPTABLE_LINEAR_ERROR = 8;
-// Linear models with error ≤8 are accepted immediately.
+inline constexpr std::size_t MAX_ACCEPTABLE_LINEAR_ERROR = 2;
+// Linear models with error ≤MAX_ACCEPTABLE_LINEAR_ERROR are accepted immediately.
 // Keeps exponential search efficient (~3 iterations: radius 2,4,8)
 
 inline constexpr double QUADRATIC_IMPROVEMENT_THRESHOLD = 0.7;
@@ -170,51 +170,67 @@ template <typename T>
     }
 
     // Try quadratic model: index = a*value^2 + b*value + c
-    // Use least squares fitting
+    // Use least squares fitting with normalization for numerical stability
     double sum_x = 0.0, sum_x2 = 0.0, sum_x3 = 0.0, sum_x4 = 0.0;
     double sum_y = 0.0, sum_xy = 0.0, sum_x2y = 0.0;
 
+    // Normalize x values to [0, 1] range for better numerical stability
+    const double x_min = min_val;
+    const double x_scale = value_range > 0.0 ? value_range : 1.0;
+
     for (std::size_t i = start; i < end; ++i) {
-        const double x = static_cast<double>(data[i]);
+        const double x_normalized = (static_cast<double>(data[i]) - x_min) / x_scale;
         const double y = static_cast<double>(i);
-        const double x2 = x * x;
-        const double x3 = x2 * x;
+        const double x2 = x_normalized * x_normalized;
+        const double x3 = x2 * x_normalized;
         const double x4 = x2 * x2;
 
-        sum_x += x;
+        sum_x += x_normalized;
         sum_x2 += x2;
         sum_x3 += x3;
         sum_x4 += x4;
         sum_y += y;
-        sum_xy += x * y;
+        sum_xy += x_normalized * y;
         sum_x2y += x2 * y;
     }
 
     const double n_double = static_cast<double>(n);
 
-    // Solve normal equations (simplified for speed, may not be perfect)
-    const double denom = n_double * (sum_x2 * sum_x4 - sum_x3 * sum_x3) -
-                        sum_x * (sum_x * sum_x4 - sum_x2 * sum_x3) +
-                        sum_x2 * (sum_x * sum_x3 - sum_x2 * sum_x2);
+    // Solve normal equations using Cramer's rule for 3x3 system
+    // System: [Σx⁴  Σx³  Σx²] [a]   [Σx²y]
+    //         [Σx³  Σx²  Σx ] [b] = [Σxy ]
+    //         [Σx²  Σx   n  ] [c]   [Σy  ]
 
-    if (std::abs(denom) > 1e-10) {
-        const double a = (n_double * (sum_x2y * sum_x2 - sum_xy * sum_x3) -
-                         sum_x * (sum_xy * sum_x2 - sum_y * sum_x3) +
-                         sum_x2 * (sum_xy * sum_x - sum_y * sum_x2)) / denom;
+    // Determinant of coefficient matrix
+    const double det = sum_x4 * (sum_x2 * n_double - sum_x * sum_x)
+                     - sum_x3 * (sum_x3 * n_double - sum_x * sum_x2)
+                     + sum_x2 * (sum_x3 * sum_x - sum_x2 * sum_x2);
 
-        const double b = (n_double * (sum_x4 * sum_xy - sum_x3 * sum_x2y) -
-                         sum_x * (sum_x3 * sum_xy - sum_x2 * sum_x2y) +
-                         sum_x2 * (sum_x2 * sum_xy - sum_x * sum_x2y)) / denom;
+    if (std::abs(det) > 1e-10) {
+        // Cramer's rule for a, b, c
+        const double det_a = sum_x2y * (sum_x2 * n_double - sum_x * sum_x)
+                           - sum_xy * (sum_x3 * n_double - sum_x * sum_x2)
+                           + sum_y * (sum_x3 * sum_x - sum_x2 * sum_x2);
 
-        const double c = (sum_y - a * sum_x2 - b * sum_x) / n_double;
+        const double det_b = sum_x4 * (sum_xy * n_double - sum_y * sum_x)
+                           - sum_x3 * (sum_x2y * n_double - sum_y * sum_x2)
+                           + sum_x2 * (sum_x2y * sum_x - sum_xy * sum_x2);
 
-        // Measure quadratic error
+        const double det_c = sum_x4 * (sum_x2 * sum_y - sum_x * sum_xy)
+                           - sum_x3 * (sum_x3 * sum_y - sum_x * sum_x2y)
+                           + sum_x2 * (sum_x3 * sum_xy - sum_x2 * sum_x2y);
+
+        const double a = det_a / det;
+        const double b = det_b / det;
+        const double c = det_c / det;
+
+        // Measure quadratic error using normalized x
         std::size_t quad_max_error = 0;
         double quad_total_error = 0.0;
 
         for (std::size_t i = start; i < end; ++i) {
-            const double x = static_cast<double>(data[i]);
-            const double pred_double = std::fma(x, std::fma(x, a, b), c);
+            const double x_normalized = (static_cast<double>(data[i]) - x_min) / x_scale;
+            const double pred_double = std::fma(x_normalized, std::fma(x_normalized, a, b), c);
             const double error = std::abs(pred_double - static_cast<double>(i));
             quad_max_error = std::max(quad_max_error, static_cast<std::size_t>(std::ceil(error)));
             quad_total_error += error;
@@ -225,9 +241,13 @@ template <typename T>
         // Choose quadratic if it's significantly better
         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
             result.best_model = ModelType::QUADRATIC;
-            result.quad_a = a;
-            result.quad_b = b;
-            result.quad_c = c;
+            // Transform coefficients from normalized space back to original space
+            // Original: index = a*x_norm^2 + b*x_norm + c, where x_norm = (x - x_min) / x_scale
+            // Want: index = a'*x^2 + b'*x + c'
+            const double x_scale_sq = x_scale * x_scale;
+            result.quad_a = a / x_scale_sq;
+            result.quad_b = b / x_scale - 2.0 * a * x_min / x_scale_sq;
+            result.quad_c = a * x_min * x_min / x_scale_sq - b * x_min / x_scale + c;
             result.max_error = quad_max_error;
             result.mean_error = quad_mean_error;
             return result;

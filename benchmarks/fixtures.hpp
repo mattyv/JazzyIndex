@@ -120,6 +120,13 @@ inline std::vector<std::uint64_t> make_extreme_polynomial_values(std::size_t siz
                                                 static_cast<std::uint64_t>(size));
 }
 
+inline std::vector<std::uint64_t> make_inverse_polynomial_values(std::size_t size) {
+    return dataset::generate_inverse_polynomial(size,
+                                                dataset::kSeed,
+                                                0,
+                                                static_cast<std::uint64_t>(size));
+}
+
 template <std::size_t Segments>
 inline jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> make_index(
     const std::vector<std::uint64_t>& values) {
