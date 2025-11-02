@@ -137,6 +137,9 @@ void register_lower_bound_suites() {
         register_lower_bound_distribution_suite("Lognormal", qi::bench::make_lognormal_values, size);
         register_lower_bound_distribution_suite("Zipf", qi::bench::make_zipf_values, size);
         register_lower_bound_distribution_suite("Mixed", qi::bench::make_mixed_values, size);
+        register_lower_bound_distribution_suite("Quadratic", qi::bench::make_quadratic_values, size);
+        register_lower_bound_distribution_suite("ExtremePoly", qi::bench::make_extreme_polynomial_values, size);
+        register_lower_bound_distribution_suite("InversePoly", qi::bench::make_inverse_polynomial_values, size);
     }
 }
 
@@ -181,6 +184,21 @@ void register_build_suites() {
         auto zipf_data = qi::bench::make_zipf_values(size);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "Zipf", zipf_data);
+        });
+
+        auto quadratic_data = qi::bench::make_quadratic_values(size);
+        for_each_segment_count([&](auto seg_tag) {
+            register_build_benchmark<decltype(seg_tag)::value>(size, "Quadratic", quadratic_data);
+        });
+
+        auto extreme_poly_data = qi::bench::make_extreme_polynomial_values(size);
+        for_each_segment_count([&](auto seg_tag) {
+            register_build_benchmark<decltype(seg_tag)::value>(size, "ExtremePoly", extreme_poly_data);
+        });
+
+        auto inverse_poly_data = qi::bench::make_inverse_polynomial_values(size);
+        for_each_segment_count([&](auto seg_tag) {
+            register_build_benchmark<decltype(seg_tag)::value>(size, "InversePoly", inverse_poly_data);
         });
     }
 }
@@ -300,6 +318,9 @@ void register_distribution_suites() {
             register_distribution_suite<Segments>("Lognormal", qi::bench::make_lognormal_values, size);
             register_distribution_suite<Segments>("Zipf", qi::bench::make_zipf_values, size);
             register_distribution_suite<Segments>("Mixed", qi::bench::make_mixed_values, size);
+            register_distribution_suite<Segments>("Quadratic", qi::bench::make_quadratic_values, size);
+            register_distribution_suite<Segments>("ExtremePoly", qi::bench::make_extreme_polynomial_values, size);
+            register_distribution_suite<Segments>("InversePoly", qi::bench::make_inverse_polynomial_values, size);
         });
     }
 }

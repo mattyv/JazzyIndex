@@ -171,6 +171,30 @@ if(BUILD_BENCHMARKS)
         add_custom_target(plot_benchmarks DEPENDS ${JAZZY_BENCHMARK_PNG})
         add_dependencies(plot_benchmarks jazzy_python_env jazzy_benchmark_json)
 
+        # Full benchmark suite (up to 1M keys)
+        set(JAZZY_BENCHMARK_FULL_JSON ${CMAKE_BINARY_DIR}/jazzy_benchmarks_full.json)
+        add_custom_command(
+            OUTPUT ${JAZZY_BENCHMARK_FULL_JSON}
+            COMMAND $<TARGET_FILE:jazzy_index_benchmarks> --full-benchmarks --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_FULL_JSON}
+            DEPENDS jazzy_index_benchmarks
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMENT "Running JazzyIndex full benchmarks (up to 1M keys, JSON output)"
+            VERBATIM
+        )
+        add_custom_target(jazzy_benchmark_full_json DEPENDS ${JAZZY_BENCHMARK_FULL_JSON})
+
+        set(JAZZY_BENCHMARK_FULL_PNG ${CMAKE_BINARY_DIR}/jazzy_benchmarks_full.png)
+        add_custom_command(
+            OUTPUT ${JAZZY_BENCHMARK_FULL_PNG}
+            COMMAND ${JAZZY_VENV_PYTHON} ${JAZZY_PLOT_SCRIPT} --input ${JAZZY_BENCHMARK_FULL_JSON} --output ${JAZZY_BENCHMARK_FULL_PNG}
+            DEPENDS ${JAZZY_BENCHMARK_FULL_JSON} ${JAZZY_PLOT_SCRIPT} ${JAZZY_VENV_PYTHON}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMENT "Generating JazzyIndex full benchmark plots"
+            VERBATIM
+        )
+        add_custom_target(plot_benchmarks_full DEPENDS ${JAZZY_BENCHMARK_FULL_PNG})
+        add_dependencies(plot_benchmarks_full jazzy_python_env jazzy_benchmark_full_json)
+
         # Index visualization target
         set(JAZZY_INDEX_DATA_DIR ${CMAKE_BINARY_DIR}/index_data)
         set(JAZZY_PLOT_INDEX_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/scripts/plot_index_structure.py)
