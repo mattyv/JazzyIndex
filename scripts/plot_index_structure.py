@@ -79,7 +79,7 @@ def plot_segment_model(ax, segment: Dict[str, Any], keys: np.ndarray, alpha: flo
 
 
 def plot_error_bands(ax, segment: Dict[str, Any], keys: np.ndarray):
-    """Plot error bands around segment boundaries."""
+    """Plot error bands along the entire segment model prediction."""
     start_idx = segment['start_idx']
     end_idx = segment['end_idx']
     max_error = segment['max_error']
@@ -87,15 +87,40 @@ def plot_error_bands(ax, segment: Dict[str, Any], keys: np.ndarray):
     if max_error == 0 or end_idx <= start_idx:
         return
 
-    # Get the value range
+    # Get value range for this segment
     min_val = segment['min_val']
     max_val = segment['max_val']
 
-    # Shade the error region
-    ax.axvspan(start_idx - max_error, start_idx + max_error,
-               color='orange', alpha=0.1, zorder=1)
-    ax.axvspan(end_idx - max_error, end_idx + max_error,
-               color='orange', alpha=0.1, zorder=1)
+    # Create dense sample of values in this segment's range
+    if max_val > min_val:
+        values = np.linspace(min_val, max_val, 100)
+    else:
+        values = np.array([min_val])
+
+    # Compute predicted indices based on model type
+    model_type = segment['model_type']
+    params = segment['params']
+
+    if model_type == 'LINEAR':
+        slope = params['slope']
+        intercept = params['intercept']
+        predictions = slope * values + intercept
+    elif model_type == 'QUADRATIC':
+        a = params['a']
+        b = params['b']
+        c = params['c']
+        predictions = a * values * values + b * values + c
+    elif model_type == 'CONSTANT':
+        predictions = np.full_like(values, params['constant_idx'])
+    else:  # DIRECT
+        predictions = np.full_like(values, start_idx)
+
+    # Draw error band as a shaded region around the prediction line
+    # fill_betweenx shades horizontally (along x-axis = index positions)
+    ax.fill_betweenx(values,
+                     predictions - max_error,
+                     predictions + max_error,
+                     color='tan', alpha=0.2, zorder=1)
 
 
 def plot_index_structure(data: Dict[str, Any], output_file: Path):
@@ -161,7 +186,7 @@ def plot_index_structure(data: Dict[str, Any], output_file: Path):
         mpatches.Patch(color='red', label=f'LINEAR models ({model_counts["LINEAR"]})'),
         mpatches.Patch(color='blue', label=f'QUADRATIC models ({model_counts["QUADRATIC"]})'),
         mpatches.Patch(color='green', label=f'CONSTANT models ({model_counts["CONSTANT"]})'),
-        mpatches.Patch(color='orange', alpha=0.3, label='Error bands (±max_error)'),
+        mpatches.Patch(color='tan', alpha=0.2, label='Error bands (±max_error)'),
         mpatches.Patch(color='gray', label='Segment boundaries')
     ]
 
