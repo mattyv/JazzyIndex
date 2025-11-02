@@ -1,4 +1,4 @@
-# Jazzy Index
+# Jazzy Index - Proof of Concept 
 
 [![CI Tests](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml)
 [![Code Coverage](https://codecov.io/gh/mattyv/JazzyIndex/branch/main/graph/badge.svg)](https://codecov.io/gh/mattyv/JazzyIndex)

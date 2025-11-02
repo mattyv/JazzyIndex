@@ -247,6 +247,38 @@ jobs:
         fail_ci_if_error: false
         verbose: true
 
+  clang-tidy:
+    name: Clang-Tidy Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build clang-tidy
+
+    - name: Configure CMake with compile commands
+      run: |
+        cmake -B build \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+          -DBUILD_TESTS=ON \
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Run clang-tidy on headers
+      run: |
+        echo "Running clang-tidy on header files..."
+        clang-tidy -p build include/*.hpp --header-filter='include/.*'
+
+    - name: Run clang-tidy on tests
+      run: |
+        echo "Running clang-tidy on test files..."
+        clang-tidy -p build tests/*.cpp --header-filter='(include/|tests/).*' || true
+
   sanitizers-linux:
     name: Sanitizers - Linux - ${{ matrix.compiler }} - ${{ matrix.sanitizer }}
     runs-on: ubuntu-latest
