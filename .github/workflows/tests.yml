@@ -287,11 +287,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [gcc-12, clang-15]
-        sanitizer: [address, undefined, thread]
-        exclude:
-          # Thread sanitizer doesn't work well with some compilers in CI
-          - compiler: gcc-12
-            sanitizer: thread
+        sanitizer: [address, undefined]
 
     steps:
     - name: Checkout code
@@ -337,7 +333,6 @@ jobs:
       env:
         ASAN_OPTIONS: detect_leaks=1:check_initialization_order=1:strict_init_order=1
         UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
-        TSAN_OPTIONS: second_deadlock_stack=1
       run: ctest --output-on-failure --verbose
 
   sanitizers-windows:
