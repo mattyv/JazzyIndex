@@ -100,13 +100,37 @@ void register_lower_bound_distribution_suite(const std::string& name,
         return;
     }
 
-    const std::uint64_t target = (*data)[data->size() / 3];
+    const std::uint64_t mid_target = (*data)[data->size() / 2];
+    const std::uint64_t end_target = data->back();
+    const std::uint64_t miss_target =
+        end_target == std::numeric_limits<std::uint64_t>::max() ? end_target : end_target + 1;
+
     const std::string base = "LowerBound/" + name + "/N" + std::to_string(size);
 
-    benchmark::RegisterBenchmark((base + "/Found").c_str(),
-                                 [data, target](benchmark::State& state) {
+    benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                 [data, mid_target](benchmark::State& state) {
                                      for (auto _ : state) {
-                                         const auto* result = find_with_lower_bound(*data, target);
+                                         const auto* result = find_with_lower_bound(*data, mid_target);
+                                         benchmark::DoNotOptimize(result);
+                                     }
+                                     state.counters["size"] = static_cast<double>(data->size());
+                                 })
+        ->Unit(benchmark::kNanosecond);
+
+    benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                 [data, end_target](benchmark::State& state) {
+                                     for (auto _ : state) {
+                                         const auto* result = find_with_lower_bound(*data, end_target);
+                                         benchmark::DoNotOptimize(result);
+                                     }
+                                     state.counters["size"] = static_cast<double>(data->size());
+                                 })
+        ->Unit(benchmark::kNanosecond);
+
+    benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                 [data, miss_target](benchmark::State& state) {
+                                     for (auto _ : state) {
+                                         const auto* result = find_with_lower_bound(*data, miss_target);
                                          benchmark::DoNotOptimize(result);
                                      }
                                      state.counters["size"] = static_cast<double>(data->size());
@@ -271,15 +295,43 @@ void register_distribution_suite(const std::string& name,
         return;
     }
 
-    const std::uint64_t target = (*data)[data->size() / 3];
+    const std::uint64_t mid_target = (*data)[data->size() / 2];
+    const std::uint64_t end_target = data->back();
+    const std::uint64_t miss_target =
+        end_target == std::numeric_limits<std::uint64_t>::max() ? end_target : end_target + 1;
+
     const std::string base = "JazzyIndex/" + name + "/S" + std::to_string(Segments) +
                              "/N" + std::to_string(size);
 
-    benchmark::RegisterBenchmark((base + "/Found").c_str(),
-                                 [data, target](benchmark::State& state) {
+    benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                 [data, mid_target](benchmark::State& state) {
                                      auto index = qi::bench::make_index<Segments>(*data);
                                      for (auto _ : state) {
-                                         const auto* result = index.find(target);
+                                         const auto* result = index.find(mid_target);
+                                         benchmark::DoNotOptimize(result);
+                                     }
+                                     state.counters["segments"] = Segments;
+                                     state.counters["size"] = static_cast<double>(data->size());
+                                 })
+        ->Unit(benchmark::kNanosecond);
+
+    benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                 [data, end_target](benchmark::State& state) {
+                                     auto index = qi::bench::make_index<Segments>(*data);
+                                     for (auto _ : state) {
+                                         const auto* result = index.find(end_target);
+                                         benchmark::DoNotOptimize(result);
+                                     }
+                                     state.counters["segments"] = Segments;
+                                     state.counters["size"] = static_cast<double>(data->size());
+                                 })
+        ->Unit(benchmark::kNanosecond);
+
+    benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                 [data, miss_target](benchmark::State& state) {
+                                     auto index = qi::bench::make_index<Segments>(*data);
+                                     for (auto _ : state) {
+                                         const auto* result = index.find(miss_target);
                                          benchmark::DoNotOptimize(result);
                                      }
                                      state.counters["segments"] = Segments;

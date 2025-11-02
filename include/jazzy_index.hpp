@@ -289,8 +289,6 @@ template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Comp
 class JazzyIndex {
     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
 
-    static_assert(detail::is_strictly_arithmetic_v<T>,
-                  "JazzyIndex expects arithmetic value types.");
     static_assert(NumSegments > 0 && NumSegments <= 4096,
                   "NumSegments must be in range [1, 4096]");
 
