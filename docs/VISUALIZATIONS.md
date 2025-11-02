@@ -175,7 +175,7 @@ cmake --build build --target visualize_index
 This will:
 1. Run benchmarks with index structure dumping enabled
 2. Generate visualization plots for all distributions and segment counts
-3. Save plots to [docs/images/index_data/](../images/index_data/)
+3. Save plots to [docs/images/index_data/](images/index_data/)
 
 ### All Available Visualizations
 
