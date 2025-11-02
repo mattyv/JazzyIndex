@@ -32,18 +32,10 @@ Checks: >
   -readability-implicit-bool-conversion,
   -readability-uppercase-literal-suffix,
   -readability-braces-around-statements,
-  -readability-isolate-declaration,
-  -readability-redundant-inline-specifier,
-  -readability-avoid-nested-conditional-operator,
-  -modernize-use-auto,
-  -modernize-concat-nested-namespaces,
-  -performance-enum-size,
-  -bugprone-narrowing-conversions,
-  -cppcoreguidelines-narrowing-conversions,
 
 WarningsAsErrors: ''
 
-HeaderFilterRegex: '.*'
+HeaderFilterRegex: '(include/|tests/).*'
 
 CheckOptions:
   - key: readability-identifier-naming.NamespaceCase

@@ -272,12 +272,12 @@ jobs:
     - name: Run clang-tidy on headers
       run: |
         echo "Running clang-tidy on header files..."
-        clang-tidy -p build include/*.hpp --warnings-as-errors='-*'
+        clang-tidy -p build include/*.hpp --header-filter='include/.*'
 
     - name: Run clang-tidy on tests
       run: |
         echo "Running clang-tidy on test files..."
-        clang-tidy -p build tests/*.cpp --warnings-as-errors='-*' || true
+        clang-tidy -p build tests/*.cpp --header-filter='(include/|tests/).*' || true
 
   sanitizers-linux:
     name: Sanitizers - Linux - ${{ matrix.compiler }} - ${{ matrix.sanitizer }}
