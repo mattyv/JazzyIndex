@@ -82,7 +82,7 @@ struct alignas(64) Segment {  // Cache line aligned
                 return static_cast<std::size_t>(pred);
             }
             case ModelType::QUADRATIC: {
-                const double x = static_cast<double>(value);
+                const auto x = static_cast<double>(value);
                 const double pred = std::fma(x,
                                             std::fma(x, params.quadratic.a, params.quadratic.b),
                                             params.quadratic.c);
@@ -133,8 +133,8 @@ template <typename T>
         return make_constant();
 
     // Fit linear model
-    const double min_val = static_cast<double>(data[start]);
-    const double max_val = static_cast<double>(data[end - 1]);
+    const auto min_val = static_cast<double>(data[start]);
+    const auto max_val = static_cast<double>(data[end - 1]);
     const double value_range = max_val - min_val;
 
     if (value_range < std::numeric_limits<double>::epsilon()) {
@@ -171,12 +171,17 @@ template <typename T>
 
     // Try quadratic model: index = a*value^2 + b*value + c
     // Use least squares fitting
-    double sum_x = 0.0, sum_x2 = 0.0, sum_x3 = 0.0, sum_x4 = 0.0;
-    double sum_y = 0.0, sum_xy = 0.0, sum_x2y = 0.0;
+    double sum_x = 0.0;
+    double sum_x2 = 0.0;
+    double sum_x3 = 0.0;
+    double sum_x4 = 0.0;
+    double sum_y = 0.0;
+    double sum_xy = 0.0;
+    double sum_x2y = 0.0;
 
     for (std::size_t i = start; i < end; ++i) {
-        const double x = static_cast<double>(data[i]);
-        const double y = static_cast<double>(i);
+        const auto x = static_cast<double>(data[i]);
+        const auto y = static_cast<double>(i);
         const double x2 = x * x;
         const double x3 = x2 * x;
         const double x4 = x2 * x2;
@@ -190,7 +195,7 @@ template <typename T>
         sum_x2y += x2 * y;
     }
 
-    const double n_double = static_cast<double>(n);
+    const auto n_double = static_cast<double>(n);
 
     // Solve normal equations (simplified for speed, may not be perfect)
     const double denom = n_double * (sum_x2 * sum_x4 - sum_x3 * sum_x3) -
@@ -213,7 +218,7 @@ template <typename T>
         double quad_total_error = 0.0;
 
         for (std::size_t i = start; i < end; ++i) {
-            const double x = static_cast<double>(data[i]);
+            const auto x = static_cast<double>(data[i]);
             const double pred_double = std::fma(x, std::fma(x, a, b), c);
             const double error = std::abs(pred_double - static_cast<double>(i));
             quad_max_error = std::max(quad_max_error, static_cast<std::size_t>(std::ceil(error)));
@@ -223,7 +228,7 @@ template <typename T>
         const double quad_mean_error = quad_total_error / n_double;
 
         // Choose quadratic if it's significantly better
-        if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
+        if (static_cast<double>(quad_max_error) < static_cast<double>(linear_max_error) * QUADRATIC_IMPROVEMENT_THRESHOLD) {
             result.best_model = ModelType::QUADRATIC;
             result.quad_a = a;
             result.quad_b = b;
@@ -244,7 +249,7 @@ template <typename T>
 }  // namespace detail
 
 // Recommended segment count presets
-enum class SegmentCount : std::size_t {
+enum class SegmentCount : std::uint16_t {
     TINY = 32,       // Very small datasets or minimal memory footprint
     SMALL = 64,      // Small datasets (thousands of elements)
     MEDIUM = 128,    // Medium datasets
@@ -256,18 +261,18 @@ enum class SegmentCount : std::size_t {
 
 // Helper to convert std::size_t to SegmentCount for generic code
 template <std::size_t N>
-inline constexpr SegmentCount to_segment_count() {
+constexpr SegmentCount to_segment_count() {
     return static_cast<SegmentCount>(N);
 }
 
 template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, bool EnableBoundsCheck = true>
 class JazzyIndex {
-    static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+    static constexpr std::size_t NUM_SEGMENTS = static_cast<std::size_t>(Segments);
 
-    static_assert(detail::is_strictly_arithmetic_v<T>,
+    static_assert(detail::IS_STRICTLY_ARITHMETIC_V<T>,
                   "JazzyIndex expects arithmetic value types.");
-    static_assert(NumSegments > 0 && NumSegments <= 4096,
-                  "NumSegments must be in range [1, 4096]");
+    static_assert(NUM_SEGMENTS > 0 && NUM_SEGMENTS <= 4096,
+                  "NUM_SEGMENTS must be in range [1, 4096]");
 
 public:
     JazzyIndex() = default;
@@ -302,7 +307,7 @@ public:
         }
 
         // Build quantile-based segments
-        const std::size_t actual_segments = std::min(NumSegments, size_);
+        const std::size_t actual_segments = std::min(NUM_SEGMENTS, size_);
         num_segments_ = actual_segments;
 
         for (std::size_t i = 0; i < actual_segments; ++i) {
@@ -491,7 +496,7 @@ private:
         // Fast path: O(1) arithmetic lookup for uniform data
         if (is_uniform_) {
             const double offset = static_cast<double>(value) - static_cast<double>(min_);
-            std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
+            auto seg_idx = static_cast<std::size_t>(offset * segment_scale_);
 
             // Clamp to valid range
             if (seg_idx >= num_segments_) {
@@ -544,7 +549,7 @@ private:
     std::size_t num_segments_{0};
     bool is_uniform_{false};
     double segment_scale_{0.0};
-    std::array<detail::Segment<T>, NumSegments> segments_{};
+    std::array<detail::Segment<T>, NUM_SEGMENTS> segments_{};
 };
 
 }  // namespace jazzy
