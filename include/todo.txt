@@ -1,0 +1,16 @@
+allow iterators/ranges
+less pointer passing internally
+strong type on keys 
+try doing a version where the segments cover the uniform range and skew to non uniform locations
+avoid running the full set of keys multiple times when building
+memory usage plotting 
+key value
+mixed distributions
+remove benchmarks ci
+better explanation for error bounds
+not sure "Your dataset is small (<1000 elements) - index overhead isn't worth it" makes sense anymore
+"The template parameters are:" add bounds checking
+can i get an Md or html to show all index plots
+use specified models?
+optimise hot path
+multi threaded build?

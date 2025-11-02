@@ -56,11 +56,15 @@ Three types of prediction models are displayed:
 - Cost: 0 computation
 - Used when all values in a segment are identical
 
-#### Error Bounds (Beige Bands)
-- The shaded region around each model shows **±max_error**
-- `max_error` is the maximum prediction error for that segment
-- During queries, JazzyIndex searches within a radius based on this error
-- Narrower bands = more accurate predictions = faster queries
+#### Error Bounds (Tan Bands)
+
+The tan shaded regions surrounding each model line represent the **prediction error tolerance zones**. Here's what they mean:
+
+- **What they show:** The horizontal width of the band extends ±max_error from the model's prediction line throughout the entire segment
+- **What max_error means:** The worst-case difference between where the model predicts an index should be versus where it actually is within that segment
+- **Why they matter:** During a query, JazzyIndex uses this error bound to determine the search radius. If max_error is 5, the algorithm knows to search within ±5 positions of the predicted index
+- **Performance impact:** Narrower bands = smaller max_error = tighter search radius = faster queries. Wide bands mean the model is a poor fit and more searching is needed
+- **Visual interpretation:** The band creates an "envelope" or "tunnel" around each model line. If you see black dots touching or exceeding the band edges, those are the worst-case prediction errors that define the band width
 
 ### Statistics Box
 
@@ -212,7 +216,7 @@ These showcase plots demonstrate key features:
 
 ## Key Takeaways
 
-1. **Error bounds matter:** The beige bands show prediction accuracy - narrower is better
+1. **Error bounds matter:** The tan bands show prediction accuracy - narrower is better
 2. **Quadratic models are selective:** JazzyIndex only uses them when they provide ≥30% error reduction
 3. **Segment count is a dial:** Turn it up for accuracy, down for memory/speed
 4. **Quantile partitioning:** Segments contain equal element counts, not equal value ranges

@@ -27,7 +27,7 @@ Each visualization shows:
 - **Red lines**: LINEAR models (cost: 1 FMA)
 - **Blue lines**: QUADRATIC models (cost: 3 FMA)
 - **Green lines**: CONSTANT models (cost: 0)
-- **Beige bands**: ±max_error prediction bounds
+- **Tan bands**: Prediction error tolerance zones (±max_error) shown along the entire model line. The band width shows how far off the model's predictions can be from actual index positions. Narrower bands mean more accurate predictions and faster queries.
 - **Gray dashed lines**: Segment boundaries
 
 For a detailed guide, see [VISUALIZATIONS.md](../../VISUALIZATIONS.md).
