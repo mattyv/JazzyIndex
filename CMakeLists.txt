@@ -105,6 +105,29 @@ if(BUILD_TESTS)
     if(ENABLE_COVERAGE OR CMAKE_BUILD_TYPE STREQUAL "Coverage")
         target_compile_options(jazzy_index_tests PRIVATE --coverage -O0 -g)
         target_link_options(jazzy_index_tests PRIVATE --coverage)
+
+        # Coverage report generation
+        find_program(LCOV lcov)
+        find_program(GENHTML genhtml)
+
+        if(LCOV AND GENHTML)
+            add_custom_target(coverage
+                COMMAND ${CMAKE_COMMAND} -E make_directory coverage_html
+                COMMAND ${LCOV} --capture --directory . --output-file coverage.info --ignore-errors mismatch
+                COMMAND ${LCOV} --remove coverage.info '/usr/*' '*/googletest/*' '*/rapidcheck/*' '*/tests/*'
+                        --output-file coverage_filtered.info --ignore-errors mismatch
+                COMMAND ${GENHTML} coverage_filtered.info --output-directory coverage_html
+                COMMAND ${CMAKE_COMMAND} -E echo "Coverage report generated: file://${CMAKE_BINARY_DIR}/coverage_html/index.html"
+                COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/docs/coverage
+                COMMAND ${CMAKE_COMMAND} -E copy_directory coverage_html ${CMAKE_SOURCE_DIR}/docs/coverage
+                COMMAND ${CMAKE_COMMAND} -E echo "Coverage report copied to docs/coverage/index.html"
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                DEPENDS jazzy_index_tests
+                COMMENT "Generating code coverage report"
+            )
+        else()
+            message(STATUS "lcov and/or genhtml not found; coverage target is disabled.")
+        endif()
     endif()
 endif()
 
