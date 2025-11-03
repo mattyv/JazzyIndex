@@ -183,7 +183,7 @@ Here's what the learned index actually looks like internally. Each visualization
 
 ### Extreme Polynomial Distribution (x⁵)
 
-![ExtremePoly Index Structure](docs/images/visualizations/index_ExtremePoly_N1000_S8.png)
+![ExtremePoly Index Structure](docs/images/index_data/index_ExtremePoly_N1000_S8.png)
 
 With only 8 segments, you can clearly see adaptive model selection in action:
 - **Flat beginning**: 2 CONSTANT models (green) where all values are nearly identical
@@ -330,7 +330,7 @@ cmake --build build --target plot_benchmarks_full
 
 # Generate all documentation plots (performance + visualizations)
 cmake --build build --target generate_docs_plots
-# Output: docs/images/benchmarks/*.png and docs/images/visualizations/*.png
+# Output: docs/images/benchmarks/*.png and docs/images/index_data/*.png
 ```
 
 ## Tuning and Tradeoffs
@@ -440,7 +440,6 @@ docs/
   MODEL_SELECTION.md              # Mathematical details of model fitting
   images/
     benchmarks/                   # Performance plots (committed)
-    visualizations/               # Showcase index structure plots (5 curated)
     index_data/                   # All index structure plots (270+ plots)
 ```
 
