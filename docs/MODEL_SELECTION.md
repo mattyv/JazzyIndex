@@ -77,6 +77,22 @@ predicted_index = a × value² + b × value + c
 **Selection criteria:**
 1. Linear max_error > `MAX_ACCEPTABLE_LINEAR_ERROR` (2 elements)
 2. Quadratic max_error ≤ `QUADRATIC_IMPROVEMENT_THRESHOLD` × linear_error (≤70%)
+3. **Monotonicity constraint:** Derivative must be non-negative over segment range
+
+**Monotonicity requirement:**
+For a search index, the prediction function `f(key) = index` must be **monotonically increasing**.
+This is validated by checking that the derivative `f'(x) = 2ax + b ≥ 0` at both segment endpoints:
+```cpp
+derivative_at_min = 2*a*min_val + b >= 0
+derivative_at_max = 2*a*max_val + b >= 0
+```
+If either check fails, the quadratic is non-monotonic and rejected (falls back to linear).
+
+**Why this matters:**
+- Non-monotonic quadratics can produce backwards-looping curves
+- This violates the fundamental property: `key1 < key2 ⟹ index1 ≤ index2`
+- Such models would give incorrect search results
+- Trade-off: Some segments use linear (higher error) but maintain correctness
 
 **Why 30% improvement?**
 - Quadratic costs 3× more than linear (3 FMA vs. 1 FMA)

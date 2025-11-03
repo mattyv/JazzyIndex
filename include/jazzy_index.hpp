@@ -241,17 +241,32 @@ template <typename T>
 
         // Choose quadratic if it's significantly better
         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
-            result.best_model = ModelType::QUADRATIC;
             // Transform coefficients from normalized space back to original space
             // Original: index = a*x_norm^2 + b*x_norm + c, where x_norm = (x - x_min) / x_scale
             // Want: index = a'*x^2 + b'*x + c'
             const double x_scale_sq = x_scale * x_scale;
-            result.quad_a = a / x_scale_sq;
-            result.quad_b = b / x_scale - 2.0 * a * x_min / x_scale_sq;
-            result.quad_c = a * x_min * x_min / x_scale_sq - b * x_min / x_scale + c;
-            result.max_error = quad_max_error;
-            result.mean_error = quad_mean_error;
-            return result;
+            const double quad_a_transformed = a / x_scale_sq;
+            const double quad_b_transformed = b / x_scale - 2.0 * a * x_min / x_scale_sq;
+            const double quad_c_transformed = a * x_min * x_min / x_scale_sq - b * x_min / x_scale + c;
+
+            // Check monotonicity: derivative f'(x) = 2*a*x + b must be non-negative over [min_val, max_val]
+            // For a search index, predictions must be monotonically INCREASING
+            // Since f'(x) is linear, we just need to check both endpoints
+            const double derivative_at_min = 2.0 * quad_a_transformed * min_val + quad_b_transformed;
+            const double derivative_at_max = 2.0 * quad_a_transformed * max_val + quad_b_transformed;
+            const bool is_monotonic = (derivative_at_min >= 0.0) && (derivative_at_max >= 0.0);
+
+            // Only accept quadratic if it's monotonic
+            if (is_monotonic) {
+                result.best_model = ModelType::QUADRATIC;
+                result.quad_a = quad_a_transformed;
+                result.quad_b = quad_b_transformed;
+                result.quad_c = quad_c_transformed;
+                result.max_error = quad_max_error;
+                result.mean_error = quad_mean_error;
+                return result;
+            }
+            // If non-monotonic, fall through to use linear model instead
         }
     }
 

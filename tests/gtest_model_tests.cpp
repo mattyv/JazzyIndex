@@ -263,3 +263,39 @@ TEST_F(IntModelTest, PiecewiseLinearData) {
     EXPECT_TRUE(is_found(index, data, 500));
     EXPECT_TRUE(is_found(index, data, 1090));
 }
+
+// Test: Monotonicity constraint - non-monotonic quadratics should be rejected
+TEST_F(DoubleModelTest, NonMonotonicQuadraticsRejected) {
+    // Create exponential distribution that might produce non-monotonic quadratics
+    // with low segment counts
+    std::vector<double> data;
+    data.reserve(100);
+    for (int i = 0; i < 100; ++i) {
+        // Exponential growth: index -> value mapping
+        data.push_back(5.0 * (std::exp(static_cast<double>(i) / 50.0) - 1.0) / (std::exp(2.0) - 1.0));
+    }
+
+    // Build with S=1 (single segment) - this previously produced backwards loops
+    jazzy::JazzyIndex<double, jazzy::to_segment_count<1>()> index;
+    index.build(data.data(), data.data() + data.size());
+
+    // All values should still be findable (monotonicity preserved)
+    for (std::size_t i = 0; i < data.size(); ++i) {
+        const double* result = index.find(data[i]);
+        ASSERT_NE(result, data.data() + data.size())
+            << "Failed to find data[" << i << "] = " << data[i];
+        EXPECT_EQ(*result, data[i])
+            << "Found wrong value for data[" << i << "]";
+    }
+
+    // Binary search should also work (verifies monotonicity)
+    for (double test_val : {0.5, 1.5, 2.5, 3.5, 4.5}) {
+        auto it = std::lower_bound(data.begin(), data.end(), test_val);
+        const double* result = index.find(test_val);
+        if (it != data.end() && *it == test_val) {
+            EXPECT_EQ(*result, test_val);
+        } else {
+            EXPECT_EQ(result, data.data() + data.size());
+        }
+    }
+}
