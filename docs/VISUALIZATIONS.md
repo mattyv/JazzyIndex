@@ -23,7 +23,7 @@ JazzyIndex generates visualizations that show exactly how it partitions data int
 
 Each visualization shows:
 
-![Uniform Distribution Example](images/visualizations/index_Uniform_N1000_S256.png)
+![Uniform Distribution Example](images/index_data/index_Uniform_N1000_S256.png)
 *Example: Uniform distribution with perfect linear fit*
 
 #### Keys (Black Dots)
@@ -80,7 +80,7 @@ In the bottom-right corner, you'll find:
 
 ### 1. Uniform Distribution
 
-![Uniform Distribution](images/visualizations/index_Uniform_N1000_S256.png)
+![Uniform Distribution](images/index_data/index_Uniform_N1000_S256.png)
 
 **Characteristics:**
 - Perfectly linear data
@@ -94,7 +94,7 @@ In the bottom-right corner, you'll find:
 
 ### 2. Quadratic (S-Curve) Distribution
 
-![Quadratic S-Curve Distribution](images/visualizations/index_Quadratic_N1000_S256.png)
+![Quadratic S-Curve Distribution](images/index_data/index_Quadratic_N1000_S256.png)
 
 **Characteristics:**
 - S-shaped curve using `tanh` function
@@ -108,7 +108,7 @@ In the bottom-right corner, you'll find:
 
 ### 3. Extreme Polynomial Distribution
 
-![Extreme Polynomial Distribution](images/visualizations/index_ExtremePoly_N1000_S8.png)
+![Extreme Polynomial Distribution](images/index_data/index_ExtremePoly_N1000_S8.png)
 
 **Characteristics:**
 - Data follows y = x⁵ (explosive curvature at the end)
@@ -123,7 +123,7 @@ In the bottom-right corner, you'll find:
 
 ### 4. Zipf Distribution
 
-![Zipf Distribution](images/visualizations/index_Zipf_N10000_S256.png)
+![Zipf Distribution](images/index_data/index_Zipf_N10000_S256.png)
 
 **Characteristics:**
 - Heavy-tailed power-law distribution (common in real-world data)
@@ -137,7 +137,7 @@ In the bottom-right corner, you'll find:
 
 ### 5. Inverse Polynomial Distribution
 
-![Inverse Polynomial Distribution](images/visualizations/index_InversePoly_N1000_S64.png)
+![Inverse Polynomial Distribution](images/index_data/index_InversePoly_N1000_S64.png)
 
 **Characteristics:**
 - Data follows y = 1 - (1-x)⁵ (steep start, gentle end)
@@ -196,21 +196,6 @@ Examples:
 - `index_Uniform_N10000_S256.png` - Uniform distribution, 10K elements, 256 segments
 - `index_Zipf_N1000_S64.png` - Zipf distribution, 1K elements, 64 segments
 - `index_ExtremePoly_N1000_S8.png` - Extreme polynomial, 1K elements, 8 segments
-
-### Committed Showcase Plots
-
-A curated selection of 5 showcase plots are committed to `docs/images/visualizations/` and can be regenerated with:
-
-```bash
-cmake --build build --target generate_docs_plots
-```
-
-These showcase plots demonstrate key features:
-- `index_Uniform_N1000_S256.png` - Perfect linear fit
-- `index_Quadratic_N1000_S256.png` - Adaptive quadratic selection
-- `index_ExtremePoly_N1000_S8.png` - Model type diversity (constant/linear/quadratic)
-- `index_Zipf_N10000_S256.png` - Real-world heavy-tailed distribution
-- `index_InversePoly_N1000_S64.png` - Inverse curvature handling
 
 ---
 

@@ -43,7 +43,7 @@ This will regenerate all plots in this directory.
 
 ## Showcase Plots
 
-A curated selection of 5 showcase plots are copied to [../visualizations/](../visualizations/) for use in documentation:
+Key plots highlighted in the documentation:
 - `index_Uniform_N1000_S256.png` - Perfect linear fit
 - `index_Quadratic_N1000_S256.png` - Adaptive quadratic selection
 - `index_ExtremePoly_N1000_S8.png` - Model type diversity

@@ -34,7 +34,6 @@ fi
 
 # Create output directories
 mkdir -p "$DOCS_IMAGES/benchmarks"
-mkdir -p "$DOCS_IMAGES/visualizations"
 mkdir -p "$DOCS_IMAGES/index_data"
 
 echo "Step 1/3: Running performance benchmarks..."
@@ -67,15 +66,6 @@ cp -r "$BUILD_DIR/index_data"/* "$DOCS_IMAGES/index_data/"
 # Generate all visualization plots
 "$BUILD_DIR/jazzy_venv/bin/python" "$SCRIPT_DIR/plot_index_structure.py" "$DOCS_IMAGES/index_data"
 
-# Copy select showcase visualizations to docs/images/visualizations/
-echo
-echo "Copying select showcase visualizations..."
-cp "$DOCS_IMAGES/index_data/index_Uniform_N1000_S256.png" "$DOCS_IMAGES/visualizations/"
-cp "$DOCS_IMAGES/index_data/index_Quadratic_N1000_S256.png" "$DOCS_IMAGES/visualizations/"
-cp "$DOCS_IMAGES/index_data/index_ExtremePoly_N1000_S8.png" "$DOCS_IMAGES/visualizations/"
-cp "$DOCS_IMAGES/index_data/index_Zipf_N10000_S256.png" "$DOCS_IMAGES/visualizations/"
-cp "$DOCS_IMAGES/index_data/index_InversePoly_N1000_S64.png" "$DOCS_IMAGES/visualizations/"
-
 echo
 echo "========================================"
 echo "Documentation Plots Generated Successfully!"
@@ -86,10 +76,7 @@ echo "  - $DOCS_IMAGES/benchmarks/jazzy_benchmarks_low.png"
 echo "  - $DOCS_IMAGES/benchmarks/jazzy_benchmarks_medium.png"
 echo "  - $DOCS_IMAGES/benchmarks/jazzy_benchmarks_high.png"
 echo
-echo "Showcase visualization plots:"
-ls -1 "$DOCS_IMAGES/visualizations/"
-echo
-echo "All index structure visualizations (270+ plots):"
+echo "Index structure visualizations (270+ plots):"
 echo "  $DOCS_IMAGES/index_data/"
 echo
 echo "These plots are ready to commit to the repository."
