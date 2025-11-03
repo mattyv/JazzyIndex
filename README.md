@@ -22,7 +22,7 @@
 
 | Job | Status | Description |
 |-----|:------:|-------------|
-| **Code Coverage** | [![Coverage](https://img.shields.io/badge/coverage-95.7%25-brightgreen)](docs/coverage/index.html) | Line coverage: 95.7% (242/253 lines) - [View Report](docs/coverage/index.html) |
+| **Code Coverage** | [![Coverage](https://img.shields.io/badge/coverage-95.7%25-brightgreen)](docs/coverage/index.html) | Auto-updated on every push to main - [View Report](docs/coverage/index.html) |
 | **Benchmarks** | [![Benchmarks](https://img.shields.io/badge/benchmarks-passing-brightgreen)](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml) | Google Benchmark suite with plot generation |
 
 **Total Test Configurations:** 16 compiler/build combinations + 4 Linux sanitizers + 1 Windows sanitizer + coverage + benchmarks = **23 CI jobs**
@@ -304,9 +304,11 @@ The test suite includes deterministic unit tests plus RapidCheck property-based 
 
 ### Code Coverage
 
-**Current Coverage: 95.7%** (242 of 253 lines)
+**Current Coverage: 95.7%** (242 of 253 lines) - [![View Report](https://img.shields.io/badge/view-report-blue)](docs/coverage/index.html)
 
-Generate a detailed coverage report locally:
+Coverage is **automatically tracked** by CI and updated on every push to `main`. View the detailed line-by-line [HTML coverage report](docs/coverage/index.html).
+
+Generate a coverage report locally:
 
 ```bash
 # Configure with coverage enabled
@@ -319,17 +321,13 @@ cmake --build build --target jazzy_index_tests
 # Generate HTML coverage report
 cmake --build build --target coverage
 
-# View the report
-# Opens: build/coverage_html/index.html
-# Or view the committed report at: docs/coverage/index.html
+# View the report at: build/coverage_html/index.html
 ```
 
 The test suite achieves excellent coverage of all core functionality. The 11 uncovered lines consist of:
 - Dead code (unused DIRECT model type)
 - Defensive error checks (impossible to trigger via public API)
 - Rare edge cases in exponential search fallback
-
-For detailed coverage analysis, see the [HTML coverage report](docs/coverage/index.html).
 
 ## Running Benchmarks
 

@@ -240,12 +240,52 @@ jobs:
           --output-file coverage_filtered.info
         lcov --gcov-tool "$GCOV" --list coverage_filtered.info
 
+    - name: Generate HTML coverage report
+      working-directory: build_coverage
+      run: |
+        genhtml coverage_filtered.info --output-directory coverage_html
+
+    - name: Extract coverage percentage
+      id: coverage
+      working-directory: build_coverage
+      run: |
+        COVERAGE=$(lcov --gcov-tool "$GCOV" --summary coverage_filtered.info 2>&1 | grep "lines" | awk '{print $2}' | sed 's/%//')
+        echo "percentage=$COVERAGE" >> $GITHUB_OUTPUT
+        echo "Coverage: $COVERAGE%"
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
         files: ./build_coverage/coverage_filtered.info
         fail_ci_if_error: false
         verbose: true
+
+    - name: Update docs/coverage directory
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        rm -rf docs/coverage/*
+        cp -r build_coverage/coverage_html/* docs/coverage/
+
+    - name: Update README badge
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        COVERAGE="${{ steps.coverage.outputs.percentage }}"
+        sed -i "s/coverage-[0-9.]*%25/coverage-${COVERAGE}%25/g" README.md
+
+    - name: Commit coverage report
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add docs/coverage/ README.md
+        git diff --staged --quiet || git commit -m "Update coverage report to ${{ steps.coverage.outputs.percentage }}% [skip ci]"
+
+    - name: Push changes
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: main
 
   clang-tidy:
     name: Clang-Tidy Static Analysis
