@@ -443,38 +443,3 @@ jobs:
       env:
         ASAN_OPTIONS: detect_leaks=0:windows_hook_rtl_allocators=true
       run: ctest --output-on-failure --verbose
-
-  benchmarks:
-    name: Benchmarks
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y cmake ninja-build python3 python3-pip python3-venv
-
-    - name: Configure CMake
-      run: |
-        cmake -B build \
-          -G Ninja \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DBUILD_TESTS=OFF \
-          -DBUILD_BENCHMARKS=ON
-
-    - name: Build benchmarks
-      run: cmake --build build --parallel
-
-    - name: Run benchmarks
-      working-directory: build
-      run: ./jazzy_index_benchmarks --benchmark_min_time=0.1s
-
-    - name: Archive benchmark results
-      uses: actions/upload-artifact@v4
-      with:
-        name: benchmark-results
-        path: build/jazzy_benchmarks.json
-        if-no-files-found: ignore
