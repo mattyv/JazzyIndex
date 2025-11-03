@@ -2,6 +2,7 @@
 
 [![CI Tests](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml)
 [![Code Coverage](https://img.shields.io/badge/coverage-95.7%25-brightgreen)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html)
+[![Clang-Tidy](https://img.shields.io/badge/clang--tidy-report-blue)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/clang-tidy/index.html)
 
 ## Build & Test Status
 
@@ -23,9 +24,9 @@
 | Job | Status | Description |
 |-----|:------:|-------------|
 | **Code Coverage** | [![Coverage](https://img.shields.io/badge/coverage-95.7%25-brightgreen)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html) | Auto-updated on every push to main - [View Report](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html) |
-| **Benchmarks** | [![Benchmarks](https://img.shields.io/badge/benchmarks-passing-brightgreen)](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml) | Google Benchmark suite with plot generation |
+| **Clang-Tidy** | [![Report](https://img.shields.io/badge/clang--tidy-report-blue)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/clang-tidy/index.html) | Static analysis report auto-updated on every push to main - [View Report](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/clang-tidy/index.html) |
 
-**Total Test Configurations:** 16 compiler/build combinations + 4 Linux sanitizers + 1 Windows sanitizer + coverage + benchmarks = **23 CI jobs**
+**Total Test Configurations:** 16 compiler/build combinations + 4 Linux sanitizers + 1 Windows sanitizer + coverage + clang-tidy = **23 CI jobs**
 
 A fast, adaptive learned index for sorted arrays that predicts element positions instead of searching blindly.
 
