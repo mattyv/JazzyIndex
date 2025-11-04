@@ -84,6 +84,7 @@ if(BUILD_TESTS)
         tests/gtest_error_recovery_tests.cpp
         tests/gtest_uniformity_tests.cpp
         tests/gtest_property_tests.cpp
+        tests/gtest_key_value_tests.cpp
     )
     target_link_libraries(jazzy_index_tests PRIVATE
         jazzy_index
@@ -149,6 +150,15 @@ if(BUILD_BENCHMARKS)
         ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
     )
 
+    # Worst-case key-value benchmark
+    add_executable(benchmark_key_value_worst_case
+        benchmarks/benchmark_key_value_worst_case.cpp
+    )
+    target_link_libraries(benchmark_key_value_worst_case PRIVATE jazzy_index benchmark::benchmark)
+    target_include_directories(benchmark_key_value_worst_case PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
+    )
+
     find_package(Python3 COMPONENTS Interpreter)
     if(Python3_Interpreter_FOUND)
         set(JAZZY_VENV_DIR ${CMAKE_BINARY_DIR}/jazzy_venv)
@@ -174,7 +184,7 @@ if(BUILD_BENCHMARKS)
         set(JAZZY_BENCHMARK_JSON ${CMAKE_BINARY_DIR}/jazzy_benchmarks.json)
         add_custom_command(
             OUTPUT ${JAZZY_BENCHMARK_JSON}
-            COMMAND $<TARGET_FILE:jazzy_index_benchmarks> --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_JSON}
+            COMMAND $<TARGET_FILE:jazzy_index_benchmarks> --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_JSON} --benchmark_min_warmup_time=0.5
             DEPENDS jazzy_index_benchmarks
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Running JazzyIndex benchmarks (JSON output)"
@@ -200,7 +210,7 @@ if(BUILD_BENCHMARKS)
         set(JAZZY_BENCHMARK_FULL_JSON ${CMAKE_BINARY_DIR}/jazzy_benchmarks_full.json)
         add_custom_command(
             OUTPUT ${JAZZY_BENCHMARK_FULL_JSON}
-            COMMAND $<TARGET_FILE:jazzy_index_benchmarks> --full-benchmarks --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_FULL_JSON}
+            COMMAND $<TARGET_FILE:jazzy_index_benchmarks> --full-benchmarks --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_FULL_JSON} --benchmark_min_warmup_time=0.5
             DEPENDS jazzy_index_benchmarks
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Running JazzyIndex full benchmarks (up to 1M keys, JSON output)"

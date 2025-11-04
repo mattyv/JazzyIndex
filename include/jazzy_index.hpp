@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <functional>
 #include <limits>
+#include <ranges>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -15,14 +16,23 @@
 
 namespace jazzy {
 
+// Identity functor for key extraction (default: no transformation)
+// Provides a fallback for std::identity when not available
+struct identity {
+    template <typename T>
+    constexpr T&& operator()(T&& t) const noexcept {
+        return std::forward<T>(t);
+    }
+    using is_transparent = void;
+};
+
 namespace detail {
 
 // Model types for different segment characteristics
 enum class ModelType : uint8_t {
     LINEAR,      // Most common: y = mx + b (1 FMA)
     QUADRATIC,   // Curved regions: y = ax^2 + bx + c (3 FMA)
-    CONSTANT,    // All values same: y = c (0 computation)
-    DIRECT       // Tiny dense segments: array lookup
+    CONSTANT     // All values same: y = c (0 computation)
 };
 
 // Model selection and search tuning constants
@@ -74,24 +84,25 @@ struct alignas(64) Segment {  // Cache line aligned
     std::size_t start_idx;
     std::size_t end_idx;
 
-    [[nodiscard]] std::size_t predict(T value) const noexcept {
+    template <typename KeyExtractor = jazzy::identity>
+    [[nodiscard]] std::size_t predict(const T& value, KeyExtractor key_extract = KeyExtractor{}) const noexcept {
         switch (model_type) {
             case ModelType::LINEAR: {
-                const double pred = std::fma(static_cast<double>(value),
+                const double key_val = static_cast<double>(std::invoke(key_extract, value));
+                const double pred = std::fma(key_val,
                                             params.linear.slope,
                                             params.linear.intercept);
                 return static_cast<std::size_t>(pred);
             }
             case ModelType::QUADRATIC: {
-                const double x = static_cast<double>(value);
-                const double pred = std::fma(x,
-                                            std::fma(x, params.quadratic.a, params.quadratic.b),
+                const double key_val = static_cast<double>(std::invoke(key_extract, value));
+                const double pred = std::fma(key_val,
+                                            std::fma(key_val, params.quadratic.a, params.quadratic.b),
                                             params.quadratic.c);
                 return static_cast<std::size_t>(pred);
             }
             case ModelType::CONSTANT:
                 return params.constant.constant_idx;
-            case ModelType::DIRECT:
             default:
                 return start_idx;  // Fallback
         }
@@ -109,10 +120,11 @@ struct SegmentAnalysis {
 };
 
 // Fit linear model to segment: index = slope * value + intercept
-template <typename T>
+template <typename T, typename KeyExtractor = jazzy::identity>
 [[nodiscard]] SegmentAnalysis<T> analyze_segment(const T* data,
                                                    std::size_t start,
-                                                   std::size_t end) noexcept {
+                                                   std::size_t end,
+                                                   KeyExtractor key_extract = KeyExtractor{}) noexcept {
     SegmentAnalysis<T> result{};
 
     auto make_constant = [&result, start]() {
@@ -134,8 +146,8 @@ template <typename T>
         return make_constant();
 
     // Fit linear model
-    const double min_val = static_cast<double>(data[start]);
-    const double max_val = static_cast<double>(data[end - 1]);
+    const double min_val = static_cast<double>(std::invoke(key_extract, data[start]));
+    const double max_val = static_cast<double>(std::invoke(key_extract, data[end - 1]));
     const double value_range = max_val - min_val;
 
     if (value_range < std::numeric_limits<double>::epsilon()) {
@@ -154,7 +166,8 @@ template <typename T>
     double linear_total_error = 0.0;
 
     for (std::size_t i = start; i < end; ++i) {
-        const double pred_double = std::fma(static_cast<double>(data[i]), slope, intercept);
+        const double key_val = static_cast<double>(std::invoke(key_extract, data[i]));
+        const double pred_double = std::fma(key_val, slope, intercept);
         const double error = std::abs(pred_double - static_cast<double>(i));
         linear_max_error = std::max(linear_max_error, static_cast<std::size_t>(std::ceil(error)));
         linear_total_error += error;
@@ -180,7 +193,8 @@ template <typename T>
     const double x_scale = value_range > 0.0 ? value_range : 1.0;
 
     for (std::size_t i = start; i < end; ++i) {
-        const double x_normalized = (static_cast<double>(data[i]) - x_min) / x_scale;
+        const double key_val = static_cast<double>(std::invoke(key_extract, data[i]));
+        const double x_normalized = (key_val - x_min) / x_scale;
         const double y = static_cast<double>(i);
         const double x2 = x_normalized * x_normalized;
         const double x3 = x2 * x_normalized;
@@ -230,7 +244,8 @@ template <typename T>
         double quad_total_error = 0.0;
 
         for (std::size_t i = start; i < end; ++i) {
-            const double x_normalized = (static_cast<double>(data[i]) - x_min) / x_scale;
+            const double key_val = static_cast<double>(std::invoke(key_extract, data[i]));
+            const double x_normalized = (key_val - x_min) / x_scale;
             const double pred_double = std::fma(x_normalized, std::fma(x_normalized, a, b), c);
             const double error = std::abs(pred_double - static_cast<double>(i));
             quad_max_error = std::max(quad_max_error, static_cast<std::size_t>(std::ceil(error)));
@@ -301,7 +316,7 @@ inline constexpr SegmentCount to_segment_count() {
     return static_cast<SegmentCount>(N);
 }
 
-template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>>
+template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
 class JazzyIndex {
     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
 
@@ -311,13 +326,14 @@ class JazzyIndex {
 public:
     JazzyIndex() = default;
 
-    JazzyIndex(const T* first, const T* last, Compare comp = Compare{}) {
-        build(first, last, comp);
+    JazzyIndex(const T* first, const T* last, Compare comp = Compare{}, KeyExtractor key_extract = KeyExtractor{}) {
+        build(first, last, comp, key_extract);
     }
 
-    void build(const T* first, const T* last, Compare comp = Compare{}) {
+    void build(const T* first, const T* last, Compare comp = Compare{}, KeyExtractor key_extract = KeyExtractor{}) {
         base_ = first;
         size_ = static_cast<std::size_t>(last - first);
+        key_extract_ = key_extract;
         comp_ = comp;
 
         if (size_ == 0) {
@@ -355,7 +371,7 @@ public:
             seg.end_idx = end;
 
             // Analyze segment and choose best model
-            const auto analysis = detail::analyze_segment(base_, start, end);
+            const auto analysis = detail::analyze_segment(base_, start, end, key_extract_);
 
             seg.model_type = analysis.best_model;
             seg.max_error = static_cast<uint8_t>(std::min<std::size_t>(analysis.max_error, 255));
@@ -401,7 +417,7 @@ public:
         }
 
         // Predict index using segment's model
-        std::size_t predicted = seg->predict(key);
+        std::size_t predicted = seg->predict(key, key_extract_);
         predicted = detail::clamp_value<std::size_t>(predicted, seg->start_idx,
                                                       seg->end_idx > 0 ? seg->end_idx - 1 : 0);
 
@@ -481,8 +497,8 @@ public:
     [[nodiscard]] std::size_t num_segments() const noexcept { return num_segments_; }
 
     // Friend declaration for export functionality
-    template <typename U, SegmentCount S, typename C>
-    friend std::string export_index_metadata(const JazzyIndex<U, S, C>& index);
+    template <typename U, SegmentCount S, typename C, typename K>
+    friend std::string export_index_metadata(const JazzyIndex<U, S, C, K>& index);
 
 private:
     void detect_uniformity() noexcept {
@@ -493,7 +509,8 @@ private:
 
         // Check if segments are roughly evenly spaced in value range
         // This indicates uniform distribution
-        const double total_range = static_cast<double>(max_) - static_cast<double>(min_);
+        const double total_range = static_cast<double>(std::invoke(key_extract_, max_)) -
+                                   static_cast<double>(std::invoke(key_extract_, min_));
         if (total_range < std::numeric_limits<double>::epsilon()) {
             is_uniform_ = true;
             return;
@@ -505,8 +522,8 @@ private:
         const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
 
         for (std::size_t i = 0; i < num_segments_; ++i) {
-            const double segment_range = static_cast<double>(segments_[i].max_val) -
-                                        static_cast<double>(segments_[i].min_val);
+            const double segment_range = static_cast<double>(std::invoke(key_extract_, segments_[i].max_val)) -
+                                        static_cast<double>(std::invoke(key_extract_, segments_[i].min_val));
 
             if (std::abs(segment_range - expected_spacing) > tolerance) {
                 is_uniform_ = false;
@@ -529,7 +546,8 @@ private:
 
         // Fast path: O(1) arithmetic lookup for uniform data
         if (is_uniform_) {
-            const double offset = static_cast<double>(value) - static_cast<double>(min_);
+            const double offset = static_cast<double>(std::invoke(key_extract_, value)) -
+                                 static_cast<double>(std::invoke(key_extract_, min_));
             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
 
             // Clamp to valid range
@@ -579,6 +597,7 @@ private:
     std::size_t size_{0};
     T min_{};
     T max_{};
+    KeyExtractor key_extract_{};
     Compare comp_{};
     std::size_t num_segments_{0};
     bool is_uniform_{false};

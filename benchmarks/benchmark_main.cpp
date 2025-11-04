@@ -21,6 +21,28 @@ namespace {
 // Global flag to control benchmark dataset sizes
 static bool use_full_benchmarks = false;
 
+// Key-value struct for benchmarking
+struct KeyValue {
+    std::uint64_t key;
+    std::string value;
+
+    bool operator<(const KeyValue& other) const {
+        return key < other.key;
+    }
+
+    bool operator>(const KeyValue& other) const {
+        return key > other.key;
+    }
+
+    bool operator==(const KeyValue& other) const {
+        return key == other.key;
+    }
+
+    bool operator!=(const KeyValue& other) const {
+        return !(*this == other);
+    }
+};
+
 template <typename F, std::size_t... Segments>
 void for_each_segment_count_impl(F&& f, std::integer_sequence<std::size_t, Segments...>) {
     (f(std::integral_constant<std::size_t, Segments>{}), ...);
@@ -138,6 +160,68 @@ void register_lower_bound_distribution_suite(const std::string& name,
         ->Unit(benchmark::kNanosecond);
 }
 
+// Lower bound benchmarks for key-value pairs
+template <typename Generator>
+void register_lower_bound_keyvalue_suite(const std::string& name,
+                                         Generator&& generator,
+                                         std::size_t size) {
+    if (size == 0) {
+        return;
+    }
+
+    // Generate keys and create key-value pairs
+    auto keys = std::make_shared<std::vector<std::uint64_t>>(generator(size));
+    if (keys->empty()) {
+        return;
+    }
+
+    auto data = std::make_shared<std::vector<KeyValue>>();
+    data->reserve(size);
+    for (std::size_t i = 0; i < size; ++i) {
+        data->push_back({(*keys)[i], "value_" + std::to_string((*keys)[i])});
+    }
+
+    const std::uint64_t mid_key = (*keys)[keys->size() / 2];
+    const std::uint64_t end_key = keys->back();
+    const std::uint64_t miss_key =
+        end_key == std::numeric_limits<std::uint64_t>::max() ? end_key : end_key + 1;
+
+    const std::string base = "LowerBound/" + name + "KV/N" + std::to_string(size);
+
+    benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                 [data, mid_key](benchmark::State& state) {
+                                     KeyValue target{mid_key, ""};
+                                     for (auto _ : state) {
+                                         const auto* result = find_with_lower_bound(*data, target);
+                                         benchmark::DoNotOptimize(result);
+                                     }
+                                     state.counters["size"] = static_cast<double>(data->size());
+                                 })
+        ->Unit(benchmark::kNanosecond);
+
+    benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                 [data, end_key](benchmark::State& state) {
+                                     KeyValue target{end_key, ""};
+                                     for (auto _ : state) {
+                                         const auto* result = find_with_lower_bound(*data, target);
+                                         benchmark::DoNotOptimize(result);
+                                     }
+                                     state.counters["size"] = static_cast<double>(data->size());
+                                 })
+        ->Unit(benchmark::kNanosecond);
+
+    benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                 [data, miss_key](benchmark::State& state) {
+                                     KeyValue target{miss_key, ""};
+                                     for (auto _ : state) {
+                                         const auto* result = find_with_lower_bound(*data, target);
+                                         benchmark::DoNotOptimize(result);
+                                     }
+                                     state.counters["size"] = static_cast<double>(data->size());
+                                 })
+        ->Unit(benchmark::kNanosecond);
+}
+
 void register_lower_bound_suites() {
     std::vector<std::size_t> sizes = {100, 1'000, 10'000};
     if (use_full_benchmarks) {
@@ -164,6 +248,12 @@ void register_lower_bound_suites() {
         register_lower_bound_distribution_suite("Quadratic", qi::bench::make_quadratic_values, size);
         register_lower_bound_distribution_suite("ExtremePoly", qi::bench::make_extreme_polynomial_values, size);
         register_lower_bound_distribution_suite("InversePoly", qi::bench::make_inverse_polynomial_values, size);
+    }
+
+    // Add key-value lower_bound baselines
+    for (const std::size_t size : dist_sizes) {
+        register_lower_bound_keyvalue_suite("Clustered", qi::bench::make_clustered_values, size);
+        register_lower_bound_keyvalue_suite("ExtremePoly", qi::bench::make_extreme_polynomial_values, size);
     }
 }
 
@@ -377,6 +467,101 @@ void register_distribution_suites() {
     }
 }
 
+// Key-Value benchmarks (for worst-case distributions)
+template <std::size_t Segments, typename Generator>
+void register_keyvalue_suite(const std::string& name,
+                              Generator&& generator,
+                              std::size_t size) {
+    if (size == 0) {
+        return;
+    }
+
+    // Generate keys and create key-value pairs
+    auto keys = std::make_shared<std::vector<std::uint64_t>>(generator(size));
+    if (keys->empty()) {
+        return;
+    }
+
+    auto data = std::make_shared<std::vector<KeyValue>>();
+    data->reserve(size);
+    for (std::size_t i = 0; i < size; ++i) {
+        data->push_back({(*keys)[i], "value_" + std::to_string((*keys)[i])});
+    }
+
+    const std::uint64_t mid_key = (*keys)[keys->size() / 2];
+    const std::uint64_t end_key = keys->back();
+    const std::uint64_t miss_key =
+        end_key == std::numeric_limits<std::uint64_t>::max() ? end_key : end_key + 1;
+
+    const std::string base = "JazzyIndex/" + name + "KV/S" + std::to_string(Segments) +
+                             "/N" + std::to_string(size);
+
+    benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                 [data, mid_key](benchmark::State& state) {
+                                     jazzy::JazzyIndex<KeyValue, jazzy::to_segment_count<Segments>(),
+                                                       std::less<>, decltype(&KeyValue::key)> index;
+                                     index.build(data->data(), data->data() + data->size(),
+                                                std::less<>{}, &KeyValue::key);
+                                     KeyValue target{mid_key, ""};
+                                     for (auto _ : state) {
+                                         const auto* result = index.find(target);
+                                         benchmark::DoNotOptimize(result);
+                                     }
+                                     state.counters["segments"] = Segments;
+                                     state.counters["size"] = static_cast<double>(data->size());
+                                 })
+        ->Unit(benchmark::kNanosecond);
+
+    benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                 [data, end_key](benchmark::State& state) {
+                                     jazzy::JazzyIndex<KeyValue, jazzy::to_segment_count<Segments>(),
+                                                       std::less<>, decltype(&KeyValue::key)> index;
+                                     index.build(data->data(), data->data() + data->size(),
+                                                std::less<>{}, &KeyValue::key);
+                                     KeyValue target{end_key, ""};
+                                     for (auto _ : state) {
+                                         const auto* result = index.find(target);
+                                         benchmark::DoNotOptimize(result);
+                                     }
+                                     state.counters["segments"] = Segments;
+                                     state.counters["size"] = static_cast<double>(data->size());
+                                 })
+        ->Unit(benchmark::kNanosecond);
+
+    benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                 [data, miss_key](benchmark::State& state) {
+                                     jazzy::JazzyIndex<KeyValue, jazzy::to_segment_count<Segments>(),
+                                                       std::less<>, decltype(&KeyValue::key)> index;
+                                     index.build(data->data(), data->data() + data->size(),
+                                                std::less<>{}, &KeyValue::key);
+                                     KeyValue target{miss_key, ""};
+                                     for (auto _ : state) {
+                                         const auto* result = index.find(target);
+                                         benchmark::DoNotOptimize(result);
+                                     }
+                                     state.counters["segments"] = Segments;
+                                     state.counters["size"] = static_cast<double>(data->size());
+                                 })
+        ->Unit(benchmark::kNanosecond);
+}
+
+void register_keyvalue_suites() {
+    // Only benchmark key-value for worst-case distributions
+    std::vector<std::size_t> sizes = {100, 10'000};
+    if (use_full_benchmarks) {
+        sizes.push_back(100'000);
+        sizes.push_back(1'000'000);
+    }
+
+    for (const std::size_t size : sizes) {
+        for_each_segment_count([size](auto seg_tag) {
+            constexpr std::size_t Segments = decltype(seg_tag)::value;
+            register_keyvalue_suite<Segments>("Clustered", qi::bench::make_clustered_values, size);
+            register_keyvalue_suite<Segments>("ExtremePoly", qi::bench::make_extreme_polynomial_values, size);
+        });
+    }
+}
+
 // Helper to create output directory
 bool ensure_directory_exists(const std::string& path) {
     struct stat info;
@@ -562,6 +747,9 @@ int main(int argc, char** argv) {
     // Register JazzyIndex query benchmarks
     register_uniform_suites();
     register_distribution_suites();
+
+    // Register key-value benchmarks (worst-case distributions)
+    register_keyvalue_suites();
 
     // Register JazzyIndex build time benchmarks
     register_build_suites();

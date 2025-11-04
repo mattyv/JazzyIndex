@@ -14,3 +14,4 @@ can i get an Md or html to show all index plots
 use specified models?
 optimise hot path
 multi threaded build?
+we don't seem to ever do the binary search on the segments
