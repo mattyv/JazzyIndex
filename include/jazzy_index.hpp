@@ -120,11 +120,11 @@ struct alignas(64) Segment {  // Cache line aligned
                 return static_cast<std::size_t>(std::max(0.0, pred));
             }
             case ModelType::CUBIC: {
-                const double x = static_cast<double>(value);
+                const double key_val = static_cast<double>(std::invoke(key_extract, value));
                 // Horner's method: ((a*x + b)*x + c)*x + d
-                const double pred = std::fma(x,
-                                            std::fma(x,
-                                                    std::fma(x, params.cubic.a, params.cubic.b),
+                const double pred = std::fma(key_val,
+                                            std::fma(key_val,
+                                                    std::fma(key_val, params.cubic.a, params.cubic.b),
                                                     params.cubic.c),
                                             params.cubic.d);
                 // Clamp to non-negative before casting to unsigned type
@@ -420,7 +420,8 @@ template <typename T, typename KeyExtractor = jazzy::identity>
                         double cubic_total_error = 0.0;
 
                         for (std::size_t i = start; i < end; ++i) {
-                            const double x_norm = (static_cast<double>(data[i]) - x_min) / x_scale;
+                            const double key_value = static_cast<double>(std::invoke(key_extract, data[i]));
+                            const double x_norm = (key_value - x_min) / x_scale;
                             const double pred = std::fma(x_norm,
                                                         std::fma(x_norm,
                                                                 std::fma(x_norm, cubic_a_norm, cubic_b_norm),
