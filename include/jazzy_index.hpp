@@ -371,7 +371,8 @@ public:
         num_segments_ = actual_segments;
 
         // Precompute uniformity parameters before loop
-        const double total_range = static_cast<double>(max_) - static_cast<double>(min_);
+        const double total_range = static_cast<double>(std::invoke(key_extract_, max_)) -
+                                   static_cast<double>(std::invoke(key_extract_, min_));
         const double expected_spacing = (num_segments_ > 1 && total_range >= std::numeric_limits<double>::epsilon())
             ? total_range / static_cast<double>(num_segments_)
             : 0.0;
@@ -390,7 +391,8 @@ public:
 
             // Check uniformity inline (while min/max values are hot in cache)
             if (is_uniform_ && num_segments_ > 1 && total_range >= std::numeric_limits<double>::epsilon()) {
-                const double segment_range = static_cast<double>(seg.max_val) - static_cast<double>(seg.min_val);
+                const double segment_range = static_cast<double>(std::invoke(key_extract_, seg.max_val)) -
+                                            static_cast<double>(std::invoke(key_extract_, seg.min_val));
                 if (std::abs(segment_range - expected_spacing) > tolerance) {
                     is_uniform_ = false;
                 }
@@ -529,46 +531,6 @@ public:
     friend std::string export_index_metadata(const JazzyIndex<U, S, C, K>& index);
 
 private:
-<<<<<<< HEAD
-    void detect_uniformity() noexcept {
-        if (num_segments_ <= 1) {
-            is_uniform_ = true;
-            return;
-        }
-
-        // Check if segments are roughly evenly spaced in value range
-        // This indicates uniform distribution
-        const double total_range = static_cast<double>(std::invoke(key_extract_, max_)) -
-                                   static_cast<double>(std::invoke(key_extract_, min_));
-        if (total_range < std::numeric_limits<double>::epsilon()) {
-            is_uniform_ = true;
-            return;
-        }
-
-        const double expected_spacing = total_range / static_cast<double>(num_segments_);
-
-        // Allow 30% deviation for uniformity detection
-        const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
-
-        for (std::size_t i = 0; i < num_segments_; ++i) {
-            const double segment_range = static_cast<double>(std::invoke(key_extract_, segments_[i].max_val)) -
-                                        static_cast<double>(std::invoke(key_extract_, segments_[i].min_val));
-
-            if (std::abs(segment_range - expected_spacing) > tolerance) {
-                is_uniform_ = false;
-                return;
-            }
-        }
-
-        is_uniform_ = true;
-
-        // Precompute scale factor for O(1) arithmetic lookup
-        if (is_uniform_) {
-            segment_scale_ = static_cast<double>(num_segments_) / total_range;
-        }
-    }
-=======
->>>>>>> origin/main
 
     [[nodiscard]] const detail::Segment<T>* find_segment(const T& value) const noexcept {
         if (num_segments_ == 0) {
