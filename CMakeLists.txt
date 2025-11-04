@@ -78,6 +78,7 @@ if(BUILD_TESTS)
     add_executable(jazzy_index_tests
         tests/gtest_unit_tests.cpp
         tests/gtest_model_tests.cpp
+        tests/gtest_model_selection_verification.cpp
         tests/gtest_boundary_tests.cpp
         tests/gtest_floating_point_tests.cpp
         tests/gtest_comparator_tests.cpp
@@ -85,6 +86,7 @@ if(BUILD_TESTS)
         tests/gtest_uniformity_tests.cpp
         tests/gtest_property_tests.cpp
         tests/gtest_key_value_tests.cpp
+        tests/gtest_binary_search_tests.cpp
     )
     target_link_libraries(jazzy_index_tests PRIVATE
         jazzy_index

@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JazzyIndex Visualization Charts</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .filters {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #cbd5e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .stats {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .chart-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+
+        .chart-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+        }
+
+        .chart-info {
+            padding: 15px;
+            background: #f7fafc;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .chart-meta {
+            font-size: 0.85em;
+            color: #718096;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            margin: 2% auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            animation: zoomIn 0.3s;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); }
+            to { transform: scale(1); }
+        }
+
+        .close {
+            position: absolute;
+            top: 30px;
+            right: 45px;
+            color: #f1f1f1;
+            font-size: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #bbb;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="https://github.com/mattyv/JazzyIndex/blob/main/docs/VISUALIZATIONS.md" class="back-link">← Back to Visualizations Guide</a>
+
+        <h1>📊 Index Visualization Charts</h1>
+        <p class="subtitle">Exploring 270 index structure visualizations across different distributions and configurations</p>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Distribution:</label>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="distribution" data-value="all">All</button>
+                    <button class="filter-btn" data-filter="distribution" data-value="Clustered">Clustered</button><button class="filter-btn" data-filter="distribution" data-value="Exponential">Exponential</button><button class="filter-btn" data-filter="distribution" data-value="ExtremePoly">ExtremePoly</button><button class="filter-btn" data-filter="distribution" data-value="InversePoly">InversePoly</button><button class="filter-btn" data-filter="distribution" data-value="Lognormal">Lognormal</button><button class="filter-btn" data-filter="distribution" data-value="Mixed">Mixed</button><button class="filter-btn" data-filter="distribution" data-value="Quadratic">Quadratic</button><button class="filter-btn" data-filter="distribution" data-value="Uniform">Uniform</button><button class="filter-btn" data-filter="distribution" data-value="Zipf">Zipf</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Dataset Size:</label>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="size" data-value="all">All</button>
+                    <button class="filter-btn" data-filter="size" data-value="100">N=100</button><button class="filter-btn" data-filter="size" data-value="1000">N=1000</button><button class="filter-btn" data-filter="size" data-value="10000">N=10000</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Segments:</label>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="segments" data-value="all">All</button>
+                    <button class="filter-btn" data-filter="segments" data-value="1">S=1</button><button class="filter-btn" data-filter="segments" data-value="2">S=2</button><button class="filter-btn" data-filter="segments" data-value="4">S=4</button><button class="filter-btn" data-filter="segments" data-value="8">S=8</button><button class="filter-btn" data-filter="segments" data-value="16">S=16</button><button class="filter-btn" data-filter="segments" data-value="32">S=32</button><button class="filter-btn" data-filter="segments" data-value="64">S=64</button><button class="filter-btn" data-filter="segments" data-value="128">S=128</button><button class="filter-btn" data-filter="segments" data-value="256">S=256</button><button class="filter-btn" data-filter="segments" data-value="512">S=512</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            Showing <span id="visible-count">270</span> of 270 charts
+        </div>
+
+        <div class="gallery" id="gallery">
+            <div class="chart-card" data-distribution="Clustered" data-size="10000" data-segments="1">
+                <img src="images/index_data/index_Clustered_N10000_S1.png" alt="index_Clustered_N10000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="10000" data-segments="128">
+                <img src="images/index_data/index_Clustered_N10000_S128.png" alt="index_Clustered_N10000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="10000" data-segments="16">
+                <img src="images/index_data/index_Clustered_N10000_S16.png" alt="index_Clustered_N10000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="10000" data-segments="2">
+                <img src="images/index_data/index_Clustered_N10000_S2.png" alt="index_Clustered_N10000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="10000" data-segments="256">
+                <img src="images/index_data/index_Clustered_N10000_S256.png" alt="index_Clustered_N10000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="10000" data-segments="32">
+                <img src="images/index_data/index_Clustered_N10000_S32.png" alt="index_Clustered_N10000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="10000" data-segments="4">
+                <img src="images/index_data/index_Clustered_N10000_S4.png" alt="index_Clustered_N10000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="10000" data-segments="512">
+                <img src="images/index_data/index_Clustered_N10000_S512.png" alt="index_Clustered_N10000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="10000" data-segments="64">
+                <img src="images/index_data/index_Clustered_N10000_S64.png" alt="index_Clustered_N10000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="10000" data-segments="8">
+                <img src="images/index_data/index_Clustered_N10000_S8.png" alt="index_Clustered_N10000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="1000" data-segments="1">
+                <img src="images/index_data/index_Clustered_N1000_S1.png" alt="index_Clustered_N1000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="1000" data-segments="128">
+                <img src="images/index_data/index_Clustered_N1000_S128.png" alt="index_Clustered_N1000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="1000" data-segments="16">
+                <img src="images/index_data/index_Clustered_N1000_S16.png" alt="index_Clustered_N1000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="1000" data-segments="2">
+                <img src="images/index_data/index_Clustered_N1000_S2.png" alt="index_Clustered_N1000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="1000" data-segments="256">
+                <img src="images/index_data/index_Clustered_N1000_S256.png" alt="index_Clustered_N1000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="1000" data-segments="32">
+                <img src="images/index_data/index_Clustered_N1000_S32.png" alt="index_Clustered_N1000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="1000" data-segments="4">
+                <img src="images/index_data/index_Clustered_N1000_S4.png" alt="index_Clustered_N1000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="1000" data-segments="512">
+                <img src="images/index_data/index_Clustered_N1000_S512.png" alt="index_Clustered_N1000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="1000" data-segments="64">
+                <img src="images/index_data/index_Clustered_N1000_S64.png" alt="index_Clustered_N1000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="1000" data-segments="8">
+                <img src="images/index_data/index_Clustered_N1000_S8.png" alt="index_Clustered_N1000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="100" data-segments="1">
+                <img src="images/index_data/index_Clustered_N100_S1.png" alt="index_Clustered_N100_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="100" data-segments="128">
+                <img src="images/index_data/index_Clustered_N100_S128.png" alt="index_Clustered_N100_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="100" data-segments="16">
+                <img src="images/index_data/index_Clustered_N100_S16.png" alt="index_Clustered_N100_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="100" data-segments="2">
+                <img src="images/index_data/index_Clustered_N100_S2.png" alt="index_Clustered_N100_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="100" data-segments="256">
+                <img src="images/index_data/index_Clustered_N100_S256.png" alt="index_Clustered_N100_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="100" data-segments="32">
+                <img src="images/index_data/index_Clustered_N100_S32.png" alt="index_Clustered_N100_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="100" data-segments="4">
+                <img src="images/index_data/index_Clustered_N100_S4.png" alt="index_Clustered_N100_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="100" data-segments="512">
+                <img src="images/index_data/index_Clustered_N100_S512.png" alt="index_Clustered_N100_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="100" data-segments="64">
+                <img src="images/index_data/index_Clustered_N100_S64.png" alt="index_Clustered_N100_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Clustered" data-size="100" data-segments="8">
+                <img src="images/index_data/index_Clustered_N100_S8.png" alt="index_Clustered_N100_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Clustered Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="10000" data-segments="1">
+                <img src="images/index_data/index_Exponential_N10000_S1.png" alt="index_Exponential_N10000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="10000" data-segments="128">
+                <img src="images/index_data/index_Exponential_N10000_S128.png" alt="index_Exponential_N10000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="10000" data-segments="16">
+                <img src="images/index_data/index_Exponential_N10000_S16.png" alt="index_Exponential_N10000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="10000" data-segments="2">
+                <img src="images/index_data/index_Exponential_N10000_S2.png" alt="index_Exponential_N10000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="10000" data-segments="256">
+                <img src="images/index_data/index_Exponential_N10000_S256.png" alt="index_Exponential_N10000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="10000" data-segments="32">
+                <img src="images/index_data/index_Exponential_N10000_S32.png" alt="index_Exponential_N10000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="10000" data-segments="4">
+                <img src="images/index_data/index_Exponential_N10000_S4.png" alt="index_Exponential_N10000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="10000" data-segments="512">
+                <img src="images/index_data/index_Exponential_N10000_S512.png" alt="index_Exponential_N10000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="10000" data-segments="64">
+                <img src="images/index_data/index_Exponential_N10000_S64.png" alt="index_Exponential_N10000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="10000" data-segments="8">
+                <img src="images/index_data/index_Exponential_N10000_S8.png" alt="index_Exponential_N10000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="1000" data-segments="1">
+                <img src="images/index_data/index_Exponential_N1000_S1.png" alt="index_Exponential_N1000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="1000" data-segments="128">
+                <img src="images/index_data/index_Exponential_N1000_S128.png" alt="index_Exponential_N1000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="1000" data-segments="16">
+                <img src="images/index_data/index_Exponential_N1000_S16.png" alt="index_Exponential_N1000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="1000" data-segments="2">
+                <img src="images/index_data/index_Exponential_N1000_S2.png" alt="index_Exponential_N1000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="1000" data-segments="256">
+                <img src="images/index_data/index_Exponential_N1000_S256.png" alt="index_Exponential_N1000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="1000" data-segments="32">
+                <img src="images/index_data/index_Exponential_N1000_S32.png" alt="index_Exponential_N1000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="1000" data-segments="4">
+                <img src="images/index_data/index_Exponential_N1000_S4.png" alt="index_Exponential_N1000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="1000" data-segments="512">
+                <img src="images/index_data/index_Exponential_N1000_S512.png" alt="index_Exponential_N1000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="1000" data-segments="64">
+                <img src="images/index_data/index_Exponential_N1000_S64.png" alt="index_Exponential_N1000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="1000" data-segments="8">
+                <img src="images/index_data/index_Exponential_N1000_S8.png" alt="index_Exponential_N1000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="100" data-segments="1">
+                <img src="images/index_data/index_Exponential_N100_S1.png" alt="index_Exponential_N100_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="100" data-segments="128">
+                <img src="images/index_data/index_Exponential_N100_S128.png" alt="index_Exponential_N100_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="100" data-segments="16">
+                <img src="images/index_data/index_Exponential_N100_S16.png" alt="index_Exponential_N100_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="100" data-segments="2">
+                <img src="images/index_data/index_Exponential_N100_S2.png" alt="index_Exponential_N100_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="100" data-segments="256">
+                <img src="images/index_data/index_Exponential_N100_S256.png" alt="index_Exponential_N100_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="100" data-segments="32">
+                <img src="images/index_data/index_Exponential_N100_S32.png" alt="index_Exponential_N100_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="100" data-segments="4">
+                <img src="images/index_data/index_Exponential_N100_S4.png" alt="index_Exponential_N100_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="100" data-segments="512">
+                <img src="images/index_data/index_Exponential_N100_S512.png" alt="index_Exponential_N100_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="100" data-segments="64">
+                <img src="images/index_data/index_Exponential_N100_S64.png" alt="index_Exponential_N100_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Exponential" data-size="100" data-segments="8">
+                <img src="images/index_data/index_Exponential_N100_S8.png" alt="index_Exponential_N100_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Exponential Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="10000" data-segments="1">
+                <img src="images/index_data/index_ExtremePoly_N10000_S1.png" alt="index_ExtremePoly_N10000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="10000" data-segments="128">
+                <img src="images/index_data/index_ExtremePoly_N10000_S128.png" alt="index_ExtremePoly_N10000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="10000" data-segments="16">
+                <img src="images/index_data/index_ExtremePoly_N10000_S16.png" alt="index_ExtremePoly_N10000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="10000" data-segments="2">
+                <img src="images/index_data/index_ExtremePoly_N10000_S2.png" alt="index_ExtremePoly_N10000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="10000" data-segments="256">
+                <img src="images/index_data/index_ExtremePoly_N10000_S256.png" alt="index_ExtremePoly_N10000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="10000" data-segments="32">
+                <img src="images/index_data/index_ExtremePoly_N10000_S32.png" alt="index_ExtremePoly_N10000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="10000" data-segments="4">
+                <img src="images/index_data/index_ExtremePoly_N10000_S4.png" alt="index_ExtremePoly_N10000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="10000" data-segments="512">
+                <img src="images/index_data/index_ExtremePoly_N10000_S512.png" alt="index_ExtremePoly_N10000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="10000" data-segments="64">
+                <img src="images/index_data/index_ExtremePoly_N10000_S64.png" alt="index_ExtremePoly_N10000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="10000" data-segments="8">
+                <img src="images/index_data/index_ExtremePoly_N10000_S8.png" alt="index_ExtremePoly_N10000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="1000" data-segments="1">
+                <img src="images/index_data/index_ExtremePoly_N1000_S1.png" alt="index_ExtremePoly_N1000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="1000" data-segments="128">
+                <img src="images/index_data/index_ExtremePoly_N1000_S128.png" alt="index_ExtremePoly_N1000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="1000" data-segments="16">
+                <img src="images/index_data/index_ExtremePoly_N1000_S16.png" alt="index_ExtremePoly_N1000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="1000" data-segments="2">
+                <img src="images/index_data/index_ExtremePoly_N1000_S2.png" alt="index_ExtremePoly_N1000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="1000" data-segments="256">
+                <img src="images/index_data/index_ExtremePoly_N1000_S256.png" alt="index_ExtremePoly_N1000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="1000" data-segments="32">
+                <img src="images/index_data/index_ExtremePoly_N1000_S32.png" alt="index_ExtremePoly_N1000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="1000" data-segments="4">
+                <img src="images/index_data/index_ExtremePoly_N1000_S4.png" alt="index_ExtremePoly_N1000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="1000" data-segments="512">
+                <img src="images/index_data/index_ExtremePoly_N1000_S512.png" alt="index_ExtremePoly_N1000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="1000" data-segments="64">
+                <img src="images/index_data/index_ExtremePoly_N1000_S64.png" alt="index_ExtremePoly_N1000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="1000" data-segments="8">
+                <img src="images/index_data/index_ExtremePoly_N1000_S8.png" alt="index_ExtremePoly_N1000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="100" data-segments="1">
+                <img src="images/index_data/index_ExtremePoly_N100_S1.png" alt="index_ExtremePoly_N100_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="100" data-segments="128">
+                <img src="images/index_data/index_ExtremePoly_N100_S128.png" alt="index_ExtremePoly_N100_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="100" data-segments="16">
+                <img src="images/index_data/index_ExtremePoly_N100_S16.png" alt="index_ExtremePoly_N100_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="100" data-segments="2">
+                <img src="images/index_data/index_ExtremePoly_N100_S2.png" alt="index_ExtremePoly_N100_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="100" data-segments="256">
+                <img src="images/index_data/index_ExtremePoly_N100_S256.png" alt="index_ExtremePoly_N100_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="100" data-segments="32">
+                <img src="images/index_data/index_ExtremePoly_N100_S32.png" alt="index_ExtremePoly_N100_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="100" data-segments="4">
+                <img src="images/index_data/index_ExtremePoly_N100_S4.png" alt="index_ExtremePoly_N100_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="100" data-segments="512">
+                <img src="images/index_data/index_ExtremePoly_N100_S512.png" alt="index_ExtremePoly_N100_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="100" data-segments="64">
+                <img src="images/index_data/index_ExtremePoly_N100_S64.png" alt="index_ExtremePoly_N100_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="ExtremePoly" data-size="100" data-segments="8">
+                <img src="images/index_data/index_ExtremePoly_N100_S8.png" alt="index_ExtremePoly_N100_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">ExtremePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="10000" data-segments="1">
+                <img src="images/index_data/index_InversePoly_N10000_S1.png" alt="index_InversePoly_N10000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="10000" data-segments="128">
+                <img src="images/index_data/index_InversePoly_N10000_S128.png" alt="index_InversePoly_N10000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="10000" data-segments="16">
+                <img src="images/index_data/index_InversePoly_N10000_S16.png" alt="index_InversePoly_N10000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="10000" data-segments="2">
+                <img src="images/index_data/index_InversePoly_N10000_S2.png" alt="index_InversePoly_N10000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="10000" data-segments="256">
+                <img src="images/index_data/index_InversePoly_N10000_S256.png" alt="index_InversePoly_N10000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="10000" data-segments="32">
+                <img src="images/index_data/index_InversePoly_N10000_S32.png" alt="index_InversePoly_N10000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="10000" data-segments="4">
+                <img src="images/index_data/index_InversePoly_N10000_S4.png" alt="index_InversePoly_N10000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="10000" data-segments="512">
+                <img src="images/index_data/index_InversePoly_N10000_S512.png" alt="index_InversePoly_N10000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="10000" data-segments="64">
+                <img src="images/index_data/index_InversePoly_N10000_S64.png" alt="index_InversePoly_N10000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="10000" data-segments="8">
+                <img src="images/index_data/index_InversePoly_N10000_S8.png" alt="index_InversePoly_N10000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="1000" data-segments="1">
+                <img src="images/index_data/index_InversePoly_N1000_S1.png" alt="index_InversePoly_N1000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="1000" data-segments="128">
+                <img src="images/index_data/index_InversePoly_N1000_S128.png" alt="index_InversePoly_N1000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="1000" data-segments="16">
+                <img src="images/index_data/index_InversePoly_N1000_S16.png" alt="index_InversePoly_N1000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="1000" data-segments="2">
+                <img src="images/index_data/index_InversePoly_N1000_S2.png" alt="index_InversePoly_N1000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="1000" data-segments="256">
+                <img src="images/index_data/index_InversePoly_N1000_S256.png" alt="index_InversePoly_N1000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="1000" data-segments="32">
+                <img src="images/index_data/index_InversePoly_N1000_S32.png" alt="index_InversePoly_N1000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="1000" data-segments="4">
+                <img src="images/index_data/index_InversePoly_N1000_S4.png" alt="index_InversePoly_N1000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="1000" data-segments="512">
+                <img src="images/index_data/index_InversePoly_N1000_S512.png" alt="index_InversePoly_N1000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="1000" data-segments="64">
+                <img src="images/index_data/index_InversePoly_N1000_S64.png" alt="index_InversePoly_N1000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="1000" data-segments="8">
+                <img src="images/index_data/index_InversePoly_N1000_S8.png" alt="index_InversePoly_N1000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="100" data-segments="1">
+                <img src="images/index_data/index_InversePoly_N100_S1.png" alt="index_InversePoly_N100_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="100" data-segments="128">
+                <img src="images/index_data/index_InversePoly_N100_S128.png" alt="index_InversePoly_N100_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="100" data-segments="16">
+                <img src="images/index_data/index_InversePoly_N100_S16.png" alt="index_InversePoly_N100_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="100" data-segments="2">
+                <img src="images/index_data/index_InversePoly_N100_S2.png" alt="index_InversePoly_N100_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="100" data-segments="256">
+                <img src="images/index_data/index_InversePoly_N100_S256.png" alt="index_InversePoly_N100_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="100" data-segments="32">
+                <img src="images/index_data/index_InversePoly_N100_S32.png" alt="index_InversePoly_N100_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="100" data-segments="4">
+                <img src="images/index_data/index_InversePoly_N100_S4.png" alt="index_InversePoly_N100_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="100" data-segments="512">
+                <img src="images/index_data/index_InversePoly_N100_S512.png" alt="index_InversePoly_N100_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="100" data-segments="64">
+                <img src="images/index_data/index_InversePoly_N100_S64.png" alt="index_InversePoly_N100_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="InversePoly" data-size="100" data-segments="8">
+                <img src="images/index_data/index_InversePoly_N100_S8.png" alt="index_InversePoly_N100_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">InversePoly Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="10000" data-segments="1">
+                <img src="images/index_data/index_Lognormal_N10000_S1.png" alt="index_Lognormal_N10000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="10000" data-segments="128">
+                <img src="images/index_data/index_Lognormal_N10000_S128.png" alt="index_Lognormal_N10000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="10000" data-segments="16">
+                <img src="images/index_data/index_Lognormal_N10000_S16.png" alt="index_Lognormal_N10000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="10000" data-segments="2">
+                <img src="images/index_data/index_Lognormal_N10000_S2.png" alt="index_Lognormal_N10000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="10000" data-segments="256">
+                <img src="images/index_data/index_Lognormal_N10000_S256.png" alt="index_Lognormal_N10000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="10000" data-segments="32">
+                <img src="images/index_data/index_Lognormal_N10000_S32.png" alt="index_Lognormal_N10000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="10000" data-segments="4">
+                <img src="images/index_data/index_Lognormal_N10000_S4.png" alt="index_Lognormal_N10000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="10000" data-segments="512">
+                <img src="images/index_data/index_Lognormal_N10000_S512.png" alt="index_Lognormal_N10000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="10000" data-segments="64">
+                <img src="images/index_data/index_Lognormal_N10000_S64.png" alt="index_Lognormal_N10000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="10000" data-segments="8">
+                <img src="images/index_data/index_Lognormal_N10000_S8.png" alt="index_Lognormal_N10000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="1000" data-segments="1">
+                <img src="images/index_data/index_Lognormal_N1000_S1.png" alt="index_Lognormal_N1000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="1000" data-segments="128">
+                <img src="images/index_data/index_Lognormal_N1000_S128.png" alt="index_Lognormal_N1000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="1000" data-segments="16">
+                <img src="images/index_data/index_Lognormal_N1000_S16.png" alt="index_Lognormal_N1000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="1000" data-segments="2">
+                <img src="images/index_data/index_Lognormal_N1000_S2.png" alt="index_Lognormal_N1000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="1000" data-segments="256">
+                <img src="images/index_data/index_Lognormal_N1000_S256.png" alt="index_Lognormal_N1000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="1000" data-segments="32">
+                <img src="images/index_data/index_Lognormal_N1000_S32.png" alt="index_Lognormal_N1000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="1000" data-segments="4">
+                <img src="images/index_data/index_Lognormal_N1000_S4.png" alt="index_Lognormal_N1000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="1000" data-segments="512">
+                <img src="images/index_data/index_Lognormal_N1000_S512.png" alt="index_Lognormal_N1000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="1000" data-segments="64">
+                <img src="images/index_data/index_Lognormal_N1000_S64.png" alt="index_Lognormal_N1000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="1000" data-segments="8">
+                <img src="images/index_data/index_Lognormal_N1000_S8.png" alt="index_Lognormal_N1000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="100" data-segments="1">
+                <img src="images/index_data/index_Lognormal_N100_S1.png" alt="index_Lognormal_N100_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="100" data-segments="128">
+                <img src="images/index_data/index_Lognormal_N100_S128.png" alt="index_Lognormal_N100_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="100" data-segments="16">
+                <img src="images/index_data/index_Lognormal_N100_S16.png" alt="index_Lognormal_N100_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="100" data-segments="2">
+                <img src="images/index_data/index_Lognormal_N100_S2.png" alt="index_Lognormal_N100_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="100" data-segments="256">
+                <img src="images/index_data/index_Lognormal_N100_S256.png" alt="index_Lognormal_N100_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="100" data-segments="32">
+                <img src="images/index_data/index_Lognormal_N100_S32.png" alt="index_Lognormal_N100_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="100" data-segments="4">
+                <img src="images/index_data/index_Lognormal_N100_S4.png" alt="index_Lognormal_N100_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="100" data-segments="512">
+                <img src="images/index_data/index_Lognormal_N100_S512.png" alt="index_Lognormal_N100_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="100" data-segments="64">
+                <img src="images/index_data/index_Lognormal_N100_S64.png" alt="index_Lognormal_N100_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Lognormal" data-size="100" data-segments="8">
+                <img src="images/index_data/index_Lognormal_N100_S8.png" alt="index_Lognormal_N100_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Lognormal Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="10000" data-segments="1">
+                <img src="images/index_data/index_Mixed_N10000_S1.png" alt="index_Mixed_N10000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="10000" data-segments="128">
+                <img src="images/index_data/index_Mixed_N10000_S128.png" alt="index_Mixed_N10000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="10000" data-segments="16">
+                <img src="images/index_data/index_Mixed_N10000_S16.png" alt="index_Mixed_N10000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="10000" data-segments="2">
+                <img src="images/index_data/index_Mixed_N10000_S2.png" alt="index_Mixed_N10000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="10000" data-segments="256">
+                <img src="images/index_data/index_Mixed_N10000_S256.png" alt="index_Mixed_N10000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="10000" data-segments="32">
+                <img src="images/index_data/index_Mixed_N10000_S32.png" alt="index_Mixed_N10000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="10000" data-segments="4">
+                <img src="images/index_data/index_Mixed_N10000_S4.png" alt="index_Mixed_N10000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="10000" data-segments="512">
+                <img src="images/index_data/index_Mixed_N10000_S512.png" alt="index_Mixed_N10000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="10000" data-segments="64">
+                <img src="images/index_data/index_Mixed_N10000_S64.png" alt="index_Mixed_N10000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="10000" data-segments="8">
+                <img src="images/index_data/index_Mixed_N10000_S8.png" alt="index_Mixed_N10000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="1000" data-segments="1">
+                <img src="images/index_data/index_Mixed_N1000_S1.png" alt="index_Mixed_N1000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="1000" data-segments="128">
+                <img src="images/index_data/index_Mixed_N1000_S128.png" alt="index_Mixed_N1000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="1000" data-segments="16">
+                <img src="images/index_data/index_Mixed_N1000_S16.png" alt="index_Mixed_N1000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="1000" data-segments="2">
+                <img src="images/index_data/index_Mixed_N1000_S2.png" alt="index_Mixed_N1000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="1000" data-segments="256">
+                <img src="images/index_data/index_Mixed_N1000_S256.png" alt="index_Mixed_N1000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="1000" data-segments="32">
+                <img src="images/index_data/index_Mixed_N1000_S32.png" alt="index_Mixed_N1000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="1000" data-segments="4">
+                <img src="images/index_data/index_Mixed_N1000_S4.png" alt="index_Mixed_N1000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="1000" data-segments="512">
+                <img src="images/index_data/index_Mixed_N1000_S512.png" alt="index_Mixed_N1000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="1000" data-segments="64">
+                <img src="images/index_data/index_Mixed_N1000_S64.png" alt="index_Mixed_N1000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="1000" data-segments="8">
+                <img src="images/index_data/index_Mixed_N1000_S8.png" alt="index_Mixed_N1000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="100" data-segments="1">
+                <img src="images/index_data/index_Mixed_N100_S1.png" alt="index_Mixed_N100_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="100" data-segments="128">
+                <img src="images/index_data/index_Mixed_N100_S128.png" alt="index_Mixed_N100_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="100" data-segments="16">
+                <img src="images/index_data/index_Mixed_N100_S16.png" alt="index_Mixed_N100_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="100" data-segments="2">
+                <img src="images/index_data/index_Mixed_N100_S2.png" alt="index_Mixed_N100_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="100" data-segments="256">
+                <img src="images/index_data/index_Mixed_N100_S256.png" alt="index_Mixed_N100_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="100" data-segments="32">
+                <img src="images/index_data/index_Mixed_N100_S32.png" alt="index_Mixed_N100_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="100" data-segments="4">
+                <img src="images/index_data/index_Mixed_N100_S4.png" alt="index_Mixed_N100_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="100" data-segments="512">
+                <img src="images/index_data/index_Mixed_N100_S512.png" alt="index_Mixed_N100_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="100" data-segments="64">
+                <img src="images/index_data/index_Mixed_N100_S64.png" alt="index_Mixed_N100_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Mixed" data-size="100" data-segments="8">
+                <img src="images/index_data/index_Mixed_N100_S8.png" alt="index_Mixed_N100_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Mixed Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="10000" data-segments="1">
+                <img src="images/index_data/index_Quadratic_N10000_S1.png" alt="index_Quadratic_N10000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="10000" data-segments="128">
+                <img src="images/index_data/index_Quadratic_N10000_S128.png" alt="index_Quadratic_N10000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="10000" data-segments="16">
+                <img src="images/index_data/index_Quadratic_N10000_S16.png" alt="index_Quadratic_N10000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="10000" data-segments="2">
+                <img src="images/index_data/index_Quadratic_N10000_S2.png" alt="index_Quadratic_N10000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="10000" data-segments="256">
+                <img src="images/index_data/index_Quadratic_N10000_S256.png" alt="index_Quadratic_N10000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="10000" data-segments="32">
+                <img src="images/index_data/index_Quadratic_N10000_S32.png" alt="index_Quadratic_N10000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="10000" data-segments="4">
+                <img src="images/index_data/index_Quadratic_N10000_S4.png" alt="index_Quadratic_N10000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="10000" data-segments="512">
+                <img src="images/index_data/index_Quadratic_N10000_S512.png" alt="index_Quadratic_N10000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="10000" data-segments="64">
+                <img src="images/index_data/index_Quadratic_N10000_S64.png" alt="index_Quadratic_N10000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="10000" data-segments="8">
+                <img src="images/index_data/index_Quadratic_N10000_S8.png" alt="index_Quadratic_N10000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="1000" data-segments="1">
+                <img src="images/index_data/index_Quadratic_N1000_S1.png" alt="index_Quadratic_N1000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="1000" data-segments="128">
+                <img src="images/index_data/index_Quadratic_N1000_S128.png" alt="index_Quadratic_N1000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="1000" data-segments="16">
+                <img src="images/index_data/index_Quadratic_N1000_S16.png" alt="index_Quadratic_N1000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="1000" data-segments="2">
+                <img src="images/index_data/index_Quadratic_N1000_S2.png" alt="index_Quadratic_N1000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="1000" data-segments="256">
+                <img src="images/index_data/index_Quadratic_N1000_S256.png" alt="index_Quadratic_N1000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="1000" data-segments="32">
+                <img src="images/index_data/index_Quadratic_N1000_S32.png" alt="index_Quadratic_N1000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="1000" data-segments="4">
+                <img src="images/index_data/index_Quadratic_N1000_S4.png" alt="index_Quadratic_N1000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="1000" data-segments="512">
+                <img src="images/index_data/index_Quadratic_N1000_S512.png" alt="index_Quadratic_N1000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="1000" data-segments="64">
+                <img src="images/index_data/index_Quadratic_N1000_S64.png" alt="index_Quadratic_N1000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="1000" data-segments="8">
+                <img src="images/index_data/index_Quadratic_N1000_S8.png" alt="index_Quadratic_N1000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="100" data-segments="1">
+                <img src="images/index_data/index_Quadratic_N100_S1.png" alt="index_Quadratic_N100_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="100" data-segments="128">
+                <img src="images/index_data/index_Quadratic_N100_S128.png" alt="index_Quadratic_N100_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="100" data-segments="16">
+                <img src="images/index_data/index_Quadratic_N100_S16.png" alt="index_Quadratic_N100_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="100" data-segments="2">
+                <img src="images/index_data/index_Quadratic_N100_S2.png" alt="index_Quadratic_N100_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="100" data-segments="256">
+                <img src="images/index_data/index_Quadratic_N100_S256.png" alt="index_Quadratic_N100_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="100" data-segments="32">
+                <img src="images/index_data/index_Quadratic_N100_S32.png" alt="index_Quadratic_N100_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="100" data-segments="4">
+                <img src="images/index_data/index_Quadratic_N100_S4.png" alt="index_Quadratic_N100_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="100" data-segments="512">
+                <img src="images/index_data/index_Quadratic_N100_S512.png" alt="index_Quadratic_N100_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="100" data-segments="64">
+                <img src="images/index_data/index_Quadratic_N100_S64.png" alt="index_Quadratic_N100_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Quadratic" data-size="100" data-segments="8">
+                <img src="images/index_data/index_Quadratic_N100_S8.png" alt="index_Quadratic_N100_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Quadratic Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="10000" data-segments="1">
+                <img src="images/index_data/index_Uniform_N10000_S1.png" alt="index_Uniform_N10000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="10000" data-segments="128">
+                <img src="images/index_data/index_Uniform_N10000_S128.png" alt="index_Uniform_N10000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="10000" data-segments="16">
+                <img src="images/index_data/index_Uniform_N10000_S16.png" alt="index_Uniform_N10000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="10000" data-segments="2">
+                <img src="images/index_data/index_Uniform_N10000_S2.png" alt="index_Uniform_N10000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="10000" data-segments="256">
+                <img src="images/index_data/index_Uniform_N10000_S256.png" alt="index_Uniform_N10000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="10000" data-segments="32">
+                <img src="images/index_data/index_Uniform_N10000_S32.png" alt="index_Uniform_N10000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="10000" data-segments="4">
+                <img src="images/index_data/index_Uniform_N10000_S4.png" alt="index_Uniform_N10000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="10000" data-segments="512">
+                <img src="images/index_data/index_Uniform_N10000_S512.png" alt="index_Uniform_N10000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="10000" data-segments="64">
+                <img src="images/index_data/index_Uniform_N10000_S64.png" alt="index_Uniform_N10000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="10000" data-segments="8">
+                <img src="images/index_data/index_Uniform_N10000_S8.png" alt="index_Uniform_N10000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="1000" data-segments="1">
+                <img src="images/index_data/index_Uniform_N1000_S1.png" alt="index_Uniform_N1000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="1000" data-segments="128">
+                <img src="images/index_data/index_Uniform_N1000_S128.png" alt="index_Uniform_N1000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="1000" data-segments="16">
+                <img src="images/index_data/index_Uniform_N1000_S16.png" alt="index_Uniform_N1000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="1000" data-segments="2">
+                <img src="images/index_data/index_Uniform_N1000_S2.png" alt="index_Uniform_N1000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="1000" data-segments="256">
+                <img src="images/index_data/index_Uniform_N1000_S256.png" alt="index_Uniform_N1000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="1000" data-segments="32">
+                <img src="images/index_data/index_Uniform_N1000_S32.png" alt="index_Uniform_N1000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="1000" data-segments="4">
+                <img src="images/index_data/index_Uniform_N1000_S4.png" alt="index_Uniform_N1000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="1000" data-segments="512">
+                <img src="images/index_data/index_Uniform_N1000_S512.png" alt="index_Uniform_N1000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="1000" data-segments="64">
+                <img src="images/index_data/index_Uniform_N1000_S64.png" alt="index_Uniform_N1000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="1000" data-segments="8">
+                <img src="images/index_data/index_Uniform_N1000_S8.png" alt="index_Uniform_N1000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="100" data-segments="1">
+                <img src="images/index_data/index_Uniform_N100_S1.png" alt="index_Uniform_N100_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="100" data-segments="128">
+                <img src="images/index_data/index_Uniform_N100_S128.png" alt="index_Uniform_N100_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="100" data-segments="16">
+                <img src="images/index_data/index_Uniform_N100_S16.png" alt="index_Uniform_N100_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="100" data-segments="2">
+                <img src="images/index_data/index_Uniform_N100_S2.png" alt="index_Uniform_N100_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="100" data-segments="256">
+                <img src="images/index_data/index_Uniform_N100_S256.png" alt="index_Uniform_N100_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="100" data-segments="32">
+                <img src="images/index_data/index_Uniform_N100_S32.png" alt="index_Uniform_N100_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="100" data-segments="4">
+                <img src="images/index_data/index_Uniform_N100_S4.png" alt="index_Uniform_N100_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="100" data-segments="512">
+                <img src="images/index_data/index_Uniform_N100_S512.png" alt="index_Uniform_N100_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="100" data-segments="64">
+                <img src="images/index_data/index_Uniform_N100_S64.png" alt="index_Uniform_N100_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Uniform" data-size="100" data-segments="8">
+                <img src="images/index_data/index_Uniform_N100_S8.png" alt="index_Uniform_N100_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Uniform Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="10000" data-segments="1">
+                <img src="images/index_data/index_Zipf_N10000_S1.png" alt="index_Zipf_N10000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="10000" data-segments="128">
+                <img src="images/index_data/index_Zipf_N10000_S128.png" alt="index_Zipf_N10000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="10000" data-segments="16">
+                <img src="images/index_data/index_Zipf_N10000_S16.png" alt="index_Zipf_N10000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="10000" data-segments="2">
+                <img src="images/index_data/index_Zipf_N10000_S2.png" alt="index_Zipf_N10000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="10000" data-segments="256">
+                <img src="images/index_data/index_Zipf_N10000_S256.png" alt="index_Zipf_N10000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="10000" data-segments="32">
+                <img src="images/index_data/index_Zipf_N10000_S32.png" alt="index_Zipf_N10000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="10000" data-segments="4">
+                <img src="images/index_data/index_Zipf_N10000_S4.png" alt="index_Zipf_N10000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="10000" data-segments="512">
+                <img src="images/index_data/index_Zipf_N10000_S512.png" alt="index_Zipf_N10000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="10000" data-segments="64">
+                <img src="images/index_data/index_Zipf_N10000_S64.png" alt="index_Zipf_N10000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="10000" data-segments="8">
+                <img src="images/index_data/index_Zipf_N10000_S8.png" alt="index_Zipf_N10000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 10000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="1000" data-segments="1">
+                <img src="images/index_data/index_Zipf_N1000_S1.png" alt="index_Zipf_N1000_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="1000" data-segments="128">
+                <img src="images/index_data/index_Zipf_N1000_S128.png" alt="index_Zipf_N1000_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="1000" data-segments="16">
+                <img src="images/index_data/index_Zipf_N1000_S16.png" alt="index_Zipf_N1000_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="1000" data-segments="2">
+                <img src="images/index_data/index_Zipf_N1000_S2.png" alt="index_Zipf_N1000_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="1000" data-segments="256">
+                <img src="images/index_data/index_Zipf_N1000_S256.png" alt="index_Zipf_N1000_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="1000" data-segments="32">
+                <img src="images/index_data/index_Zipf_N1000_S32.png" alt="index_Zipf_N1000_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="1000" data-segments="4">
+                <img src="images/index_data/index_Zipf_N1000_S4.png" alt="index_Zipf_N1000_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="1000" data-segments="512">
+                <img src="images/index_data/index_Zipf_N1000_S512.png" alt="index_Zipf_N1000_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="1000" data-segments="64">
+                <img src="images/index_data/index_Zipf_N1000_S64.png" alt="index_Zipf_N1000_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="1000" data-segments="8">
+                <img src="images/index_data/index_Zipf_N1000_S8.png" alt="index_Zipf_N1000_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 1000 | Segments: 8</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="100" data-segments="1">
+                <img src="images/index_data/index_Zipf_N100_S1.png" alt="index_Zipf_N100_S1.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 1</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="100" data-segments="128">
+                <img src="images/index_data/index_Zipf_N100_S128.png" alt="index_Zipf_N100_S128.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 128</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="100" data-segments="16">
+                <img src="images/index_data/index_Zipf_N100_S16.png" alt="index_Zipf_N100_S16.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 16</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="100" data-segments="2">
+                <img src="images/index_data/index_Zipf_N100_S2.png" alt="index_Zipf_N100_S2.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 2</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="100" data-segments="256">
+                <img src="images/index_data/index_Zipf_N100_S256.png" alt="index_Zipf_N100_S256.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 256</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="100" data-segments="32">
+                <img src="images/index_data/index_Zipf_N100_S32.png" alt="index_Zipf_N100_S32.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 32</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="100" data-segments="4">
+                <img src="images/index_data/index_Zipf_N100_S4.png" alt="index_Zipf_N100_S4.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 4</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="100" data-segments="512">
+                <img src="images/index_data/index_Zipf_N100_S512.png" alt="index_Zipf_N100_S512.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 512</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="100" data-segments="64">
+                <img src="images/index_data/index_Zipf_N100_S64.png" alt="index_Zipf_N100_S64.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 64</div>
+                </div>
+            </div>
+            <div class="chart-card" data-distribution="Zipf" data-size="100" data-segments="8">
+                <img src="images/index_data/index_Zipf_N100_S8.png" alt="index_Zipf_N100_S8.png" onclick="openModal(this.src)">
+                <div class="chart-info">
+                    <div class="chart-title">Zipf Distribution</div>
+                    <div class="chart-meta">Size: 100 | Segments: 8</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script>
+        // Filter state
+        const filters = {
+            distribution: 'all',
+            size: 'all',
+            segments: 'all'
+        };
+
+        // Initialize filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const filterType = this.dataset.filter;
+                const value = this.dataset.value;
+
+                // Update active state for this filter group
+                this.parentElement.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+
+                // Update filter state
+                filters[filterType] = value;
+
+                // Apply filters
+                applyFilters();
+            });
+        });
+
+        function applyFilters() {
+            const cards = document.querySelectorAll('.chart-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const dist = card.dataset.distribution;
+                const size = card.dataset.size;
+                const seg = card.dataset.segments;
+
+                const matchesDist = filters.distribution === 'all' || dist === filters.distribution;
+                const matchesSize = filters.size === 'all' || size === filters.size;
+                const matchesSeg = filters.segments === 'all' || seg === filters.segments;
+
+                if (matchesDist && matchesSize && matchesSeg) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            document.getElementById('visible-count').textContent = visibleCount;
+        }
+
+        function openModal(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = src;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
