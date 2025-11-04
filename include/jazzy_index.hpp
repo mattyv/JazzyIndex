@@ -72,7 +72,7 @@ struct alignas(64) Segment {  // Cache line aligned
     T min_val;
     T max_val;
     ModelType model_type;
-    uint8_t max_error;
+    uint16_t max_error;
 
     // Model parameters (hot path for predict())
     // Using float instead of double to keep struct within 64 bytes
@@ -616,7 +616,7 @@ public:
             const auto analysis = detail::analyze_segment(base_, start, end, key_extract_);
 
             seg.model_type = analysis.best_model;
-            seg.max_error = static_cast<uint8_t>(std::min<std::size_t>(analysis.max_error, 255));
+            seg.max_error = static_cast<uint16_t>(std::min<std::size_t>(analysis.max_error, std::numeric_limits<uint16_t>::max()));
 
             switch (analysis.best_model) {
                 case detail::ModelType::LINEAR:
