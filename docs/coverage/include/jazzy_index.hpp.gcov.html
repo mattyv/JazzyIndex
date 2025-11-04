@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2025-11-04 03:30:54</td>
+            <td class="headerValue">2025-11-04 06:43:24</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
@@ -136,8 +136,8 @@
 <span id="L74"><span class="lineNum">      74</span>              :     std::size_t start_idx;</span>
 <span id="L75"><span class="lineNum">      75</span>              :     std::size_t end_idx;</span>
 <span id="L76"><span class="lineNum">      76</span>              : </span>
-<span id="L77"><span class="lineNum">      77</span> <span class="tlaGNC tlaBgGNC">       10080 :     [[nodiscard]] std::size_t predict(T value) const noexcept {</span></span>
-<span id="L78"><span class="lineNum">      78</span> <span class="tlaGNC">       10080 :         switch (model_type) {</span></span>
+<span id="L77"><span class="lineNum">      77</span> <span class="tlaGNC tlaBgGNC">       10154 :     [[nodiscard]] std::size_t predict(T value) const noexcept {</span></span>
+<span id="L78"><span class="lineNum">      78</span> <span class="tlaGNC">       10154 :         switch (model_type) {</span></span>
 <span id="L79"><span class="lineNum">      79</span> <span class="tlaGNC">         560 :             case ModelType::LINEAR: {</span></span>
 <span id="L80"><span class="lineNum">      80</span> <span class="tlaGNC">         560 :                 const double pred = std::fma(static_cast&lt;double&gt;(value),</span></span>
 <span id="L81"><span class="lineNum">      81</span> <span class="tlaGNC">         560 :                                             params.linear.slope,</span></span>
@@ -153,8 +153,8 @@
 <span id="L91"><span class="lineNum">      91</span>              :                 // Clamp to non-negative before casting to unsigned type</span>
 <span id="L92"><span class="lineNum">      92</span> <span class="tlaGNC">           6 :                 return static_cast&lt;std::size_t&gt;(std::max(0.0, pred));</span></span>
 <span id="L93"><span class="lineNum">      93</span>              :             }</span>
-<span id="L94"><span class="lineNum">      94</span> <span class="tlaGNC">        9514 :             case ModelType::CONSTANT:</span></span>
-<span id="L95"><span class="lineNum">      95</span> <span class="tlaGNC">        9514 :                 return params.constant.constant_idx;</span></span>
+<span id="L94"><span class="lineNum">      94</span> <span class="tlaGNC">        9588 :             case ModelType::CONSTANT:</span></span>
+<span id="L95"><span class="lineNum">      95</span> <span class="tlaGNC">        9588 :                 return params.constant.constant_idx;</span></span>
 <span id="L96"><span class="lineNum">      96</span> <span class="tlaUNC tlaBgUNC">           0 :             case ModelType::DIRECT:</span></span>
 <span id="L97"><span class="lineNum">      97</span>              :             default:</span>
 <span id="L98"><span class="lineNum">      98</span> <span class="tlaUNC">           0 :                 return start_idx;  // Fallback</span></span>
@@ -174,31 +174,31 @@
 <span id="L112"><span class="lineNum">     112</span>              : </span>
 <span id="L113"><span class="lineNum">     113</span>              : // Fit linear model to segment: index = slope * value + intercept</span>
 <span id="L114"><span class="lineNum">     114</span>              : template &lt;typename T&gt;</span>
-<span id="L115"><span class="lineNum">     115</span> <span class="tlaGNC tlaBgGNC">       29523 : [[nodiscard]] SegmentAnalysis&lt;T&gt; analyze_segment(const T* data,</span></span>
+<span id="L115"><span class="lineNum">     115</span> <span class="tlaGNC tlaBgGNC">       29825 : [[nodiscard]] SegmentAnalysis&lt;T&gt; analyze_segment(const T* data,</span></span>
 <span id="L116"><span class="lineNum">     116</span>              :                                                    std::size_t start,</span>
 <span id="L117"><span class="lineNum">     117</span>              :                                                    std::size_t end) noexcept {</span>
-<span id="L118"><span class="lineNum">     118</span> <span class="tlaGNC">       29523 :     SegmentAnalysis&lt;T&gt; result{};</span></span>
+<span id="L118"><span class="lineNum">     118</span> <span class="tlaGNC">       29825 :     SegmentAnalysis&lt;T&gt; result{};</span></span>
 <span id="L119"><span class="lineNum">     119</span>              : </span>
-<span id="L120"><span class="lineNum">     120</span> <span class="tlaGNC">       52134 :     auto make_constant = [&amp;result, start]() {</span></span>
-<span id="L121"><span class="lineNum">     121</span> <span class="tlaGNC">       22611 :         result.best_model = ModelType::CONSTANT;</span></span>
-<span id="L122"><span class="lineNum">     122</span> <span class="tlaGNC">       22611 :         result.linear_b = static_cast&lt;double&gt;(start);</span></span>
-<span id="L123"><span class="lineNum">     123</span> <span class="tlaGNC">       22611 :         result.max_error = 0;</span></span>
-<span id="L124"><span class="lineNum">     124</span> <span class="tlaGNC">       22611 :         return result;</span></span>
+<span id="L120"><span class="lineNum">     120</span> <span class="tlaGNC">       52738 :     auto make_constant = [&amp;result, start]() {</span></span>
+<span id="L121"><span class="lineNum">     121</span> <span class="tlaGNC">       22913 :         result.best_model = ModelType::CONSTANT;</span></span>
+<span id="L122"><span class="lineNum">     122</span> <span class="tlaGNC">       22913 :         result.linear_b = static_cast&lt;double&gt;(start);</span></span>
+<span id="L123"><span class="lineNum">     123</span> <span class="tlaGNC">       22913 :         result.max_error = 0;</span></span>
+<span id="L124"><span class="lineNum">     124</span> <span class="tlaGNC">       22913 :         return result;</span></span>
 <span id="L125"><span class="lineNum">     125</span>              :     };</span>
 <span id="L126"><span class="lineNum">     126</span>              : </span>
-<span id="L127"><span class="lineNum">     127</span> <span class="tlaGNC">       29523 :     if (end &lt;= start)</span></span>
+<span id="L127"><span class="lineNum">     127</span> <span class="tlaGNC">       29825 :     if (end &lt;= start)</span></span>
 <span id="L128"><span class="lineNum">     128</span> <span class="tlaUNC tlaBgUNC">           0 :         return make_constant();</span></span>
 <span id="L129"><span class="lineNum">     129</span>              : </span>
-<span id="L130"><span class="lineNum">     130</span> <span class="tlaGNC tlaBgGNC">       29523 :     const std::size_t n = end - start;</span></span>
+<span id="L130"><span class="lineNum">     130</span> <span class="tlaGNC tlaBgGNC">       29825 :     const std::size_t n = end - start;</span></span>
 <span id="L131"><span class="lineNum">     131</span>              : </span>
 <span id="L132"><span class="lineNum">     132</span>              :     // For sorted data, min/max are at endpoints</span>
-<span id="L133"><span class="lineNum">     133</span> <span class="tlaGNC">       29523 :     const double min_val = static_cast&lt;double&gt;(data[start]);</span></span>
-<span id="L134"><span class="lineNum">     134</span> <span class="tlaGNC">       29523 :     const double max_val = static_cast&lt;double&gt;(data[end - 1]);</span></span>
-<span id="L135"><span class="lineNum">     135</span> <span class="tlaGNC">       29523 :     const double value_range = max_val - min_val;</span></span>
+<span id="L133"><span class="lineNum">     133</span> <span class="tlaGNC">       29825 :     const double min_val = static_cast&lt;double&gt;(data[start]);</span></span>
+<span id="L134"><span class="lineNum">     134</span> <span class="tlaGNC">       29825 :     const double max_val = static_cast&lt;double&gt;(data[end - 1]);</span></span>
+<span id="L135"><span class="lineNum">     135</span> <span class="tlaGNC">       29825 :     const double value_range = max_val - min_val;</span></span>
 <span id="L136"><span class="lineNum">     136</span>              : </span>
 <span id="L137"><span class="lineNum">     137</span>              :     // Check for constant segment (zero range)</span>
-<span id="L138"><span class="lineNum">     138</span> <span class="tlaGNC">       29523 :     if (value_range &lt; std::numeric_limits&lt;double&gt;::epsilon()) {</span></span>
-<span id="L139"><span class="lineNum">     139</span> <span class="tlaGNC">       22611 :         return make_constant();</span></span>
+<span id="L138"><span class="lineNum">     138</span> <span class="tlaGNC">       29825 :     if (value_range &lt; std::numeric_limits&lt;double&gt;::epsilon()) {</span></span>
+<span id="L139"><span class="lineNum">     139</span> <span class="tlaGNC">       22913 :         return make_constant();</span></span>
 <span id="L140"><span class="lineNum">     140</span>              :     }</span>
 <span id="L141"><span class="lineNum">     141</span>              : </span>
 <span id="L142"><span class="lineNum">     142</span>              :     // Precompute linear model parameters</span>
@@ -395,62 +395,62 @@
 <span id="L333"><span class="lineNum">     333</span> <span class="tlaGNC">           1 :         comp_ = comp;</span></span>
 <span id="L334"><span class="lineNum">     334</span>              : </span>
 <span id="L335"><span class="lineNum">     335</span> <span class="tlaGNC">        1036 :         if (size_ == 0) {</span></span>
-<span id="L336"><span class="lineNum">     336</span> <span class="tlaGNC">         109 :             return;</span></span>
+<span id="L336"><span class="lineNum">     336</span> <span class="tlaGNC">         108 :             return;</span></span>
 <span id="L337"><span class="lineNum">     337</span>              :         }</span>
 <span id="L338"><span class="lineNum">     338</span>              : </span>
-<span id="L339"><span class="lineNum">     339</span> <span class="tlaGNC">         927 :         min_ = base_[0];</span></span>
-<span id="L340"><span class="lineNum">     340</span> <span class="tlaGNC">         927 :         max_ = base_[size_ - 1];</span></span>
+<span id="L339"><span class="lineNum">     339</span> <span class="tlaGNC">         928 :         min_ = base_[0];</span></span>
+<span id="L340"><span class="lineNum">     340</span> <span class="tlaGNC">         928 :         max_ = base_[size_ - 1];</span></span>
 <span id="L341"><span class="lineNum">     341</span>              : </span>
-<span id="L342"><span class="lineNum">     342</span> <span class="tlaGNC">         927 :         if (size_ == 1) {</span></span>
+<span id="L342"><span class="lineNum">     342</span> <span class="tlaGNC">         928 :         if (size_ == 1) {</span></span>
 <span id="L343"><span class="lineNum">     343</span>              :             // Single element</span>
-<span id="L344"><span class="lineNum">     344</span> <span class="tlaGNC">         129 :             segments_[0].min_val = min_;</span></span>
-<span id="L345"><span class="lineNum">     345</span> <span class="tlaGNC">         129 :             segments_[0].max_val = max_;</span></span>
-<span id="L346"><span class="lineNum">     346</span> <span class="tlaGNC">         129 :             segments_[0].start_idx = 0;</span></span>
-<span id="L347"><span class="lineNum">     347</span> <span class="tlaGNC">         129 :             segments_[0].end_idx = 1;</span></span>
-<span id="L348"><span class="lineNum">     348</span> <span class="tlaGNC">         129 :             segments_[0].model_type = detail::ModelType::CONSTANT;</span></span>
-<span id="L349"><span class="lineNum">     349</span> <span class="tlaGNC">         129 :             segments_[0].max_error = 0;</span></span>
-<span id="L350"><span class="lineNum">     350</span> <span class="tlaGNC">         129 :             segments_[0].params.constant.constant_idx = 0;</span></span>
-<span id="L351"><span class="lineNum">     351</span> <span class="tlaGNC">         129 :             num_segments_ = 1;</span></span>
-<span id="L352"><span class="lineNum">     352</span> <span class="tlaGNC">         129 :             return;</span></span>
+<span id="L344"><span class="lineNum">     344</span> <span class="tlaGNC">         136 :             segments_[0].min_val = min_;</span></span>
+<span id="L345"><span class="lineNum">     345</span> <span class="tlaGNC">         136 :             segments_[0].max_val = max_;</span></span>
+<span id="L346"><span class="lineNum">     346</span> <span class="tlaGNC">         136 :             segments_[0].start_idx = 0;</span></span>
+<span id="L347"><span class="lineNum">     347</span> <span class="tlaGNC">         136 :             segments_[0].end_idx = 1;</span></span>
+<span id="L348"><span class="lineNum">     348</span> <span class="tlaGNC">         136 :             segments_[0].model_type = detail::ModelType::CONSTANT;</span></span>
+<span id="L349"><span class="lineNum">     349</span> <span class="tlaGNC">         136 :             segments_[0].max_error = 0;</span></span>
+<span id="L350"><span class="lineNum">     350</span> <span class="tlaGNC">         136 :             segments_[0].params.constant.constant_idx = 0;</span></span>
+<span id="L351"><span class="lineNum">     351</span> <span class="tlaGNC">         136 :             num_segments_ = 1;</span></span>
+<span id="L352"><span class="lineNum">     352</span> <span class="tlaGNC">         136 :             return;</span></span>
 <span id="L353"><span class="lineNum">     353</span>              :         }</span>
 <span id="L354"><span class="lineNum">     354</span>              : </span>
 <span id="L355"><span class="lineNum">     355</span>              :         // Build quantile-based segments with single-pass uniformity detection</span>
-<span id="L356"><span class="lineNum">     356</span> <span class="tlaGNC">         798 :         const std::size_t actual_segments = std::min(NumSegments, size_);</span></span>
-<span id="L357"><span class="lineNum">     357</span> <span class="tlaGNC">         798 :         num_segments_ = actual_segments;</span></span>
+<span id="L356"><span class="lineNum">     356</span> <span class="tlaGNC">         792 :         const std::size_t actual_segments = std::min(NumSegments, size_);</span></span>
+<span id="L357"><span class="lineNum">     357</span> <span class="tlaGNC">         792 :         num_segments_ = actual_segments;</span></span>
 <span id="L358"><span class="lineNum">     358</span>              : </span>
 <span id="L359"><span class="lineNum">     359</span>              :         // Precompute uniformity parameters before loop</span>
-<span id="L360"><span class="lineNum">     360</span> <span class="tlaGNC">         798 :         const double total_range = static_cast&lt;double&gt;(max_) - static_cast&lt;double&gt;(min_);</span></span>
-<span id="L361"><span class="lineNum">     361</span> <span class="tlaGNC">         794 :         const double expected_spacing = (num_segments_ &gt; 1 &amp;&amp; total_range &gt;= std::numeric_limits&lt;double&gt;::epsilon())</span></span>
-<span id="L362"><span class="lineNum">     362</span> <span class="tlaGNC">        1592 :             ? total_range / static_cast&lt;double&gt;(num_segments_)</span></span>
+<span id="L360"><span class="lineNum">     360</span> <span class="tlaGNC">         792 :         const double total_range = static_cast&lt;double&gt;(max_) - static_cast&lt;double&gt;(min_);</span></span>
+<span id="L361"><span class="lineNum">     361</span> <span class="tlaGNC">         788 :         const double expected_spacing = (num_segments_ &gt; 1 &amp;&amp; total_range &gt;= std::numeric_limits&lt;double&gt;::epsilon())</span></span>
+<span id="L362"><span class="lineNum">     362</span> <span class="tlaGNC">        1580 :             ? total_range / static_cast&lt;double&gt;(num_segments_)</span></span>
 <span id="L363"><span class="lineNum">     363</span>              :             : 0.0;</span>
-<span id="L364"><span class="lineNum">     364</span> <span class="tlaGNC">         798 :         const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;</span></span>
-<span id="L365"><span class="lineNum">     365</span> <span class="tlaGNC">         798 :         is_uniform_ = true;  // Assume uniform until proven otherwise</span></span>
+<span id="L364"><span class="lineNum">     364</span> <span class="tlaGNC">         792 :         const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;</span></span>
+<span id="L365"><span class="lineNum">     365</span> <span class="tlaGNC">         792 :         is_uniform_ = true;  // Assume uniform until proven otherwise</span></span>
 <span id="L366"><span class="lineNum">     366</span>              : </span>
-<span id="L367"><span class="lineNum">     367</span> <span class="tlaGNC">       30321 :         for (std::size_t i = 0; i &lt; actual_segments; ++i) {</span></span>
-<span id="L368"><span class="lineNum">     368</span> <span class="tlaGNC">       29523 :             const std::size_t start = (i * size_) / actual_segments;</span></span>
-<span id="L369"><span class="lineNum">     369</span> <span class="tlaGNC">       29523 :             const std::size_t end = ((i + 1) * size_) / actual_segments;</span></span>
+<span id="L367"><span class="lineNum">     367</span> <span class="tlaGNC">       30617 :         for (std::size_t i = 0; i &lt; actual_segments; ++i) {</span></span>
+<span id="L368"><span class="lineNum">     368</span> <span class="tlaGNC">       29825 :             const std::size_t start = (i * size_) / actual_segments;</span></span>
+<span id="L369"><span class="lineNum">     369</span> <span class="tlaGNC">       29825 :             const std::size_t end = ((i + 1) * size_) / actual_segments;</span></span>
 <span id="L370"><span class="lineNum">     370</span>              : </span>
-<span id="L371"><span class="lineNum">     371</span> <span class="tlaGNC">       29523 :             auto&amp; seg = segments_[i];</span></span>
-<span id="L372"><span class="lineNum">     372</span> <span class="tlaGNC">       29523 :             seg.min_val = base_[start];</span></span>
-<span id="L373"><span class="lineNum">     373</span> <span class="tlaGNC">       29523 :             seg.max_val = base_[end - 1];</span></span>
-<span id="L374"><span class="lineNum">     374</span> <span class="tlaGNC">       29523 :             seg.start_idx = start;</span></span>
-<span id="L375"><span class="lineNum">     375</span> <span class="tlaGNC">       29523 :             seg.end_idx = end;</span></span>
+<span id="L371"><span class="lineNum">     371</span> <span class="tlaGNC">       29825 :             auto&amp; seg = segments_[i];</span></span>
+<span id="L372"><span class="lineNum">     372</span> <span class="tlaGNC">       29825 :             seg.min_val = base_[start];</span></span>
+<span id="L373"><span class="lineNum">     373</span> <span class="tlaGNC">       29825 :             seg.max_val = base_[end - 1];</span></span>
+<span id="L374"><span class="lineNum">     374</span> <span class="tlaGNC">       29825 :             seg.start_idx = start;</span></span>
+<span id="L375"><span class="lineNum">     375</span> <span class="tlaGNC">       29825 :             seg.end_idx = end;</span></span>
 <span id="L376"><span class="lineNum">     376</span>              : </span>
 <span id="L377"><span class="lineNum">     377</span>              :             // Check uniformity inline (while min/max values are hot in cache)</span>
-<span id="L378"><span class="lineNum">     378</span> <span class="tlaGNC">       29523 :             if (is_uniform_ &amp;&amp; num_segments_ &gt; 1 &amp;&amp; total_range &gt;= std::numeric_limits&lt;double&gt;::epsilon()) {</span></span>
-<span id="L379"><span class="lineNum">     379</span> <span class="tlaGNC">        1545 :                 const double segment_range = static_cast&lt;double&gt;(seg.max_val) - static_cast&lt;double&gt;(seg.min_val);</span></span>
-<span id="L380"><span class="lineNum">     380</span> <span class="tlaGNC">        1545 :                 if (std::abs(segment_range - expected_spacing) &gt; tolerance) {</span></span>
-<span id="L381"><span class="lineNum">     381</span> <span class="tlaGNC">         721 :                     is_uniform_ = false;</span></span>
+<span id="L378"><span class="lineNum">     378</span> <span class="tlaGNC">       29825 :             if (is_uniform_ &amp;&amp; num_segments_ &gt; 1 &amp;&amp; total_range &gt;= std::numeric_limits&lt;double&gt;::epsilon()) {</span></span>
+<span id="L379"><span class="lineNum">     379</span> <span class="tlaGNC">        1535 :                 const double segment_range = static_cast&lt;double&gt;(seg.max_val) - static_cast&lt;double&gt;(seg.min_val);</span></span>
+<span id="L380"><span class="lineNum">     380</span> <span class="tlaGNC">        1535 :                 if (std::abs(segment_range - expected_spacing) &gt; tolerance) {</span></span>
+<span id="L381"><span class="lineNum">     381</span> <span class="tlaGNC">         711 :                     is_uniform_ = false;</span></span>
 <span id="L382"><span class="lineNum">     382</span>              :                 }</span>
 <span id="L383"><span class="lineNum">     383</span>              :             }</span>
 <span id="L384"><span class="lineNum">     384</span>              : </span>
 <span id="L385"><span class="lineNum">     385</span>              :             // Analyze segment and choose best model</span>
-<span id="L386"><span class="lineNum">     386</span> <span class="tlaGNC">       29523 :             const auto analysis = detail::analyze_segment(base_, start, end);</span></span>
+<span id="L386"><span class="lineNum">     386</span> <span class="tlaGNC">       29825 :             const auto analysis = detail::analyze_segment(base_, start, end);</span></span>
 <span id="L387"><span class="lineNum">     387</span>              : </span>
-<span id="L388"><span class="lineNum">     388</span> <span class="tlaGNC">       29523 :             seg.model_type = analysis.best_model;</span></span>
-<span id="L389"><span class="lineNum">     389</span> <span class="tlaGNC">       29523 :             seg.max_error = static_cast&lt;uint8_t&gt;(std::min&lt;std::size_t&gt;(analysis.max_error, 255));</span></span>
+<span id="L388"><span class="lineNum">     388</span> <span class="tlaGNC">       29825 :             seg.model_type = analysis.best_model;</span></span>
+<span id="L389"><span class="lineNum">     389</span> <span class="tlaGNC">       29825 :             seg.max_error = static_cast&lt;uint8_t&gt;(std::min&lt;std::size_t&gt;(analysis.max_error, 255));</span></span>
 <span id="L390"><span class="lineNum">     390</span>              : </span>
-<span id="L391"><span class="lineNum">     391</span> <span class="tlaGNC">       29523 :             switch (analysis.best_model) {</span></span>
+<span id="L391"><span class="lineNum">     391</span> <span class="tlaGNC">       29825 :             switch (analysis.best_model) {</span></span>
 <span id="L392"><span class="lineNum">     392</span> <span class="tlaGNC">        6875 :                 case detail::ModelType::LINEAR:</span></span>
 <span id="L393"><span class="lineNum">     393</span> <span class="tlaGNC">        6875 :                     seg.params.linear.slope = analysis.linear_a;</span></span>
 <span id="L394"><span class="lineNum">     394</span> <span class="tlaGNC">        6875 :                     seg.params.linear.intercept = analysis.linear_b;</span></span>
@@ -460,77 +460,77 @@
 <span id="L398"><span class="lineNum">     398</span> <span class="tlaGNC">          37 :                     seg.params.quadratic.b = analysis.quad_b;</span></span>
 <span id="L399"><span class="lineNum">     399</span> <span class="tlaGNC">          37 :                     seg.params.quadratic.c = analysis.quad_c;</span></span>
 <span id="L400"><span class="lineNum">     400</span> <span class="tlaGNC">          37 :                     break;</span></span>
-<span id="L401"><span class="lineNum">     401</span> <span class="tlaGNC">       22611 :                 case detail::ModelType::CONSTANT:</span></span>
-<span id="L402"><span class="lineNum">     402</span> <span class="tlaGNC">       22611 :                     seg.params.constant.constant_idx = start;</span></span>
-<span id="L403"><span class="lineNum">     403</span> <span class="tlaGNC">       22611 :                     break;</span></span>
+<span id="L401"><span class="lineNum">     401</span> <span class="tlaGNC">       22913 :                 case detail::ModelType::CONSTANT:</span></span>
+<span id="L402"><span class="lineNum">     402</span> <span class="tlaGNC">       22913 :                     seg.params.constant.constant_idx = start;</span></span>
+<span id="L403"><span class="lineNum">     403</span> <span class="tlaGNC">       22913 :                     break;</span></span>
 <span id="L404"><span class="lineNum">     404</span> <span class="tlaUNC tlaBgUNC">           0 :                 default:</span></span>
 <span id="L405"><span class="lineNum">     405</span> <span class="tlaUNC">           0 :                     break;</span></span>
 <span id="L406"><span class="lineNum">     406</span>              :             }</span>
 <span id="L407"><span class="lineNum">     407</span>              :         }</span>
 <span id="L408"><span class="lineNum">     408</span>              : </span>
 <span id="L409"><span class="lineNum">     409</span>              :         // Compute scale factor for O(1) segment lookup if data is uniform</span>
-<span id="L410"><span class="lineNum">     410</span> <span class="tlaGNC tlaBgGNC">         798 :         if (is_uniform_ &amp;&amp; total_range &gt;= std::numeric_limits&lt;double&gt;::epsilon()) {</span></span>
+<span id="L410"><span class="lineNum">     410</span> <span class="tlaGNC tlaBgGNC">         792 :         if (is_uniform_ &amp;&amp; total_range &gt;= std::numeric_limits&lt;double&gt;::epsilon()) {</span></span>
 <span id="L411"><span class="lineNum">     411</span> <span class="tlaGNC">          16 :             segment_scale_ = static_cast&lt;double&gt;(num_segments_) / total_range;</span></span>
 <span id="L412"><span class="lineNum">     412</span>              :         }</span>
 <span id="L413"><span class="lineNum">     413</span>              :     }</span>
 <span id="L414"><span class="lineNum">     414</span>              : </span>
-<span id="L415"><span class="lineNum">     415</span> <span class="tlaGNC">       10529 :     [[nodiscard]] const T* find(const T&amp; key) const {</span></span>
-<span id="L416"><span class="lineNum">     416</span> <span class="tlaGNC">       10529 :         if (size_ == 0) {</span></span>
+<span id="L415"><span class="lineNum">     415</span> <span class="tlaGNC">       10606 :     [[nodiscard]] const T* find(const T&amp; key) const {</span></span>
+<span id="L416"><span class="lineNum">     416</span> <span class="tlaGNC">       10606 :         if (size_ == 0) {</span></span>
 <span id="L417"><span class="lineNum">     417</span> <span class="tlaGNC">         102 :             return base_;</span></span>
 <span id="L418"><span class="lineNum">     418</span>              :         }</span>
 <span id="L419"><span class="lineNum">     419</span>              : </span>
 <span id="L420"><span class="lineNum">     420</span>              :         // Bounds check</span>
-<span id="L421"><span class="lineNum">     421</span> <span class="tlaGNC">       10427 :         const T&amp; first_value = base_[0];</span></span>
-<span id="L422"><span class="lineNum">     422</span> <span class="tlaGNC">       10427 :         const T&amp; last_value = base_[size_ - 1];</span></span>
-<span id="L423"><span class="lineNum">     423</span> <span class="tlaGNC">       10427 :         if (comp_(key, first_value) || comp_(last_value, key)) {</span></span>
-<span id="L424"><span class="lineNum">     424</span> <span class="tlaGNC">         347 :             return base_ + size_;</span></span>
+<span id="L421"><span class="lineNum">     421</span> <span class="tlaGNC">       10504 :         const T&amp; first_value = base_[0];</span></span>
+<span id="L422"><span class="lineNum">     422</span> <span class="tlaGNC">       10504 :         const T&amp; last_value = base_[size_ - 1];</span></span>
+<span id="L423"><span class="lineNum">     423</span> <span class="tlaGNC">       10504 :         if (comp_(key, first_value) || comp_(last_value, key)) {</span></span>
+<span id="L424"><span class="lineNum">     424</span> <span class="tlaGNC">         350 :             return base_ + size_;</span></span>
 <span id="L425"><span class="lineNum">     425</span>              :         }</span>
 <span id="L426"><span class="lineNum">     426</span>              : </span>
 <span id="L427"><span class="lineNum">     427</span>              :         // Find segment using binary search</span>
-<span id="L428"><span class="lineNum">     428</span> <span class="tlaGNC">       10080 :         const auto seg = find_segment(key);</span></span>
-<span id="L429"><span class="lineNum">     429</span> <span class="tlaGNC">       10080 :         if (seg == nullptr) {</span></span>
+<span id="L428"><span class="lineNum">     428</span> <span class="tlaGNC">       10154 :         const auto seg = find_segment(key);</span></span>
+<span id="L429"><span class="lineNum">     429</span> <span class="tlaGNC">       10154 :         if (seg == nullptr) {</span></span>
 <span id="L430"><span class="lineNum">     430</span> <span class="tlaUNC tlaBgUNC">           0 :             return base_ + size_;</span></span>
 <span id="L431"><span class="lineNum">     431</span>              :         }</span>
 <span id="L432"><span class="lineNum">     432</span>              : </span>
 <span id="L433"><span class="lineNum">     433</span>              :         // Predict index using segment's model</span>
-<span id="L434"><span class="lineNum">     434</span> <span class="tlaGNC tlaBgGNC">       10080 :         std::size_t predicted = seg-&gt;predict(key);</span></span>
-<span id="L435"><span class="lineNum">     435</span> <span class="tlaGNC">       10080 :         predicted = detail::clamp_value&lt;std::size_t&gt;(predicted, seg-&gt;start_idx,</span></span>
-<span id="L436"><span class="lineNum">     436</span> <span class="tlaGNC">       10080 :                                                       seg-&gt;end_idx &gt; 0 ? seg-&gt;end_idx - 1 : 0);</span></span>
+<span id="L434"><span class="lineNum">     434</span> <span class="tlaGNC tlaBgGNC">       10154 :         std::size_t predicted = seg-&gt;predict(key);</span></span>
+<span id="L435"><span class="lineNum">     435</span> <span class="tlaGNC">       10154 :         predicted = detail::clamp_value&lt;std::size_t&gt;(predicted, seg-&gt;start_idx,</span></span>
+<span id="L436"><span class="lineNum">     436</span> <span class="tlaGNC">       10154 :                                                       seg-&gt;end_idx &gt; 0 ? seg-&gt;end_idx - 1 : 0);</span></span>
 <span id="L437"><span class="lineNum">     437</span>              : </span>
-<span id="L438"><span class="lineNum">     438</span> <span class="tlaGNC">       10080 :         const T* begin = base_;</span></span>
+<span id="L438"><span class="lineNum">     438</span> <span class="tlaGNC">       10154 :         const T* begin = base_;</span></span>
 <span id="L439"><span class="lineNum">     439</span>              : </span>
 <span id="L440"><span class="lineNum">     440</span>              :         // Check predicted position first</span>
-<span id="L441"><span class="lineNum">     441</span> <span class="tlaGNC">       10080 :         if (equal(begin[predicted], key)) {</span></span>
-<span id="L442"><span class="lineNum">     442</span> <span class="tlaGNC">        9815 :             return begin + predicted;</span></span>
+<span id="L441"><span class="lineNum">     441</span> <span class="tlaGNC">       10154 :         if (equal(begin[predicted], key)) {</span></span>
+<span id="L442"><span class="lineNum">     442</span> <span class="tlaGNC">        9890 :             return begin + predicted;</span></span>
 <span id="L443"><span class="lineNum">     443</span>              :         }</span>
 <span id="L444"><span class="lineNum">     444</span>              : </span>
 <span id="L445"><span class="lineNum">     445</span>              :         // Determine search direction using one comparison</span>
-<span id="L446"><span class="lineNum">     446</span> <span class="tlaGNC">         265 :         const bool search_left = comp_(key, begin[predicted]);</span></span>
-<span id="L447"><span class="lineNum">     447</span> <span class="tlaGNC">         265 :         const std::size_t max_radius = std::max&lt;std::size_t&gt;(seg-&gt;max_error + detail::SEARCH_RADIUS_MARGIN, detail::MIN_SEARCH_RADIUS);</span></span>
+<span id="L446"><span class="lineNum">     446</span> <span class="tlaGNC">         264 :         const bool search_left = comp_(key, begin[predicted]);</span></span>
+<span id="L447"><span class="lineNum">     447</span> <span class="tlaGNC">         264 :         const std::size_t max_radius = std::max&lt;std::size_t&gt;(seg-&gt;max_error + detail::SEARCH_RADIUS_MARGIN, detail::MIN_SEARCH_RADIUS);</span></span>
 <span id="L448"><span class="lineNum">     448</span>              : </span>
-<span id="L449"><span class="lineNum">     449</span> <span class="tlaGNC">         265 :         if (search_left) {</span></span>
+<span id="L449"><span class="lineNum">     449</span> <span class="tlaGNC">         264 :         if (search_left) {</span></span>
 <span id="L450"><span class="lineNum">     450</span>              :             // Key is less than predicted value, search leftward</span>
 <span id="L451"><span class="lineNum">     451</span>              :             // Track the rightmost position we've searched to avoid overlaps</span>
-<span id="L452"><span class="lineNum">     452</span> <span class="tlaGNC">         113 :             std::size_t right_boundary = predicted;  // We've checked predicted, don't search it again</span></span>
+<span id="L452"><span class="lineNum">     452</span> <span class="tlaGNC">         112 :             std::size_t right_boundary = predicted;  // We've checked predicted, don't search it again</span></span>
 <span id="L453"><span class="lineNum">     453</span>              : </span>
 <span id="L454"><span class="lineNum">     454</span>              :             // Exponentially expand leftward: check radii 1, 2, 4, 8...</span>
-<span id="L455"><span class="lineNum">     455</span> <span class="tlaGNC">         371 :             for (std::size_t radius = 1; radius &lt;= max_radius; radius &lt;&lt;= 1) {</span></span>
-<span id="L456"><span class="lineNum">     456</span> <span class="tlaGNC">         302 :                 const std::size_t left_pos = predicted &gt; radius ? predicted - radius : seg-&gt;start_idx;</span></span>
+<span id="L455"><span class="lineNum">     455</span> <span class="tlaGNC">         360 :             for (std::size_t radius = 1; radius &lt;= max_radius; radius &lt;&lt;= 1) {</span></span>
+<span id="L456"><span class="lineNum">     456</span> <span class="tlaGNC">         291 :                 const std::size_t left_pos = predicted &gt; radius ? predicted - radius : seg-&gt;start_idx;</span></span>
 <span id="L457"><span class="lineNum">     457</span>              : </span>
 <span id="L458"><span class="lineNum">     458</span>              :                 // If left_pos &gt;= right_boundary, no unexplored region remains</span>
-<span id="L459"><span class="lineNum">     459</span> <span class="tlaGNC">         302 :                 if (left_pos &gt;= right_boundary) break;</span></span>
+<span id="L459"><span class="lineNum">     459</span> <span class="tlaGNC">         291 :                 if (left_pos &gt;= right_boundary) break;</span></span>
 <span id="L460"><span class="lineNum">     460</span>              : </span>
 <span id="L461"><span class="lineNum">     461</span>              :                 // Search the new range [left_pos, right_boundary)</span>
-<span id="L462"><span class="lineNum">     462</span> <span class="tlaGNC">         261 :                 const T* found = std::lower_bound(begin + left_pos, begin + right_boundary, key, comp_);</span></span>
-<span id="L463"><span class="lineNum">     463</span> <span class="tlaGNC">         261 :                 if (found != begin + right_boundary &amp;&amp; equal(*found, key)) {</span></span>
+<span id="L462"><span class="lineNum">     462</span> <span class="tlaGNC">         251 :                 const T* found = std::lower_bound(begin + left_pos, begin + right_boundary, key, comp_);</span></span>
+<span id="L463"><span class="lineNum">     463</span> <span class="tlaGNC">         251 :                 if (found != begin + right_boundary &amp;&amp; equal(*found, key)) {</span></span>
 <span id="L464"><span class="lineNum">     464</span> <span class="tlaGNC">           3 :                     return found;</span></span>
 <span id="L465"><span class="lineNum">     465</span>              :                 }</span>
 <span id="L466"><span class="lineNum">     466</span>              : </span>
-<span id="L467"><span class="lineNum">     467</span> <span class="tlaGNC">         258 :                 right_boundary = left_pos;  // Update boundary for next iteration</span></span>
+<span id="L467"><span class="lineNum">     467</span> <span class="tlaGNC">         248 :                 right_boundary = left_pos;  // Update boundary for next iteration</span></span>
 <span id="L468"><span class="lineNum">     468</span>              :             }</span>
 <span id="L469"><span class="lineNum">     469</span>              : </span>
 <span id="L470"><span class="lineNum">     470</span>              :             // Fallback: search any remaining unsearched left region</span>
-<span id="L471"><span class="lineNum">     471</span> <span class="tlaGNC">         110 :             if (right_boundary &gt; seg-&gt;start_idx) {</span></span>
+<span id="L471"><span class="lineNum">     471</span> <span class="tlaGNC">         109 :             if (right_boundary &gt; seg-&gt;start_idx) {</span></span>
 <span id="L472"><span class="lineNum">     472</span> <span class="tlaGNC">           1 :                 const T* found = std::lower_bound(begin + seg-&gt;start_idx, begin + right_boundary, key, comp_);</span></span>
 <span id="L473"><span class="lineNum">     473</span> <span class="tlaGNC">           1 :                 if (found != begin + right_boundary &amp;&amp; equal(*found, key)) {</span></span>
 <span id="L474"><span class="lineNum">     474</span> <span class="tlaGNC">           1 :                     return found;</span></span>
@@ -566,7 +566,7 @@
 <span id="L504"><span class="lineNum">     504</span>              :             }</span>
 <span id="L505"><span class="lineNum">     505</span>              :         }</span>
 <span id="L506"><span class="lineNum">     506</span>              : </span>
-<span id="L507"><span class="lineNum">     507</span> <span class="tlaGNC">         119 :         return base_ + size_;</span></span>
+<span id="L507"><span class="lineNum">     507</span> <span class="tlaGNC">         118 :         return base_ + size_;</span></span>
 <span id="L508"><span class="lineNum">     508</span>              :     }</span>
 <span id="L509"><span class="lineNum">     509</span>              : </span>
 <span id="L510"><span class="lineNum">     510</span> <span class="tlaGNC">         107 :     [[nodiscard]] std::size_t size() const noexcept { return size_; }</span></span>
@@ -578,57 +578,57 @@
 <span id="L516"><span class="lineNum">     516</span>              : </span>
 <span id="L517"><span class="lineNum">     517</span>              : private:</span>
 <span id="L518"><span class="lineNum">     518</span>              : </span>
-<span id="L519"><span class="lineNum">     519</span> <span class="tlaGNC">       10080 :     [[nodiscard]] const detail::Segment&lt;T&gt;* find_segment(const T&amp; value) const noexcept {</span></span>
-<span id="L520"><span class="lineNum">     520</span> <span class="tlaGNC">       10080 :         if (num_segments_ == 0) {</span></span>
+<span id="L519"><span class="lineNum">     519</span> <span class="tlaGNC">       10154 :     [[nodiscard]] const detail::Segment&lt;T&gt;* find_segment(const T&amp; value) const noexcept {</span></span>
+<span id="L520"><span class="lineNum">     520</span> <span class="tlaGNC">       10154 :         if (num_segments_ == 0) {</span></span>
 <span id="L521"><span class="lineNum">     521</span> <span class="tlaUNC tlaBgUNC">           0 :             return nullptr;</span></span>
 <span id="L522"><span class="lineNum">     522</span>              :         }</span>
 <span id="L523"><span class="lineNum">     523</span>              : </span>
 <span id="L524"><span class="lineNum">     524</span>              :         // Fast path: O(1) arithmetic lookup for uniform data</span>
-<span id="L525"><span class="lineNum">     525</span> <span class="tlaGNC tlaBgGNC">       10080 :         if (is_uniform_) {</span></span>
-<span id="L526"><span class="lineNum">     526</span> <span class="tlaGNC">         377 :             const double offset = static_cast&lt;double&gt;(value) - static_cast&lt;double&gt;(min_);</span></span>
-<span id="L527"><span class="lineNum">     527</span> <span class="tlaGNC">         377 :             std::size_t seg_idx = static_cast&lt;std::size_t&gt;(offset * segment_scale_);</span></span>
+<span id="L525"><span class="lineNum">     525</span> <span class="tlaGNC tlaBgGNC">       10154 :         if (is_uniform_) {</span></span>
+<span id="L526"><span class="lineNum">     526</span> <span class="tlaGNC">         379 :             const double offset = static_cast&lt;double&gt;(value) - static_cast&lt;double&gt;(min_);</span></span>
+<span id="L527"><span class="lineNum">     527</span> <span class="tlaGNC">         379 :             std::size_t seg_idx = static_cast&lt;std::size_t&gt;(offset * segment_scale_);</span></span>
 <span id="L528"><span class="lineNum">     528</span>              : </span>
 <span id="L529"><span class="lineNum">     529</span>              :             // Clamp to valid range</span>
-<span id="L530"><span class="lineNum">     530</span> <span class="tlaGNC">         377 :             if (seg_idx &gt;= num_segments_) {</span></span>
+<span id="L530"><span class="lineNum">     530</span> <span class="tlaGNC">         379 :             if (seg_idx &gt;= num_segments_) {</span></span>
 <span id="L531"><span class="lineNum">     531</span> <span class="tlaGNC">           8 :                 seg_idx = num_segments_ - 1;</span></span>
 <span id="L532"><span class="lineNum">     532</span>              :             }</span>
 <span id="L533"><span class="lineNum">     533</span>              : </span>
 <span id="L534"><span class="lineNum">     534</span>              :             // Verify we got the right segment (should always be true for uniform data)</span>
-<span id="L535"><span class="lineNum">     535</span> <span class="tlaGNC">         377 :             const auto&amp; seg = segments_[seg_idx];</span></span>
-<span id="L536"><span class="lineNum">     536</span> <span class="tlaGNC">         377 :             if (!comp_(value, seg.min_val) &amp;&amp; !comp_(seg.max_val, value)) {</span></span>
-<span id="L537"><span class="lineNum">     537</span> <span class="tlaGNC">         342 :                 return &amp;seg;</span></span>
+<span id="L535"><span class="lineNum">     535</span> <span class="tlaGNC">         379 :             const auto&amp; seg = segments_[seg_idx];</span></span>
+<span id="L536"><span class="lineNum">     536</span> <span class="tlaGNC">         379 :             if (!comp_(value, seg.min_val) &amp;&amp; !comp_(seg.max_val, value)) {</span></span>
+<span id="L537"><span class="lineNum">     537</span> <span class="tlaGNC">         344 :                 return &amp;seg;</span></span>
 <span id="L538"><span class="lineNum">     538</span>              :             }</span>
 <span id="L539"><span class="lineNum">     539</span>              : </span>
 <span id="L540"><span class="lineNum">     540</span>              :             // Fallback to binary search if arithmetic failed (rare)</span>
 <span id="L541"><span class="lineNum">     541</span>              :         }</span>
 <span id="L542"><span class="lineNum">     542</span>              : </span>
 <span id="L543"><span class="lineNum">     543</span>              :         // Slow path: Binary search through segments for skewed data</span>
-<span id="L544"><span class="lineNum">     544</span> <span class="tlaGNC">        9738 :         std::size_t left = 0;</span></span>
-<span id="L545"><span class="lineNum">     545</span> <span class="tlaGNC">        9738 :         std::size_t right = num_segments_;</span></span>
+<span id="L544"><span class="lineNum">     544</span> <span class="tlaGNC">        9810 :         std::size_t left = 0;</span></span>
+<span id="L545"><span class="lineNum">     545</span> <span class="tlaGNC">        9810 :         std::size_t right = num_segments_;</span></span>
 <span id="L546"><span class="lineNum">     546</span>              : </span>
-<span id="L547"><span class="lineNum">     547</span> <span class="tlaGNC">       45851 :         while (left &lt; right) {</span></span>
-<span id="L548"><span class="lineNum">     548</span> <span class="tlaGNC">       45743 :             const std::size_t mid = left + (right - left) / 2;</span></span>
+<span id="L547"><span class="lineNum">     547</span> <span class="tlaGNC">       45982 :         while (left &lt; right) {</span></span>
+<span id="L548"><span class="lineNum">     548</span> <span class="tlaGNC">       45875 :             const std::size_t mid = left + (right - left) / 2;</span></span>
 <span id="L549"><span class="lineNum">     549</span>              : </span>
-<span id="L550"><span class="lineNum">     550</span> <span class="tlaGNC">       45743 :             if (comp_(value, segments_[mid].min_val)) {</span></span>
-<span id="L551"><span class="lineNum">     551</span> <span class="tlaGNC">       19726 :                 right = mid;</span></span>
-<span id="L552"><span class="lineNum">     552</span> <span class="tlaGNC">       26017 :             } else if (comp_(segments_[mid].max_val, value)) {</span></span>
-<span id="L553"><span class="lineNum">     553</span> <span class="tlaGNC">       16387 :                 left = mid + 1;</span></span>
+<span id="L550"><span class="lineNum">     550</span> <span class="tlaGNC">       45875 :             if (comp_(value, segments_[mid].min_val)) {</span></span>
+<span id="L551"><span class="lineNum">     551</span> <span class="tlaGNC">       19696 :                 right = mid;</span></span>
+<span id="L552"><span class="lineNum">     552</span> <span class="tlaGNC">       26179 :             } else if (comp_(segments_[mid].max_val, value)) {</span></span>
+<span id="L553"><span class="lineNum">     553</span> <span class="tlaGNC">       16476 :                 left = mid + 1;</span></span>
 <span id="L554"><span class="lineNum">     554</span>              :             } else {</span>
 <span id="L555"><span class="lineNum">     555</span>              :                 // value is within this segment</span>
-<span id="L556"><span class="lineNum">     556</span> <span class="tlaGNC">        9630 :                 return &amp;segments_[mid];</span></span>
+<span id="L556"><span class="lineNum">     556</span> <span class="tlaGNC">        9703 :                 return &amp;segments_[mid];</span></span>
 <span id="L557"><span class="lineNum">     557</span>              :             }</span>
 <span id="L558"><span class="lineNum">     558</span>              :         }</span>
 <span id="L559"><span class="lineNum">     559</span>              : </span>
 <span id="L560"><span class="lineNum">     560</span>              :         // Edge case: if we're past all segments, return last segment</span>
-<span id="L561"><span class="lineNum">     561</span> <span class="tlaGNC">         108 :         if (left &gt; 0 &amp;&amp; left &gt;= num_segments_) {</span></span>
+<span id="L561"><span class="lineNum">     561</span> <span class="tlaGNC">         107 :         if (left &gt; 0 &amp;&amp; left &gt;= num_segments_) {</span></span>
 <span id="L562"><span class="lineNum">     562</span> <span class="tlaUNC tlaBgUNC">           0 :             return &amp;segments_[num_segments_ - 1];</span></span>
 <span id="L563"><span class="lineNum">     563</span>              :         }</span>
 <span id="L564"><span class="lineNum">     564</span>              : </span>
-<span id="L565"><span class="lineNum">     565</span> <span class="tlaGNC tlaBgGNC">         108 :         return left &lt; num_segments_ ? &amp;segments_[left] : nullptr;</span></span>
+<span id="L565"><span class="lineNum">     565</span> <span class="tlaGNC tlaBgGNC">         107 :         return left &lt; num_segments_ ? &amp;segments_[left] : nullptr;</span></span>
 <span id="L566"><span class="lineNum">     566</span>              :     }</span>
 <span id="L567"><span class="lineNum">     567</span>              : </span>
-<span id="L568"><span class="lineNum">     568</span> <span class="tlaGNC">       10251 :     [[nodiscard]] bool equal(const T&amp; lhs, const T&amp; rhs) const {</span></span>
-<span id="L569"><span class="lineNum">     569</span> <span class="tlaGNC">       10251 :         return !comp_(lhs, rhs) &amp;&amp; !comp_(rhs, lhs);</span></span>
+<span id="L568"><span class="lineNum">     568</span> <span class="tlaGNC">       10325 :     [[nodiscard]] bool equal(const T&amp; lhs, const T&amp; rhs) const {</span></span>
+<span id="L569"><span class="lineNum">     569</span> <span class="tlaGNC">       10325 :         return !comp_(lhs, rhs) &amp;&amp; !comp_(rhs, lhs);</span></span>
 <span id="L570"><span class="lineNum">     570</span>              :     }</span>
 <span id="L571"><span class="lineNum">     571</span>              : </span>
 <span id="L572"><span class="lineNum">     572</span>              :     const T* base_{nullptr};</span>
