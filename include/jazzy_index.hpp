@@ -20,7 +20,8 @@ namespace detail {
 // Model types for different segment characteristics
 enum class ModelType : uint8_t {
     LINEAR,      // Most common: y = mx + b (1 FMA)
-    QUADRATIC,   // Curved regions: y = ax^2 + bx + c (3 FMA)
+    QUADRATIC,   // Curved regions: y = ax^2 + bx + c (2 FMA)
+    CUBIC,       // Highly curved: y = ax^3 + bx^2 + cx + d (3 FMA)
     CONSTANT,    // All values same: y = c (0 computation)
     DIRECT       // Tiny dense segments: array lookup
 };
@@ -32,6 +33,15 @@ inline constexpr std::size_t MAX_ACCEPTABLE_LINEAR_ERROR = 2;
 
 inline constexpr double QUADRATIC_IMPROVEMENT_THRESHOLD = 0.7;
 // Quadratic must be 30% better than linear (0.7 = 70% of linear error)
+
+inline constexpr double CUBIC_IMPROVEMENT_THRESHOLD = 0.7;
+// Cubic must be 30% better than quadratic (0.7 = 70% of quadratic error)
+
+inline constexpr std::size_t MAX_ACCEPTABLE_QUADRATIC_ERROR = 6;
+// Quadratic models with error ≤6 are good enough; don't try cubic
+
+inline constexpr std::size_t MAX_CUBIC_WORTHWHILE_ERROR = 50;
+// If quadratic error >50, likely a discontinuity; cubic won't help, skip computation
 
 inline constexpr std::size_t SEARCH_RADIUS_MARGIN = 2;
 // Extra margin added to max_error for exponential search bounds
@@ -66,6 +76,12 @@ struct alignas(64) Segment {  // Cache line aligned
             double c;
         } quadratic;
         struct {
+            double a;
+            double b;
+            double c;
+            double d;
+        } cubic;
+        struct {
             std::size_t constant_idx;
         } constant;
     } params;
@@ -91,6 +107,17 @@ struct alignas(64) Segment {  // Cache line aligned
                 // Clamp to non-negative before casting to unsigned type
                 return static_cast<std::size_t>(std::max(0.0, pred));
             }
+            case ModelType::CUBIC: {
+                const double x = static_cast<double>(value);
+                // Horner's method: ((a*x + b)*x + c)*x + d
+                const double pred = std::fma(x,
+                                            std::fma(x,
+                                                    std::fma(x, params.cubic.a, params.cubic.b),
+                                                    params.cubic.c),
+                                            params.cubic.d);
+                // Clamp to non-negative before casting to unsigned type
+                return static_cast<std::size_t>(std::max(0.0, pred));
+            }
             case ModelType::CONSTANT:
                 return params.constant.constant_idx;
             case ModelType::DIRECT:
@@ -106,6 +133,7 @@ struct SegmentAnalysis {
     ModelType best_model;
     double linear_a, linear_b;
     double quad_a, quad_b, quad_c;
+    double cubic_a, cubic_b, cubic_c, cubic_d;
     std::size_t max_error;
     double mean_error;
 };
@@ -146,12 +174,12 @@ template <typename T>
     result.linear_a = slope;
     result.linear_b = intercept;
 
-    // Single pass: compute linear error AND quadratic sums simultaneously
+    // Single pass: compute linear error AND quadratic/cubic sums simultaneously
     std::size_t linear_max_error = 0;
     double linear_total_error = 0.0;
 
-    double sum_x = 0.0, sum_x2 = 0.0, sum_x3 = 0.0, sum_x4 = 0.0;
-    double sum_y = 0.0, sum_xy = 0.0, sum_x2y = 0.0;
+    double sum_x = 0.0, sum_x2 = 0.0, sum_x3 = 0.0, sum_x4 = 0.0, sum_x5 = 0.0, sum_x6 = 0.0;
+    double sum_y = 0.0, sum_xy = 0.0, sum_x2y = 0.0, sum_x3y = 0.0;
 
     const double x_min = min_val;
     const double x_scale = value_range;
@@ -174,20 +202,25 @@ template <typename T>
         linear_max_error = std::max(linear_max_error, static_cast<std::size_t>(std::ceil(error)));
         linear_total_error += error;
 
-        // Accumulate quadratic sums (normalized x for numerical stability)
+        // Accumulate quadratic/cubic sums (normalized x for numerical stability)
         const double x_normalized = (val_double - x_min) / x_scale;
         const double y = static_cast<double>(i);
         const double x2 = x_normalized * x_normalized;
         const double x3 = x2 * x_normalized;
         const double x4 = x2 * x2;
+        const double x5 = x4 * x_normalized;
+        const double x6 = x3 * x3;
 
         sum_x += x_normalized;
         sum_x2 += x2;
         sum_x3 += x3;
         sum_x4 += x4;
+        sum_x5 += x5;
+        sum_x6 += x6;
         sum_y += y;
         sum_xy += x_normalized * y;
         sum_x2y += x2 * y;
+        sum_x3y += x3 * y;
     }
 
     // If all values are identical, use constant model
@@ -270,6 +303,185 @@ template <typename T>
 
             // Only accept quadratic if it's monotonic
             if (is_monotonic) {
+                // Check if we should try cubic for even better fit
+                // Only try cubic if error is in "sweet spot" (6 < error < 50)
+                // High error (>50) likely indicates discontinuity where cubic won't help
+                if (quad_max_error > MAX_ACCEPTABLE_QUADRATIC_ERROR &&
+                    quad_max_error < MAX_CUBIC_WORTHWHILE_ERROR) {
+                    // Try cubic model using same normalized sums
+                    // System: [Σx⁶  Σx⁵  Σx⁴  Σx³] [a]   [Σx³y]
+                    //         [Σx⁵  Σx⁴  Σx³  Σx²] [b] = [Σx²y]
+                    //         [Σx⁴  Σx³  Σx²  Σx ] [c]   [Σxy ]
+                    //         [Σx³  Σx²  Σx   n  ] [d]   [Σy  ]
+
+                    // Compute determinant of 4x4 coefficient matrix using cofactor expansion
+                    // For numerical stability and code brevity, we use a helper for 3x3 determinants
+                    auto det3x3 = [](double a11, double a12, double a13,
+                                    double a21, double a22, double a23,
+                                    double a31, double a32, double a33) -> double {
+                        return a11 * (a22 * a33 - a23 * a32)
+                             - a12 * (a21 * a33 - a23 * a31)
+                             + a13 * (a21 * a32 - a22 * a31);
+                    };
+
+                    // 4x4 determinant by expanding along first row
+                    const double det4 =
+                        sum_x6 * det3x3(sum_x4, sum_x3, sum_x2,
+                                       sum_x3, sum_x2, sum_x,
+                                       sum_x2, sum_x, n_double)
+                        - sum_x5 * det3x3(sum_x5, sum_x3, sum_x2,
+                                         sum_x4, sum_x2, sum_x,
+                                         sum_x3, sum_x, n_double)
+                        + sum_x4 * det3x3(sum_x5, sum_x4, sum_x2,
+                                         sum_x4, sum_x3, sum_x,
+                                         sum_x3, sum_x2, n_double)
+                        - sum_x3 * det3x3(sum_x5, sum_x4, sum_x3,
+                                         sum_x4, sum_x3, sum_x2,
+                                         sum_x3, sum_x2, sum_x);
+
+                    if (std::abs(det4) > 1e-10) {
+                        // Compute determinants for Cramer's rule (replace each column with RHS)
+                        const double det_a =
+                            sum_x3y * det3x3(sum_x4, sum_x3, sum_x2,
+                                           sum_x3, sum_x2, sum_x,
+                                           sum_x2, sum_x, n_double)
+                            - sum_x5 * det3x3(sum_x2y, sum_x3, sum_x2,
+                                             sum_xy, sum_x2, sum_x,
+                                             sum_y, sum_x, n_double)
+                            + sum_x4 * det3x3(sum_x2y, sum_x4, sum_x2,
+                                             sum_xy, sum_x3, sum_x,
+                                             sum_y, sum_x2, n_double)
+                            - sum_x3 * det3x3(sum_x2y, sum_x4, sum_x3,
+                                             sum_xy, sum_x3, sum_x2,
+                                             sum_y, sum_x2, sum_x);
+
+                        const double det_b =
+                            sum_x6 * det3x3(sum_x2y, sum_x3, sum_x2,
+                                           sum_xy, sum_x2, sum_x,
+                                           sum_y, sum_x, n_double)
+                            - sum_x3y * det3x3(sum_x5, sum_x3, sum_x2,
+                                              sum_x4, sum_x2, sum_x,
+                                              sum_x3, sum_x, n_double)
+                            + sum_x4 * det3x3(sum_x5, sum_x2y, sum_x2,
+                                             sum_x4, sum_xy, sum_x,
+                                             sum_x3, sum_y, n_double)
+                            - sum_x3 * det3x3(sum_x5, sum_x2y, sum_x3,
+                                             sum_x4, sum_xy, sum_x2,
+                                             sum_x3, sum_y, sum_x);
+
+                        const double det_c =
+                            sum_x6 * det3x3(sum_x4, sum_x2y, sum_x2,
+                                           sum_x3, sum_xy, sum_x,
+                                           sum_x2, sum_y, n_double)
+                            - sum_x5 * det3x3(sum_x5, sum_x2y, sum_x2,
+                                             sum_x4, sum_xy, sum_x,
+                                             sum_x3, sum_y, n_double)
+                            + sum_x3y * det3x3(sum_x5, sum_x4, sum_x2,
+                                              sum_x4, sum_x3, sum_x,
+                                              sum_x3, sum_x2, n_double)
+                            - sum_x3 * det3x3(sum_x5, sum_x4, sum_x2y,
+                                             sum_x4, sum_x3, sum_xy,
+                                             sum_x3, sum_x2, sum_y);
+
+                        const double det_d =
+                            sum_x6 * det3x3(sum_x4, sum_x3, sum_x2y,
+                                           sum_x3, sum_x2, sum_xy,
+                                           sum_x2, sum_x, sum_y)
+                            - sum_x5 * det3x3(sum_x5, sum_x3, sum_x2y,
+                                             sum_x4, sum_x2, sum_xy,
+                                             sum_x3, sum_x, sum_y)
+                            + sum_x4 * det3x3(sum_x5, sum_x4, sum_x2y,
+                                             sum_x4, sum_x3, sum_xy,
+                                             sum_x3, sum_x2, sum_y)
+                            - sum_x3y * det3x3(sum_x5, sum_x4, sum_x3,
+                                              sum_x4, sum_x3, sum_x2,
+                                              sum_x3, sum_x2, sum_x);
+
+                        const double cubic_a_norm = det_a / det4;
+                        const double cubic_b_norm = det_b / det4;
+                        const double cubic_c_norm = det_c / det4;
+                        const double cubic_d_norm = det_d / det4;
+
+                        // Measure cubic error in normalized space
+                        std::size_t cubic_max_error = 0;
+                        double cubic_total_error = 0.0;
+
+                        for (std::size_t i = start; i < end; ++i) {
+                            const double x_norm = (static_cast<double>(data[i]) - x_min) / x_scale;
+                            const double pred = std::fma(x_norm,
+                                                        std::fma(x_norm,
+                                                                std::fma(x_norm, cubic_a_norm, cubic_b_norm),
+                                                                cubic_c_norm),
+                                                        cubic_d_norm);
+                            const double error = std::abs(pred - static_cast<double>(i));
+                            cubic_max_error = std::max(cubic_max_error, static_cast<std::size_t>(std::ceil(error)));
+                            cubic_total_error += error;
+                        }
+
+                        // Choose cubic if it's significantly better than quadratic
+                        if (cubic_max_error < quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD) {
+                            // Transform coefficients from normalized space to original space
+                            // Original: y = a*x_norm^3 + b*x_norm^2 + c*x_norm + d
+                            // where x_norm = (x - x_min) / x_scale
+                            // Expand: y = a*((x-x_min)/s)^3 + b*((x-x_min)/s)^2 + c*((x-x_min)/s) + d
+
+                            const double s = x_scale;
+                            const double s2 = s * s;
+                            const double s3 = s2 * s;
+                            const double m = x_min;
+                            const double m2 = m * m;
+                            const double m3 = m2 * m;
+
+                            // Coefficients in original space (after algebraic expansion)
+                            const double cubic_a_orig = cubic_a_norm / s3;
+                            const double cubic_b_orig = cubic_b_norm / s2 - 3.0 * cubic_a_norm * m / s3;
+                            const double cubic_c_orig = cubic_c_norm / s
+                                                      - 2.0 * cubic_b_norm * m / s2
+                                                      + 3.0 * cubic_a_norm * m2 / s3;
+                            const double cubic_d_orig = cubic_d_norm
+                                                      - cubic_c_norm * m / s
+                                                      + cubic_b_norm * m2 / s2
+                                                      - cubic_a_norm * m3 / s3;
+
+                            // Check monotonicity: f'(x) = 3*a*x^2 + 2*b*x + c must be >= 0 over [min_val, max_val]
+                            // For cubic, derivative is quadratic, so we check at critical points and endpoints
+                            auto cubic_derivative = [&](double x) -> double {
+                                return 3.0 * cubic_a_orig * x * x + 2.0 * cubic_b_orig * x + cubic_c_orig;
+                            };
+
+                            bool cubic_is_monotonic = true;
+
+                            // Check endpoints
+                            if (cubic_derivative(min_val) < 0.0 || cubic_derivative(max_val) < 0.0) {
+                                cubic_is_monotonic = false;
+                            }
+
+                            // Check critical points (where f''(x) = 0)
+                            // f''(x) = 6*a*x + 2*b = 0 => x = -b/(3*a)
+                            if (cubic_is_monotonic && std::abs(cubic_a_orig) > 1e-10) {
+                                const double critical_x = -cubic_b_orig / (3.0 * cubic_a_orig);
+                                if (critical_x >= min_val && critical_x <= max_val) {
+                                    if (cubic_derivative(critical_x) < 0.0) {
+                                        cubic_is_monotonic = false;
+                                    }
+                                }
+                            }
+
+                            if (cubic_is_monotonic) {
+                                result.best_model = ModelType::CUBIC;
+                                result.cubic_a = cubic_a_orig;
+                                result.cubic_b = cubic_b_orig;
+                                result.cubic_c = cubic_c_orig;
+                                result.cubic_d = cubic_d_orig;
+                                result.max_error = cubic_max_error;
+                                result.mean_error = cubic_total_error / n_double;
+                                return result;
+                            }
+                        }
+                    }
+                }
+
+                // Use quadratic if cubic didn't work out
                 result.best_model = ModelType::QUADRATIC;
                 result.quad_a = quad_a_transformed;
                 result.quad_b = quad_b_transformed;
@@ -397,6 +609,12 @@ public:
                     seg.params.quadratic.a = analysis.quad_a;
                     seg.params.quadratic.b = analysis.quad_b;
                     seg.params.quadratic.c = analysis.quad_c;
+                    break;
+                case detail::ModelType::CUBIC:
+                    seg.params.cubic.a = analysis.cubic_a;
+                    seg.params.cubic.b = analysis.cubic_b;
+                    seg.params.cubic.c = analysis.cubic_c;
+                    seg.params.cubic.d = analysis.cubic_d;
                     break;
                 case detail::ModelType::CONSTANT:
                     seg.params.constant.constant_idx = start;

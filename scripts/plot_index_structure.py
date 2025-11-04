@@ -55,6 +55,14 @@ def plot_segment_model(ax, segment: Dict[str, Any], keys: np.ndarray, alpha: flo
         predictions = a * values * values + b * values + c
         color = 'blue'
         label = 'Q'
+    elif model_type == 'CUBIC':
+        a = params['a']
+        b = params['b']
+        c = params['c']
+        d = params['d']
+        predictions = a * values * values * values + b * values * values + c * values + d
+        color = 'orange'
+        label = 'Cu'
     elif model_type == 'CONSTANT':
         predictions = np.full_like(values, params['constant_idx'])
         color = 'green'
@@ -110,6 +118,12 @@ def plot_error_bands(ax, segment: Dict[str, Any], keys: np.ndarray):
         b = params['b']
         c = params['c']
         predictions = a * values * values + b * values + c
+    elif model_type == 'CUBIC':
+        a = params['a']
+        b = params['b']
+        c = params['c']
+        d = params['d']
+        predictions = a * values * values * values + b * values * values + c * values + d
     elif model_type == 'CONSTANT':
         predictions = np.full_like(values, params['constant_idx'])
     else:  # DIRECT
@@ -158,8 +172,8 @@ def plot_index_structure(data: Dict[str, Any], output_file: Path):
         plot_error_bands(ax, segment, keys)
 
     # Plot model prediction curves
-    model_colors = {'L': 'red', 'Q': 'blue', 'C': 'green', 'D': 'purple'}
-    model_counts = {'LINEAR': 0, 'QUADRATIC': 0, 'CONSTANT': 0, 'DIRECT': 0}
+    model_colors = {'L': 'red', 'Q': 'blue', 'Cu': 'orange', 'C': 'green', 'D': 'purple'}
+    model_counts = {'LINEAR': 0, 'QUADRATIC': 0, 'CUBIC': 0, 'CONSTANT': 0, 'DIRECT': 0}
     total_error = 0
     max_max_error = 0
 
@@ -185,6 +199,7 @@ def plot_index_structure(data: Dict[str, Any], output_file: Path):
         mpatches.Patch(color='black', label='Keys (actual data)'),
         mpatches.Patch(color='red', label=f'LINEAR models ({model_counts["LINEAR"]})'),
         mpatches.Patch(color='blue', label=f'QUADRATIC models ({model_counts["QUADRATIC"]})'),
+        mpatches.Patch(color='orange', label=f'CUBIC models ({model_counts["CUBIC"]})'),
         mpatches.Patch(color='green', label=f'CONSTANT models ({model_counts["CONSTANT"]})'),
         mpatches.Patch(color='tan', alpha=0.2, label='Error bands (±max_error)'),
         mpatches.Patch(color='gray', label='Segment boundaries')
@@ -199,7 +214,7 @@ Segments: {num_segments}
 Uniform: {is_uniform}
 Avg Error: {avg_error:.1f}
 Max Error: {max_max_error}
-L: {model_counts['LINEAR']} | Q: {model_counts['QUADRATIC']} | C: {model_counts['CONSTANT']}"""
+L: {model_counts['LINEAR']} | Q: {model_counts['QUADRATIC']} | Cu: {model_counts['CUBIC']} | C: {model_counts['CONSTANT']}"""
 
     ax.text(0.98, 0.02, stats_text, transform=ax.transAxes,
             fontsize=9, verticalalignment='bottom', horizontalalignment='right',

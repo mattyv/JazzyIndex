@@ -71,13 +71,32 @@ predicted_index = a × value² + b × value + c
 ```
 
 **When used:** Curved data where quadratic reduces error significantly
-**Cost:** 3 FMA instructions
+**Cost:** 2 FMA instructions (using Horner's method)
 **Use case:** Exponential, power-law, S-curve distributions
 
-**Selection criteria:**
+---
+
+### CUBIC Model
+```cpp
+predicted_index = a × value³ + b × value² + c × value + d
+```
+
+**When used:** Highly curved data where cubic significantly improves over quadratic
+**Cost:** 3 FMA instructions (using Horner's method)
+**Use case:** Strong power-law, high-degree polynomial, compound growth distributions
+
+**Selection criteria (Quadratic):**
 1. Linear max_error > `MAX_ACCEPTABLE_LINEAR_ERROR` (2 elements)
 2. Quadratic max_error ≤ `QUADRATIC_IMPROVEMENT_THRESHOLD` × linear_error (≤70%)
 3. **Monotonicity constraint:** Derivative must be non-negative over segment range
+
+**Selection criteria (Cubic):**
+1. Quadratic max_error > `MAX_ACCEPTABLE_QUADRATIC_ERROR` (6 elements)
+2. Quadratic max_error < `MAX_CUBIC_WORTHWHILE_ERROR` (50 elements)
+3. Cubic max_error ≤ `CUBIC_IMPROVEMENT_THRESHOLD` × quadratic_error (≤70%)
+4. **Monotonicity constraint:** Derivative f'(x) = 3ax² + 2bx + c ≥ 0 over segment range
+
+**Rationale for upper threshold:** If quadratic error > 50, data likely has discontinuities or noise that cubic cannot fit. Skipping cubic computation saves build time without affecting runtime performance.
 
 **Monotonicity requirement:**
 For a search index, the prediction function `f(key) = index` must be **monotonically increasing**.
