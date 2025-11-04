@@ -92,8 +92,11 @@ predicted_index = a × value³ + b × value² + c × value + d
 
 **Selection criteria (Cubic):**
 1. Quadratic max_error > `MAX_ACCEPTABLE_QUADRATIC_ERROR` (6 elements)
-2. Cubic max_error ≤ `CUBIC_IMPROVEMENT_THRESHOLD` × quadratic_error (≤70%)
-3. **Monotonicity constraint:** Derivative f'(x) = 3ax² + 2bx + c ≥ 0 over segment range
+2. Quadratic max_error < `MAX_CUBIC_WORTHWHILE_ERROR` (50 elements)
+3. Cubic max_error ≤ `CUBIC_IMPROVEMENT_THRESHOLD` × quadratic_error (≤70%)
+4. **Monotonicity constraint:** Derivative f'(x) = 3ax² + 2bx + c ≥ 0 over segment range
+
+**Rationale for upper threshold:** If quadratic error > 50, data likely has discontinuities or noise that cubic cannot fit. Skipping cubic computation saves build time without affecting runtime performance.
 
 **Monotonicity requirement:**
 For a search index, the prediction function `f(key) = index` must be **monotonically increasing**.

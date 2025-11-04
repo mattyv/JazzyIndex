@@ -40,6 +40,9 @@ inline constexpr double CUBIC_IMPROVEMENT_THRESHOLD = 0.7;
 inline constexpr std::size_t MAX_ACCEPTABLE_QUADRATIC_ERROR = 6;
 // Quadratic models with error ≤6 are good enough; don't try cubic
 
+inline constexpr std::size_t MAX_CUBIC_WORTHWHILE_ERROR = 50;
+// If quadratic error >50, likely a discontinuity; cubic won't help, skip computation
+
 inline constexpr std::size_t SEARCH_RADIUS_MARGIN = 2;
 // Extra margin added to max_error for exponential search bounds
 
@@ -301,7 +304,10 @@ template <typename T>
             // Only accept quadratic if it's monotonic
             if (is_monotonic) {
                 // Check if we should try cubic for even better fit
-                if (quad_max_error > MAX_ACCEPTABLE_QUADRATIC_ERROR) {
+                // Only try cubic if error is in "sweet spot" (6 < error < 50)
+                // High error (>50) likely indicates discontinuity where cubic won't help
+                if (quad_max_error > MAX_ACCEPTABLE_QUADRATIC_ERROR &&
+                    quad_max_error < MAX_CUBIC_WORTHWHILE_ERROR) {
                     // Try cubic model using same normalized sums
                     // System: [Σx⁶  Σx⁵  Σx⁴  Σx³] [a]   [Σx³y]
                     //         [Σx⁵  Σx⁴  Σx³  Σx²] [b] = [Σx²y]
