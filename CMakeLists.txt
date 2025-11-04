@@ -78,6 +78,7 @@ if(BUILD_TESTS)
     add_executable(jazzy_index_tests
         tests/gtest_unit_tests.cpp
         tests/gtest_model_tests.cpp
+        tests/gtest_model_selection_verification.cpp
         tests/gtest_boundary_tests.cpp
         tests/gtest_floating_point_tests.cpp
         tests/gtest_comparator_tests.cpp
