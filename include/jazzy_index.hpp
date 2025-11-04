@@ -124,65 +124,58 @@ template <typename T>
         return result;
     };
 
-    if (end <= start) 
+    if (end <= start)
         return make_constant();
 
     const std::size_t n = end - start;
 
-    // Check if all values are identical
-    const bool all_same = (std::adjacent_find(data + start, data + end, std::not_equal_to<T>{}) == data + end);
-
-    if (all_same) 
-        return make_constant();
-
-    // Fit linear model
+    // For sorted data, min/max are at endpoints
     const double min_val = static_cast<double>(data[start]);
     const double max_val = static_cast<double>(data[end - 1]);
     const double value_range = max_val - min_val;
 
+    // Check for constant segment (zero range)
     if (value_range < std::numeric_limits<double>::epsilon()) {
         return make_constant();
     }
 
-    // Linear model: index = slope * value + intercept
+    // Precompute linear model parameters
     const double slope = static_cast<double>(n - 1) / value_range;
     const double intercept = static_cast<double>(start) - slope * min_val;
 
     result.linear_a = slope;
     result.linear_b = intercept;
 
-    // Measure linear error
+    // Single pass: compute linear error AND quadratic sums simultaneously
     std::size_t linear_max_error = 0;
     double linear_total_error = 0.0;
 
-    for (std::size_t i = start; i < end; ++i) {
-        const double pred_double = std::fma(static_cast<double>(data[i]), slope, intercept);
-        const double error = std::abs(pred_double - static_cast<double>(i));
-        linear_max_error = std::max(linear_max_error, static_cast<std::size_t>(std::ceil(error)));
-        linear_total_error += error;
-    }
-
-    const double linear_mean_error = linear_total_error / static_cast<double>(n);
-
-    // If linear is good enough, use it
-    if (linear_max_error <= MAX_ACCEPTABLE_LINEAR_ERROR) {
-        result.best_model = ModelType::LINEAR;
-        result.max_error = linear_max_error;
-        result.mean_error = linear_mean_error;
-        return result;
-    }
-
-    // Try quadratic model: index = a*value^2 + b*value + c
-    // Use least squares fitting with normalization for numerical stability
     double sum_x = 0.0, sum_x2 = 0.0, sum_x3 = 0.0, sum_x4 = 0.0;
     double sum_y = 0.0, sum_xy = 0.0, sum_x2y = 0.0;
 
-    // Normalize x values to [0, 1] range for better numerical stability
     const double x_min = min_val;
-    const double x_scale = value_range > 0.0 ? value_range : 1.0;
+    const double x_scale = value_range;
+
+    bool all_same = true;
+    const T first_val = data[start];
 
     for (std::size_t i = start; i < end; ++i) {
-        const double x_normalized = (static_cast<double>(data[i]) - x_min) / x_scale;
+        const T current_val = data[i];
+        const double val_double = static_cast<double>(current_val);
+
+        // Check if all values are identical
+        if (all_same && current_val != first_val) {
+            all_same = false;
+        }
+
+        // Compute linear error
+        const double pred_double = std::fma(val_double, slope, intercept);
+        const double error = std::abs(pred_double - static_cast<double>(i));
+        linear_max_error = std::max(linear_max_error, static_cast<std::size_t>(std::ceil(error)));
+        linear_total_error += error;
+
+        // Accumulate quadratic sums (normalized x for numerical stability)
+        const double x_normalized = (val_double - x_min) / x_scale;
         const double y = static_cast<double>(i);
         const double x2 = x_normalized * x_normalized;
         const double x3 = x2 * x_normalized;
@@ -196,6 +189,23 @@ template <typename T>
         sum_xy += x_normalized * y;
         sum_x2y += x2 * y;
     }
+
+    // If all values are identical, use constant model
+    if (all_same) {
+        return make_constant();
+    }
+
+    const double linear_mean_error = linear_total_error / static_cast<double>(n);
+
+    // If linear is good enough, use it
+    if (linear_max_error <= MAX_ACCEPTABLE_LINEAR_ERROR) {
+        result.best_model = ModelType::LINEAR;
+        result.max_error = linear_max_error;
+        result.mean_error = linear_mean_error;
+        return result;
+    }
+
+    // Try quadratic model: we already have the sums from the single pass above
 
     const double n_double = static_cast<double>(n);
 
@@ -342,9 +352,17 @@ public:
             return;
         }
 
-        // Build quantile-based segments
+        // Build quantile-based segments with single-pass uniformity detection
         const std::size_t actual_segments = std::min(NumSegments, size_);
         num_segments_ = actual_segments;
+
+        // Precompute uniformity parameters before loop
+        const double total_range = static_cast<double>(max_) - static_cast<double>(min_);
+        const double expected_spacing = (num_segments_ > 1 && total_range >= std::numeric_limits<double>::epsilon())
+            ? total_range / static_cast<double>(num_segments_)
+            : 0.0;
+        const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
+        is_uniform_ = true;  // Assume uniform until proven otherwise
 
         for (std::size_t i = 0; i < actual_segments; ++i) {
             const std::size_t start = (i * size_) / actual_segments;
@@ -355,6 +373,14 @@ public:
             seg.max_val = base_[end - 1];
             seg.start_idx = start;
             seg.end_idx = end;
+
+            // Check uniformity inline (while min/max values are hot in cache)
+            if (is_uniform_ && num_segments_ > 1 && total_range >= std::numeric_limits<double>::epsilon()) {
+                const double segment_range = static_cast<double>(seg.max_val) - static_cast<double>(seg.min_val);
+                if (std::abs(segment_range - expected_spacing) > tolerance) {
+                    is_uniform_ = false;
+                }
+            }
 
             // Analyze segment and choose best model
             const auto analysis = detail::analyze_segment(base_, start, end);
@@ -380,8 +406,10 @@ public:
             }
         }
 
-        // Detect if data is uniformly distributed for fast O(1) segment lookup
-        detect_uniformity();
+        // Compute scale factor for O(1) segment lookup if data is uniform
+        if (is_uniform_ && total_range >= std::numeric_limits<double>::epsilon()) {
+            segment_scale_ = static_cast<double>(num_segments_) / total_range;
+        }
     }
 
     [[nodiscard]] const T* find(const T& key) const {
@@ -487,42 +515,6 @@ public:
     friend std::string export_index_metadata(const JazzyIndex<U, S, C>& index);
 
 private:
-    void detect_uniformity() noexcept {
-        if (num_segments_ <= 1) {
-            is_uniform_ = true;
-            return;
-        }
-
-        // Check if segments are roughly evenly spaced in value range
-        // This indicates uniform distribution
-        const double total_range = static_cast<double>(max_) - static_cast<double>(min_);
-        if (total_range < std::numeric_limits<double>::epsilon()) {
-            is_uniform_ = true;
-            return;
-        }
-
-        const double expected_spacing = total_range / static_cast<double>(num_segments_);
-
-        // Allow 30% deviation for uniformity detection
-        const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
-
-        for (std::size_t i = 0; i < num_segments_; ++i) {
-            const double segment_range = static_cast<double>(segments_[i].max_val) -
-                                        static_cast<double>(segments_[i].min_val);
-
-            if (std::abs(segment_range - expected_spacing) > tolerance) {
-                is_uniform_ = false;
-                return;
-            }
-        }
-
-        is_uniform_ = true;
-
-        // Precompute scale factor for O(1) arithmetic lookup
-        if (is_uniform_) {
-            segment_scale_ = static_cast<double>(num_segments_) / total_range;
-        }
-    }
 
     [[nodiscard]] const detail::Segment<T>* find_segment(const T& value) const noexcept {
         if (num_segments_ == 0) {
