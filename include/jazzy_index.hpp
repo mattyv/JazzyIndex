@@ -75,21 +75,22 @@ struct alignas(64) Segment {  // Cache line aligned
     uint8_t max_error;
 
     // Model parameters (hot path for predict())
+    // Using float instead of double to keep struct within 64 bytes
     alignas(8) union {
         struct {
-            double slope;
-            double intercept;
+            float slope;
+            float intercept;
         } linear;
         struct {
-            double a;
-            double b;
-            double c;
+            float a;
+            float b;
+            float c;
         } quadratic;
         struct {
-            double a;
-            double b;
-            double c;
-            double d;
+            float a;
+            float b;
+            float c;
+            float d;
         } cubic;
         struct {
             std::size_t constant_idx;
@@ -619,19 +620,19 @@ public:
 
             switch (analysis.best_model) {
                 case detail::ModelType::LINEAR:
-                    seg.params.linear.slope = analysis.linear_a;
-                    seg.params.linear.intercept = analysis.linear_b;
+                    seg.params.linear.slope = static_cast<float>(analysis.linear_a);
+                    seg.params.linear.intercept = static_cast<float>(analysis.linear_b);
                     break;
                 case detail::ModelType::QUADRATIC:
-                    seg.params.quadratic.a = analysis.quad_a;
-                    seg.params.quadratic.b = analysis.quad_b;
-                    seg.params.quadratic.c = analysis.quad_c;
+                    seg.params.quadratic.a = static_cast<float>(analysis.quad_a);
+                    seg.params.quadratic.b = static_cast<float>(analysis.quad_b);
+                    seg.params.quadratic.c = static_cast<float>(analysis.quad_c);
                     break;
                 case detail::ModelType::CUBIC:
-                    seg.params.cubic.a = analysis.cubic_a;
-                    seg.params.cubic.b = analysis.cubic_b;
-                    seg.params.cubic.c = analysis.cubic_c;
-                    seg.params.cubic.d = analysis.cubic_d;
+                    seg.params.cubic.a = static_cast<float>(analysis.cubic_a);
+                    seg.params.cubic.b = static_cast<float>(analysis.cubic_b);
+                    seg.params.cubic.c = static_cast<float>(analysis.cubic_c);
+                    seg.params.cubic.d = static_cast<float>(analysis.cubic_d);
                     break;
                 case detail::ModelType::CONSTANT:
                     seg.params.constant.constant_idx = start;
