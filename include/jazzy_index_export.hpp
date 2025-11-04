@@ -7,8 +7,8 @@
 namespace jazzy {
 
 // Export JazzyIndex metadata as JSON for visualization
-template <typename T, SegmentCount Segments, typename Compare>
-std::string export_index_metadata(const JazzyIndex<T, Segments, Compare>& index) {
+template <typename T, SegmentCount Segments, typename Compare, typename KeyExtractor = jazzy::identity>
+std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtractor>& index) {
     std::ostringstream oss;
     oss << std::scientific;
     oss.precision(17);  // Full double precision
@@ -28,7 +28,7 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare>& index)
     oss << "  \"keys\": [";
     for (std::size_t i = 0; i < size; ++i) {
         if (i > 0) oss << ", ";
-        oss << static_cast<double>(index.base_[i]);
+        oss << static_cast<double>(std::invoke(index.key_extract_, index.base_[i]));
     }
     oss << "],\n";
 
@@ -55,11 +55,11 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare>& index)
             case detail::ModelType::QUADRATIC:
                 oss << "QUADRATIC";
                 break;
+            case detail::ModelType::CUBIC:
+                oss << "CUBIC";
+                break;
             case detail::ModelType::CONSTANT:
                 oss << "CONSTANT";
-                break;
-            case detail::ModelType::DIRECT:
-                oss << "DIRECT";
                 break;
         }
         oss << "\",\n";
@@ -76,11 +76,14 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare>& index)
                     << "\"b\": " << seg.params.quadratic.b << ", "
                     << "\"c\": " << seg.params.quadratic.c;
                 break;
+            case detail::ModelType::CUBIC:
+                oss << "\"a\": " << seg.params.cubic.a << ", "
+                    << "\"b\": " << seg.params.cubic.b << ", "
+                    << "\"c\": " << seg.params.cubic.c << ", "
+                    << "\"d\": " << seg.params.cubic.d;
+                break;
             case detail::ModelType::CONSTANT:
                 oss << "\"constant_idx\": " << seg.params.constant.constant_idx;
-                break;
-            case detail::ModelType::DIRECT:
-                oss << "\"start_idx\": " << seg.start_idx;
                 break;
         }
         oss << "}\n";

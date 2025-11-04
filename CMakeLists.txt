@@ -20,6 +20,9 @@ option(BUILD_TESTS "Build JazzyIndex unit and property tests" ON)
 option(BUILD_BENCHMARKS "Build JazzyIndex benchmark suite" ON)
 option(ENABLE_COVERAGE "Enable coverage instrumentation for tests" OFF)
 
+# Benchmark configuration
+set(BENCHMARK_REPETITIONS "1" CACHE STRING "Number of times to repeat each benchmark (default: 1)")
+
 if(BUILD_TESTS OR BUILD_BENCHMARKS)
     include(FetchContent)
 endif()
@@ -85,6 +88,7 @@ if(BUILD_TESTS)
         tests/gtest_error_recovery_tests.cpp
         tests/gtest_uniformity_tests.cpp
         tests/gtest_property_tests.cpp
+        tests/gtest_key_value_tests.cpp
         tests/gtest_binary_search_tests.cpp
     )
     target_link_libraries(jazzy_index_tests PRIVATE
@@ -151,6 +155,15 @@ if(BUILD_BENCHMARKS)
         ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
     )
 
+    # Worst-case key-value benchmark
+    add_executable(benchmark_key_value_worst_case
+        benchmarks/benchmark_key_value_worst_case.cpp
+    )
+    target_link_libraries(benchmark_key_value_worst_case PRIVATE jazzy_index benchmark::benchmark)
+    target_include_directories(benchmark_key_value_worst_case PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
+    )
+
     find_package(Python3 COMPONENTS Interpreter)
     if(Python3_Interpreter_FOUND)
         set(JAZZY_VENV_DIR ${CMAKE_BINARY_DIR}/jazzy_venv)
@@ -174,9 +187,16 @@ if(BUILD_BENCHMARKS)
         add_custom_target(jazzy_python_env DEPENDS ${JAZZY_VENV_PYTHON})
 
         set(JAZZY_BENCHMARK_JSON ${CMAKE_BINARY_DIR}/jazzy_benchmarks.json)
+
+        # Build benchmark command with optional repetitions
+        set(BENCH_CMD $<TARGET_FILE:jazzy_index_benchmarks> --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_JSON})
+        if(BENCHMARK_REPETITIONS GREATER 1)
+            list(APPEND BENCH_CMD --benchmark_repetitions=${BENCHMARK_REPETITIONS} --benchmark_report_aggregates_only=true)
+        endif()
+
         add_custom_command(
             OUTPUT ${JAZZY_BENCHMARK_JSON}
-            COMMAND $<TARGET_FILE:jazzy_index_benchmarks> --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_JSON}
+            COMMAND ${BENCH_CMD}
             DEPENDS jazzy_index_benchmarks
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Running JazzyIndex benchmarks (JSON output)"
@@ -200,9 +220,16 @@ if(BUILD_BENCHMARKS)
 
         # Full benchmark suite (up to 1M keys)
         set(JAZZY_BENCHMARK_FULL_JSON ${CMAKE_BINARY_DIR}/jazzy_benchmarks_full.json)
+
+        # Build full benchmark command with optional repetitions
+        set(BENCH_FULL_CMD $<TARGET_FILE:jazzy_index_benchmarks> --full-benchmarks --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_FULL_JSON})
+        if(BENCHMARK_REPETITIONS GREATER 1)
+            list(APPEND BENCH_FULL_CMD --benchmark_repetitions=${BENCHMARK_REPETITIONS} --benchmark_report_aggregates_only=true)
+        endif()
+
         add_custom_command(
             OUTPUT ${JAZZY_BENCHMARK_FULL_JSON}
-            COMMAND $<TARGET_FILE:jazzy_index_benchmarks> --full-benchmarks --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_FULL_JSON}
+            COMMAND ${BENCH_FULL_CMD}
             DEPENDS jazzy_index_benchmarks
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Running JazzyIndex full benchmarks (up to 1M keys, JSON output)"
