@@ -352,3 +352,289 @@ TEST(ModelSelectionVerification, CubicModelCorrectness) {
     // Note: CUBIC models are selected adaptively based on error thresholds
     // The key requirement is correctness, not specific model selection
 }
+
+// Additional tests to improve code coverage of CUBIC and edge case paths
+
+// Test: Extreme curvature data that successfully triggers CUBIC model selection
+// The key is to create data where:
+// 1. Quadratic error is > 6 (MAX_ACCEPTABLE_QUADRATIC_ERROR)
+// 2. Quadratic error is < 50 (MAX_CUBIC_WORTHWHILE_ERROR)
+// 3. Cubic improves quadratic by > 30%
+// This requires: large segments (150+ elements) with extreme cubic spacing
+TEST(ModelSelectionVerification, ExtremeCurvatureTriggersCubic) {
+    std::vector<long long> data;
+
+    // Use extreme cubic spacing: gaps grow as i^2.8
+    // This creates curvature that requires CUBIC modeling
+    long long val = 0;
+    for (int i = 0; i < 300; ++i) {
+        data.push_back(val);
+        // Extreme cubic gap growth
+        long long gap = 1 + static_cast<long long>(0.1 * std::pow(static_cast<double>(i), 2.8));
+        val += gap;
+    }
+
+    // Use only 2 segments so each has ~150 elements (large segments needed for CUBIC)
+    jazzy::JazzyIndex<long long, jazzy::to_segment_count<2>()> index;
+    index.build(data.data(), data.data() + data.size());
+
+    std::string json = jazzy::export_index_metadata(index);
+    auto models = extract_model_types(json);
+
+    int cubic_count = count_model_type(models, "CUBIC");
+    int quadratic_count = count_model_type(models, "QUADRATIC");
+
+    // With extreme curvature, we should trigger CUBIC model
+    EXPECT_GT(cubic_count, 0)
+        << "Expected CUBIC model for extreme cubic spacing. Models found: "
+        << "CUBIC=" << cubic_count << ", QUADRATIC=" << quadratic_count;
+
+    // Verify all values are findable (tests CUBIC predict path)
+    for (const auto& val : data) {
+        const long long* result = index.find(val);
+        ASSERT_NE(result, data.data() + data.size())
+            << "Failed to find value: " << val;
+        EXPECT_EQ(*result, val)
+            << "Found wrong value for key: " << val;
+    }
+}
+
+// Test: S-curve data that exercises various model types
+TEST(ModelSelectionVerification, SCurveData) {
+    std::vector<double> data;
+
+    // Create S-curve pattern: tanh-like function
+    for (int i = 0; i < 200; ++i) {
+        double x = static_cast<double>(i);
+        double val = 50.0 * std::tanh(0.1 * (x - 100.0)) + 50.0 + x * 0.5;
+        data.push_back(val);
+    }
+
+    std::sort(data.begin(), data.end());
+
+    jazzy::JazzyIndex<double, jazzy::to_segment_count<8>()> index;
+    index.build(data.data(), data.data() + data.size());
+
+    // Verify index works correctly with any model selection
+    for (const auto& val : data) {
+        const double* result = index.find(val);
+        ASSERT_NE(result, data.data() + data.size());
+        EXPECT_EQ(*result, val);
+    }
+}
+
+// Test: Piecewise cubic data with different growth rates
+TEST(ModelSelectionVerification, PiecewiseCubic) {
+    std::vector<long long> data;
+
+    for (int i = 0; i < 100; ++i) {
+        data.push_back(static_cast<long long>(0.0001 * i * i * i));
+    }
+
+    for (int i = 100; i < 200; ++i) {
+        long long base = data.back();
+        data.push_back(base + static_cast<long long>(0.001 * (i-100) * (i-100) * (i-100)));
+    }
+
+    jazzy::JazzyIndex<long long, jazzy::to_segment_count<16>()> index;
+    index.build(data.data(), data.data() + data.size());
+
+    for (const auto& val : data) {
+        const long long* result = index.find(val);
+        ASSERT_NE(result, data.data() + data.size());
+        EXPECT_EQ(*result, val);
+    }
+}
+
+// Test: All identical values (CONSTANT model edge case)
+TEST(ModelSelectionVerification, AllIdenticalValues) {
+    std::vector<int> data(100, 42);
+
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<8>()> index;
+    index.build(data.data(), data.data() + data.size());
+
+    std::string json = jazzy::export_index_metadata(index);
+    auto models = extract_model_types(json);
+
+    int constant_count = count_model_type(models, "CONSTANT");
+    EXPECT_GT(constant_count, 0)
+        << "Expected CONSTANT models for identical values";
+
+    const int* result = index.find(42);
+    ASSERT_NE(result, data.data() + data.size());
+    EXPECT_EQ(*result, 42);
+}
+
+// Test: Empty index edge case
+TEST(ModelSelectionVerification, EmptyIndex) {
+    std::vector<int> data;
+
+    jazzy::JazzyIndex<int, jazzy::SegmentCount::SMALL> index;
+    index.build(data.data(), data.data() + data.size());
+
+    const int* result = index.find(42);
+    EXPECT_EQ(result, data.data() + data.size());
+}
+
+// Test: Find values outside the data range
+TEST(ModelSelectionVerification, FindOutsideRange) {
+    std::vector<int> data{10, 20, 30, 40, 50};
+
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>()> index;
+    index.build(data.data(), data.data() + data.size());
+
+    // Search below minimum
+    const int* result1 = index.find(5);
+    EXPECT_EQ(result1, data.data() + data.size());
+
+    // Search above maximum
+    const int* result2 = index.find(100);
+    EXPECT_EQ(result2, data.data() + data.size());
+}
+
+// Test: Steep cubic data
+TEST(ModelSelectionVerification, SteepCubic) {
+    std::vector<long long> data;
+
+    for (int i = 0; i < 150; ++i) {
+        long long val = static_cast<long long>(0.005 * i * i * i);
+        data.push_back(val);
+    }
+
+    jazzy::JazzyIndex<long long, jazzy::to_segment_count<6>()> index;
+    index.build(data.data(), data.data() + data.size());
+
+    std::string json = jazzy::export_index_metadata(index);
+    auto models = extract_model_types(json);
+
+    int cubic_count = count_model_type(models, "CUBIC");
+    int quadratic_count = count_model_type(models, "QUADRATIC");
+
+    // Should use higher-order models
+    EXPECT_GT(cubic_count + quadratic_count, 0)
+        << "Expected CUBIC or QUADRATIC models for steep cubic data";
+
+    for (const auto& val : data) {
+        const long long* result = index.find(val);
+        ASSERT_NE(result, data.data() + data.size());
+        EXPECT_EQ(*result, val);
+    }
+}
+
+// Test: Exponential-like growth pattern
+TEST(ModelSelectionVerification, ExponentialGrowth) {
+    std::vector<double> data;
+
+    for (int i = 0; i < 180; ++i) {
+        data.push_back(std::exp(0.05 * i));
+    }
+
+    jazzy::JazzyIndex<double, jazzy::to_segment_count<6>()> index;
+    index.build(data.data(), data.data() + data.size());
+
+    for (const auto& val : data) {
+        const double* result = index.find(val);
+        ASSERT_NE(result, data.data() + data.size());
+        EXPECT_DOUBLE_EQ(*result, val);
+    }
+}
+
+// Test: Key-value pairs with cubic key distribution
+TEST(ModelSelectionVerification, KeyValueWithCubicKeys) {
+    struct KeyValue {
+        double key;
+        int value;
+
+        bool operator<(const KeyValue& other) const { return key < other.key; }
+        bool operator==(const KeyValue& other) const { return key == other.key; }
+        bool operator!=(const KeyValue& other) const { return key != other.key; }
+    };
+
+    std::vector<KeyValue> data;
+    for (int i = 0; i < 150; ++i) {
+        KeyValue kv;
+        kv.key = 0.002 * i * i * i;
+        kv.value = i;
+        data.push_back(kv);
+    }
+
+    struct KeyExtractor {
+        double operator()(const KeyValue& kv) const { return kv.key; }
+    };
+
+    jazzy::JazzyIndex<KeyValue, jazzy::to_segment_count<6>(),
+                      std::less<KeyValue>, KeyExtractor> index;
+    index.build(data.data(), data.data() + data.size());
+
+    for (const auto& kv : data) {
+        const KeyValue* result = index.find(kv);
+        ASSERT_NE(result, data.data() + data.size());
+        EXPECT_EQ(result->key, kv.key);
+        EXPECT_EQ(result->value, kv.value);
+    }
+}
+
+// Test: Mixed curvature regions
+TEST(ModelSelectionVerification, MixedCurvature) {
+    std::vector<double> data;
+
+    // Linear region
+    for (int i = 0; i < 50; ++i) {
+        data.push_back(i * 1.0);
+    }
+
+    double offset = data.back();
+
+    // Quadratic region
+    for (int i = 0; i < 50; ++i) {
+        data.push_back(offset + 0.1 * i * i);
+    }
+
+    offset = data.back();
+
+    // Cubic region
+    for (int i = 0; i < 50; ++i) {
+        data.push_back(offset + 0.001 * i * i * i);
+    }
+
+    jazzy::JazzyIndex<double, jazzy::to_segment_count<12>()> index;
+    index.build(data.data(), data.data() + data.size());
+
+    std::string json = jazzy::export_index_metadata(index);
+    auto models = extract_model_types(json);
+
+    int linear_count = count_model_type(models, "LINEAR");
+    int quadratic_count = count_model_type(models, "QUADRATIC");
+    int cubic_count = count_model_type(models, "CUBIC");
+
+    EXPECT_GT(linear_count + quadratic_count + cubic_count, 0);
+
+    for (const auto& val : data) {
+        const double* result = index.find(val);
+        ASSERT_NE(result, data.data() + data.size());
+        EXPECT_DOUBLE_EQ(*result, val);
+    }
+}
+
+// Test: Various data patterns for robustness
+TEST(ModelSelectionVerification, RobustnessWithVariousPatterns) {
+    std::vector<int> patterns[] = {
+        {1, 2, 3, 4, 5},         // Linear
+        {1, 1, 1, 1, 1},         // Constant
+        {1, 4, 9, 16, 25},       // Quadratic
+        {1, 8, 27, 64, 125}      // Cubic
+    };
+
+    for (const auto& data : patterns) {
+        if (data.empty()) continue;
+
+        jazzy::JazzyIndex<int, jazzy::to_segment_count<2>()> index;
+        index.build(data.data(), data.data() + data.size());
+
+        for (const auto& val : data) {
+            const int* result = index.find(val);
+            ASSERT_NE(result, data.data() + data.size());
+            EXPECT_EQ(*result, val);
+        }
+    }
+}
