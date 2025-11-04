@@ -38,7 +38,7 @@ Each visualization shows:
 
 #### Model Lines
 
-Three types of prediction models are displayed:
+Four types of prediction models are displayed:
 
 **🔴 LINEAR Models (Red)**
 - Formula: `predicted_index = m × value + b`
@@ -47,8 +47,14 @@ Three types of prediction models are displayed:
 
 **🔵 QUADRATIC Models (Blue)**
 - Formula: `predicted_index = a × value² + b × value + c`
-- Cost: 3 FMA instructions
+- Cost: 2 FMA instructions (using Horner's method)
 - Used when data has curvature and quadratic fit reduces error by ≥30%
+- Fitted using Cramer's rule on a normalized [0,1] input range
+
+**🟣 CUBIC Models (Purple)**
+- Formula: `predicted_index = a × value³ + b × value² + c × value + d`
+- Cost: 3 FMA instructions (using Horner's method)
+- Used when data has high curvature and cubic fit reduces quadratic error by ≥30%
 - Fitted using Cramer's rule on a normalized [0,1] input range
 
 **🟢 CONSTANT Models (Green)**
@@ -98,11 +104,11 @@ In the bottom-right corner, you'll find:
 
 **Characteristics:**
 - S-shaped curve using `tanh` function
-- Mix of LINEAR and QUADRATIC models
-- Quadratic models (blue) fit the curved regions perfectly
+- Mix of LINEAR, QUADRATIC, and CUBIC models
+- Quadratic/cubic models (blue/purple) fit the curved regions perfectly
 - Error bounds remain tight throughout
 
-**Key Insight:** This demonstrates adaptive model selection - JazzyIndex uses quadratic models only where the curvature justifies the extra computational cost.
+**Key Insight:** This demonstrates adaptive model selection - JazzyIndex uses higher-degree models only where the curvature justifies the extra computational cost.
 
 ---
 
@@ -112,12 +118,12 @@ In the bottom-right corner, you'll find:
 
 **Characteristics:**
 - Data follows y = x⁵ (explosive curvature at the end)
-- **5 QUADRATIC models** (blue) for the curved right side
-- 1 LINEAR model (red) for the flat left side
-- 2 CONSTANT models (green) at the very beginning
+- **QUADRATIC/CUBIC models** (blue/purple) for the curved right side
+- LINEAR model (red) for the flat left side
+- CONSTANT models (green) at the very beginning
 - Low segment count (S=8) shows model selection clearly
 
-**Key Insight:** With only 8 segments, you can clearly see how JazzyIndex adapts its model complexity to match the data's local behavior. The quadratic models handle the steep curve at the end, while simpler models suffice elsewhere.
+**Key Insight:** With only 8 segments, you can clearly see how JazzyIndex adapts its model complexity to match the data's local behavior. The higher-degree models handle the steep curve at the end, while simpler models suffice elsewhere.
 
 ---
 
@@ -128,10 +134,10 @@ In the bottom-right corner, you'll find:
 **Characteristics:**
 - Heavy-tailed power-law distribution (common in real-world data)
 - Rapid growth at the beginning, then long tail
-- Mix of QUADRATIC and LINEAR models
+- Mix of QUADRATIC, CUBIC, and LINEAR models
 - Larger dataset (N=10,000) with more segments (S=256)
 
-**Key Insight:** Zipf distributions are challenging but common (word frequencies, web traffic, etc.). JazzyIndex adapts by using quadratic models where the rate of change is high.
+**Key Insight:** Zipf distributions are challenging but common (word frequencies, web traffic, etc.). JazzyIndex adapts by using higher-degree models where the rate of change is high.
 
 ---
 
@@ -141,7 +147,7 @@ In the bottom-right corner, you'll find:
 
 **Characteristics:**
 - Data follows y = 1 - (1-x)⁵ (steep start, gentle end)
-- Quadratic models at the beginning for the steep curve
+- Quadratic/cubic models at the beginning for the steep curve
 - Linear models for the gentler middle/end sections
 - Medium segment count (S=64) balances granularity and overhead
 
@@ -203,7 +209,7 @@ Examples:
 ## Key Takeaways
 
 1. **Error bounds matter:** The tan bands show prediction accuracy - narrower is better
-2. **Quadratic models are selective:** JazzyIndex only uses them when they provide ≥30% error reduction
+2. **Model selection is selective:** JazzyIndex only uses higher-degree models when they provide ≥30% error reduction
 3. **Segment count is a dial:** Turn it up for accuracy, down for memory/speed
 4. **Quantile partitioning:** Segments contain equal element counts, not equal value ranges
 5. **Adaptive is powerful:** The same index code produces optimal strategies for radically different distributions

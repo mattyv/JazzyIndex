@@ -73,7 +73,8 @@ JazzyIndex partitions your sorted array into equal-sized segments (by element co
 
 - **Constant model**: All values in the segment are identical (common with duplicates). Prediction: just return the start index. Cost: zero computation.
 - **Linear model**: Values grow roughly linearly (this is most segments). Prediction: `index ≈ slope × value + intercept`. Cost: one FMA instruction.
-- **Quadratic model**: Values follow a curve (happens with exponential/log distributions). Prediction: `index ≈ a×value² + b×value + c`. Cost: three FMA instructions.
+- **Quadratic model**: Values follow a moderate curve (happens with exponential/log distributions). Prediction: `index ≈ a×value² + b×value + c`. Cost: two FMA instructions (using Horner's method).
+- **Cubic model**: Values follow highly curved patterns (power-law, compound growth). Prediction: `index ≈ a×value³ + b×value² + c×value + d`. Cost: three FMA instructions (using Horner's method).
 
 Why per-segment models instead of one global model? Because real data is messy. Your array might be uniform in one region and clustered in another. Per-segment models let us adapt to local characteristics while keeping the math fast.
 
@@ -92,13 +93,15 @@ graph TD
     G --> J{Best Model?}
     J -->|All Same| K[Constant: y=c]
     J -->|Linear Fit| L[Linear: y=mx+b]
-    J -->|Curved| M[Quadratic: y=ax²+bx+c]
+    J -->|Moderately Curved| M[Quadratic: y=ax²+bx+c]
+    J -->|Highly Curved| N[Cubic: y=ax³+bx²+cx+d]
 
     style A fill:#e1f5ff
     style J fill:#fff3cd
     style K fill:#d4edda
     style L fill:#d4edda
     style M fill:#d4edda
+    style N fill:#d4edda
 ```
 
 ### Building the Index
@@ -107,7 +110,7 @@ When you call `build()`, here's what happens:
 
 1. **Partition into quantiles**: Divide the array into N segments of equal element count (default: 256 segments). This is simple arithmetic - segment `i` spans indices `[i×size/N, (i+1)×size/N)`.
 
-2. **Analyze each segment**: For every segment, fit linear and quadratic models using least-squares regression. Measure the maximum prediction error for each model. If linear error is ≤2 elements, use linear (it's faster). If quadratic reduces error by 30%+, use quadratic (it's worth the extra computation). If all values are identical, use constant.
+2. **Analyze each segment**: For every segment, fit linear, quadratic, and cubic models using least-squares regression. Measure the maximum prediction error for each model. If linear error is ≤2 elements, use linear (it's faster). If quadratic reduces error by 30%+, use quadratic. If quadratic error is still high (>6 but <50) and cubic reduces it by another 30%+, use cubic. If all values are identical, use constant.
 
 3. **Detect uniformity**: Check if segments are evenly spaced in value range (±30% tolerance). If so, we can skip segment lookup entirely and use arithmetic: `segment_index = (value - min) × num_segments / (max - min)`. This is the "fast path" you see in uniform data benchmarks.
 
@@ -177,7 +180,8 @@ flowchart TD
 Here's what the learned index actually looks like internally. Each visualization shows:
 - **Black dots**: Your actual data points (key-value pairs)
 - **Red lines**: LINEAR models (cost: 1 FMA)
-- **Blue lines**: QUADRATIC models (cost: 3 FMA)
+- **Blue lines**: QUADRATIC models (cost: 2 FMA)
+- **Purple lines**: CUBIC models (cost: 3 FMA)
 - **Green lines**: CONSTANT models (cost: 0)
 - **Beige bands**: ±max_error prediction bounds
 - **Gray dashed lines**: Segment boundaries
@@ -187,9 +191,9 @@ Here's what the learned index actually looks like internally. Each visualization
 ![ExtremePoly Index Structure](docs/images/index_data/index_ExtremePoly_N1000_S8.png)
 
 With only 8 segments, you can clearly see adaptive model selection in action:
-- **Flat beginning**: 2 CONSTANT models (green) where all values are nearly identical
-- **Gentle middle**: 1 LINEAR model (red) for the gradually increasing section
-- **Explosive end**: 5 QUADRATIC models (blue) handling the steep x⁵ curve
+- **Flat beginning**: CONSTANT models (green) where all values are nearly identical
+- **Gentle middle**: LINEAR model (red) for the gradually increasing section
+- **Explosive end**: QUADRATIC/CUBIC models (blue/purple) handling the steep x⁵ curve
 
 The error bounds (beige bands) show prediction accuracy - narrower bands mean faster queries. Notice how the quadratic models keep error bounds tight even through the extreme curvature at the end.
 
@@ -210,7 +214,7 @@ JazzyIndex comes with comprehensive technical documentation:
 ## Features
 
 - **Header-only library** (`include/jazzy_index.hpp`) with minimal dependencies
-- **Adaptive model selection**: Automatically chooses constant/linear/quadratic per segment
+- **Adaptive model selection**: Automatically chooses constant/linear/quadratic/cubic per segment
 - **Graceful degradation**: Fast on uniform data, consistent on skewed data
 - **Comprehensive testing**: Unit tests + RapidCheck property-based tests for correctness
 - **Extensive benchmarks**: 9 distributions tested (Uniform, Exponential, Clustered, Lognormal, Zipf, Mixed, Quadratic, ExtremePoly, InversePoly)
@@ -305,7 +309,7 @@ The test suite includes deterministic unit tests plus RapidCheck property-based 
 
 ### Code Coverage
 
-**Current Coverage: 95.7%** (242 of 253 lines) - [![View Report](https://img.shields.io/badge/view-report-blue)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html)
+**Current Coverage: 84.8%** - [![View Report](https://img.shields.io/badge/view-report-blue)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html)
 
 Coverage is **automatically tracked** by CI and updated on every push to `main`. View the detailed line-by-line [HTML coverage report](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html).
 
@@ -325,10 +329,7 @@ cmake --build build --target coverage
 # View the report at: build/coverage_html/index.html
 ```
 
-The test suite achieves excellent coverage of all core functionality. The 11 uncovered lines consist of:
-- Dead code (unused DIRECT model type)
-- Defensive error checks (impossible to trigger via public API)
-- Rare edge cases in exponential search fallback
+The test suite achieves excellent coverage of all core functionality.
 
 ## Running Benchmarks
 
@@ -401,7 +402,7 @@ The linear model is dead simple: given a segment from index `start` to `end` wit
 
 Solving: `slope = (end - start) / (v_end - v_start)` and `intercept = start - slope × v_start`.
 
-The quadratic model uses least-squares fitting of `index = a×value² + b×value + c`. We build a system of normal equations from all points in the segment and solve using Cramer's rule. This is numerically stable for the small segments we're dealing with (hundreds to thousands of points). For really large segments or pathological data, the quadratic solver can degrade, but we have the linear fallback.
+The quadratic model uses least-squares fitting of `index = a×value² + b×value + c`, and the cubic model uses `index = a×value³ + b×value² + c×value + d`. We build a system of normal equations from all points in the segment and solve using Cramer's rule. Input values are normalized to [0,1] for numerical stability. This works well for the small segments we're dealing with (hundreds to thousands of points). For really large segments or pathological data, higher-degree models can degrade, but we have linear/quadratic fallbacks.
 
 ### Why Quantiles?
 
