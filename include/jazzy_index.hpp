@@ -342,9 +342,17 @@ public:
             return;
         }
 
-        // Build quantile-based segments
+        // Build quantile-based segments with single-pass uniformity detection
         const std::size_t actual_segments = std::min(NumSegments, size_);
         num_segments_ = actual_segments;
+
+        // Precompute uniformity parameters before loop
+        const double total_range = static_cast<double>(max_) - static_cast<double>(min_);
+        const double expected_spacing = (num_segments_ > 1 && total_range >= std::numeric_limits<double>::epsilon())
+            ? total_range / static_cast<double>(num_segments_)
+            : 0.0;
+        const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
+        is_uniform_ = true;  // Assume uniform until proven otherwise
 
         for (std::size_t i = 0; i < actual_segments; ++i) {
             const std::size_t start = (i * size_) / actual_segments;
@@ -355,6 +363,14 @@ public:
             seg.max_val = base_[end - 1];
             seg.start_idx = start;
             seg.end_idx = end;
+
+            // Check uniformity inline (while min/max values are hot in cache)
+            if (is_uniform_ && num_segments_ > 1 && total_range >= std::numeric_limits<double>::epsilon()) {
+                const double segment_range = static_cast<double>(seg.max_val) - static_cast<double>(seg.min_val);
+                if (std::abs(segment_range - expected_spacing) > tolerance) {
+                    is_uniform_ = false;
+                }
+            }
 
             // Analyze segment and choose best model
             const auto analysis = detail::analyze_segment(base_, start, end);
@@ -380,8 +396,10 @@ public:
             }
         }
 
-        // Detect if data is uniformly distributed for fast O(1) segment lookup
-        detect_uniformity();
+        // Compute scale factor for O(1) segment lookup if data is uniform
+        if (is_uniform_ && total_range >= std::numeric_limits<double>::epsilon()) {
+            segment_scale_ = static_cast<double>(num_segments_) / total_range;
+        }
     }
 
     [[nodiscard]] const T* find(const T& key) const {
@@ -487,42 +505,6 @@ public:
     friend std::string export_index_metadata(const JazzyIndex<U, S, C>& index);
 
 private:
-    void detect_uniformity() noexcept {
-        if (num_segments_ <= 1) {
-            is_uniform_ = true;
-            return;
-        }
-
-        // Check if segments are roughly evenly spaced in value range
-        // This indicates uniform distribution
-        const double total_range = static_cast<double>(max_) - static_cast<double>(min_);
-        if (total_range < std::numeric_limits<double>::epsilon()) {
-            is_uniform_ = true;
-            return;
-        }
-
-        const double expected_spacing = total_range / static_cast<double>(num_segments_);
-
-        // Allow 30% deviation for uniformity detection
-        const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
-
-        for (std::size_t i = 0; i < num_segments_; ++i) {
-            const double segment_range = static_cast<double>(segments_[i].max_val) -
-                                        static_cast<double>(segments_[i].min_val);
-
-            if (std::abs(segment_range - expected_spacing) > tolerance) {
-                is_uniform_ = false;
-                return;
-            }
-        }
-
-        is_uniform_ = true;
-
-        // Precompute scale factor for O(1) arithmetic lookup
-        if (is_uniform_) {
-            segment_scale_ = static_cast<double>(num_segments_) / total_range;
-        }
-    }
 
     [[nodiscard]] const detail::Segment<T>* find_segment(const T& value) const noexcept {
         if (num_segments_ == 0) {
