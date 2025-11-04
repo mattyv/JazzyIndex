@@ -55,6 +55,9 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
             case detail::ModelType::QUADRATIC:
                 oss << "QUADRATIC";
                 break;
+            case detail::ModelType::CUBIC:
+                oss << "CUBIC";
+                break;
             case detail::ModelType::CONSTANT:
                 oss << "CONSTANT";
                 break;
@@ -72,6 +75,12 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
                 oss << "\"a\": " << seg.params.quadratic.a << ", "
                     << "\"b\": " << seg.params.quadratic.b << ", "
                     << "\"c\": " << seg.params.quadratic.c;
+                break;
+            case detail::ModelType::CUBIC:
+                oss << "\"a\": " << seg.params.cubic.a << ", "
+                    << "\"b\": " << seg.params.cubic.b << ", "
+                    << "\"c\": " << seg.params.cubic.c << ", "
+                    << "\"d\": " << seg.params.cubic.d;
                 break;
             case detail::ModelType::CONSTANT:
                 oss << "\"constant_idx\": " << seg.params.constant.constant_idx;
