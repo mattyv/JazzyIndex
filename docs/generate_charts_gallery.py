@@ -237,7 +237,7 @@ def generate_charts_html():
 </head>
 <body>
     <div class="container">
-        <a href="VISUALIZATIONS.md" class="back-link">← Back to Visualizations Guide</a>
+        <a href="https://github.com/mattyv/JazzyIndex/blob/main/docs/VISUALIZATIONS.md" class="back-link">← Back to Visualizations Guide</a>
 
         <h1>📊 Index Visualization Charts</h1>
         <p class="subtitle">Exploring {len(png_files)} index structure visualizations across different distributions and configurations</p>
