@@ -180,15 +180,16 @@ This will:
 1. Run benchmarks with index structure dumping enabled
 2. Generate visualization plots for all distributions and segment counts
 3. Save plots to [docs/images/index_data/](images/index_data/)
+4. Regenerate the [interactive chart gallery](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/charts.html)
 
 ### All Available Visualizations
 
-The `visualize_index` target generates **270+ plots** in **[docs/images/index_data/](images/index_data/)** covering:
+The `visualize_index` target generates **270+ plots** covering:
 - **9 distributions**: Uniform, Exponential, Clustered, Lognormal, Zipf, Mixed, Quadratic, ExtremePoly, InversePoly
 - **10 segment counts**: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512
 - **Multiple sizes**: 100, 1000, 10000 elements
 
-**Browse all plots:** After running `visualize_index`, explore [docs/images/index_data/](images/index_data/) to see every combination.
+**📊 [Browse all charts in the interactive gallery](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/charts.html)** - Filter by distribution, size, and segment count!
 
 The naming convention is: `index_{Distribution}_N{Size}_S{Segments}.png`
 
