@@ -226,17 +226,17 @@ Use -header-filter=.* to display errors from all non-system headers. Use -system
 [6/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp.
 249977 warnings generated.
 [7/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp.
-296420 warnings generated.
+296674 warnings generated.
 [8/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp.
-338111 warnings generated.
+338365 warnings generated.
 [9/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_property_tests.cpp.
-384431 warnings generated.
+384685 warnings generated.
 [10/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp.
-426136 warnings generated.
+426390 warnings generated.
 [11/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_unit_tests.cpp.
-468040 warnings generated.
+468294 warnings generated.
 [12/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/property_tests.cpp.
-507762 warnings generated.
+508016 warnings generated.
 /home/runner/work/JazzyIndex/JazzyIndex/build/_deps/rapidcheck-src/include/rapidcheck/Assertions.h:6:9: warning: variadic macro 'RC_INTERNAL_CONDITIONAL_RESULT' used; consider using a 'constexpr' variadic template function [cppcoreguidelines-macro-usage]
     6 | #define RC_INTERNAL_CONDITIONAL_RESULT(                                        \
       |         ^
@@ -5801,6 +5801,33 @@ note: this fix will not be applied because it overlaps with another fix
   334 |     for (int i = 0; i < 500; ++i) {
   335 |         data.push_back(static_cast<long long>(i) * i * i * i / 10);
       |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp:408:9: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  408 |         double x = static_cast<double>(i);
+      |         ^~~~~~
+      |         auto
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp:431:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  430 |     for (int i = 0; i < 100; ++i) {
+  431 |         data.push_back(static_cast<long long>(0.0001 * i * i * i));
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp:500:9: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  500 |         long long val = static_cast<long long>(0.005 * i * i * i);
+      |         ^~~~~~~~~
+      |         auto
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp:529:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  528 |     for (int i = 0; i < 180; ++i) {
+  529 |         data.push_back(std::exp(0.05 * i));
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp:555:9: warning: uninitialized record type: 'kv' [cppcoreguidelines-pro-type-member-init]
+  555 |         KeyValue kv;
+      |         ^          
+      |                    {}
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp:566:23: warning: prefer transparent functors 'less<>' [modernize-use-transparent-functors]
+  566 |                       std::less<KeyValue>, KeyExtractor> index;
+      |                       ^         ~~~~~~~~
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp:583:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  582 |     for (int i = 0; i < 50; ++i) {
+  583 |         data.push_back(i * 1.0);
+      |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:91:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
    90 |     for (int i = 0; i < 100; ++i) {
    91 |         data.push_back(i * 10);
@@ -5846,7 +5873,7 @@ note: this fix will not be applied because it overlaps with another fix
   227 |     for (int i = 0; i < 100; ++i) {
   228 |         data.push_back(i);
       |         ^
-Suppressed 503933 warnings (503779 in non-user code, 154 NOLINT).
+Suppressed 503992 warnings (503838 in non-user code, 154 NOLINT).
 Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
         </pre>
     </div>
