@@ -616,7 +616,7 @@ public:
             const auto analysis = detail::analyze_segment(base_, start, end, key_extract_);
 
             seg.model_type = analysis.best_model;
-            seg.max_error = static_cast<uint16_t>(std::min<std::size_t>(analysis.max_error, 65535));
+            seg.max_error = static_cast<uint16_t>(std::min<std::size_t>(analysis.max_error, std::numeric_limits<uint16_t>::max()));
 
             switch (analysis.best_model) {
                 case detail::ModelType::LINEAR:
