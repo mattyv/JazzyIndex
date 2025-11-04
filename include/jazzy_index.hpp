@@ -80,14 +80,16 @@ struct alignas(64) Segment {  // Cache line aligned
                 const double pred = std::fma(static_cast<double>(value),
                                             params.linear.slope,
                                             params.linear.intercept);
-                return static_cast<std::size_t>(pred);
+                // Clamp to non-negative before casting to unsigned type
+                return static_cast<std::size_t>(std::max(0.0, pred));
             }
             case ModelType::QUADRATIC: {
                 const double x = static_cast<double>(value);
                 const double pred = std::fma(x,
                                             std::fma(x, params.quadratic.a, params.quadratic.b),
                                             params.quadratic.c);
-                return static_cast<std::size_t>(pred);
+                // Clamp to non-negative before casting to unsigned type
+                return static_cast<std::size_t>(std::max(0.0, pred));
             }
             case ModelType::CONSTANT:
                 return params.constant.constant_idx;
