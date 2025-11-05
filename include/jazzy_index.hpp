@@ -559,6 +559,15 @@ inline constexpr SegmentCount to_segment_count() {
     return static_cast<SegmentCount>(N);
 }
 
+// Forward declarations for parallel build support
+namespace parallel {
+template <typename T, typename Compare, typename KeyExtractor>
+struct BuildTask;
+
+template <typename T, SegmentCount Segments, typename Compare, typename KeyExtractor>
+class ParallelBuilder;
+}  // namespace parallel
+
 template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
 class JazzyIndex {
     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
@@ -794,13 +803,55 @@ public:
         return base_ + size_;
     }
 
+    // Find the range of elements equal to the given value
+    // Returns a pair of pointers [lower, upper) where all elements in the range are equivalent to value
+    // For missing values, returns [position, position) where position is where the value would be inserted
+    [[nodiscard]] std::pair<const T*, const T*> equal_range(const T& value) const {
+        const T* end = base_ + size_;
+
+        // Handle empty index
+        if (size_ == 0) {
+            return std::make_pair(end, end);
+        }
+
+        // Find lower and upper bounds
+        const T* lower = find_lower_bound(value);
+        const T* upper = find_upper_bound(value);
+
+        // If value is not found, both lower and upper point to insertion position
+        // This matches std::equal_range behavior
+        if (lower == end || !are_equivalent(*lower, value)) {
+            return std::make_pair(lower, lower);
+        }
+
+        return std::make_pair(lower, upper);
+    }
+
     [[nodiscard]] std::size_t size() const noexcept { return size_; }
     [[nodiscard]] std::size_t num_segments() const noexcept { return num_segments_; }
     [[nodiscard]] bool is_built() const noexcept { return base_ != nullptr; }
 
-    // Friend declaration for export functionality
+    // Parallel build API - requires #include "jazzy_index_parallel.hpp"
+    // Prepare independent build tasks for custom threading model
+    std::vector<parallel::BuildTask<T, Compare, KeyExtractor>>
+    prepare_build_tasks(const T* first, const T* last,
+                       Compare comp = Compare{},
+                       KeyExtractor key_extract = KeyExtractor{});
+
+    // Finalize build after executing tasks
+    void finalize_build(const std::vector<detail::SegmentAnalysis<T>>& results);
+
+    // Parallel build using std::async (convenience method)
+    void build_parallel(const T* first, const T* last,
+                       Compare comp = Compare{},
+                       KeyExtractor key_extract = KeyExtractor{});
+
+    // Friend declarations
     template <typename U, SegmentCount S, typename C, typename K>
     friend std::string export_index_metadata(const JazzyIndex<U, S, C, K>& index);
+
+    template <typename U, SegmentCount S, typename C, typename K>
+    friend class parallel::ParallelBuilder;
 
 private:
 
@@ -856,6 +907,83 @@ private:
 
     [[nodiscard]] bool equal(const T& lhs, const T& rhs) const {
         return !comp_(lhs, rhs) && !comp_(rhs, lhs);
+    }
+
+    // Check if two values are equivalent according to the comparator
+    [[nodiscard]] bool are_equivalent(const T& a, const T& b) const {
+        return !comp_(a, b) && !comp_(b, a);
+    }
+
+    // Find the first occurrence of a value (lower bound)
+    [[nodiscard]] const T* find_lower_bound(const T& value) const {
+        const T* end = base_ + size_;
+
+        // Use the existing prediction mechanism to get close
+        const auto* seg = find_segment(value);
+        if (seg == nullptr) {
+            return end;
+        }
+
+        std::size_t predicted_index = seg->predict(value, key_extract_);
+
+        // Clamp to segment bounds
+        predicted_index = detail::clamp_value<std::size_t>(predicted_index, seg->start_idx,
+                                                           seg->end_idx > 0 ? seg->end_idx - 1 : 0);
+
+        // Now perform a local search to find the exact lower bound
+        const T* ptr = base_ + predicted_index;
+
+        // Check if we're at a matching value (using comp_ for equivalence)
+        if (are_equivalent(*ptr, value)) {
+            // Scan backward to find the first occurrence
+            while (ptr > base_ && are_equivalent(*(ptr - 1), value)) {
+                --ptr;
+            }
+            return ptr;
+        }
+
+        // Otherwise, use binary search in a local range
+        std::size_t search_radius = seg->max_error + detail::SEARCH_RADIUS_MARGIN;
+        const T* search_begin = (ptr >= base_ + search_radius) ? (ptr - search_radius) : base_;
+        const T* search_end = std::min(end, ptr + search_radius + 1);
+
+        return std::lower_bound(search_begin, search_end, value, comp_);
+    }
+
+    // Find one past the last occurrence of a value (upper bound)
+    [[nodiscard]] const T* find_upper_bound(const T& value) const {
+        const T* end = base_ + size_;
+
+        // Similar to lower_bound, but finds one past the last occurrence
+        const auto* seg = find_segment(value);
+        if (seg == nullptr) {
+            return end;
+        }
+
+        std::size_t predicted_index = seg->predict(value, key_extract_);
+
+        // Clamp to segment bounds
+        predicted_index = detail::clamp_value<std::size_t>(predicted_index, seg->start_idx,
+                                                           seg->end_idx > 0 ? seg->end_idx - 1 : 0);
+
+        // Perform local search for upper bound
+        const T* ptr = base_ + predicted_index;
+
+        // Check if we're at a matching value using comp_ for equivalence
+        if (are_equivalent(*ptr, value)) {
+            // Scan forward to find one past the last occurrence
+            while (ptr < end && are_equivalent(*ptr, value)) {
+                ++ptr;
+            }
+            return ptr;
+        }
+
+        // Otherwise, use binary search in a local range
+        std::size_t search_radius = seg->max_error + detail::SEARCH_RADIUS_MARGIN;
+        const T* search_begin = (ptr >= base_ + search_radius) ? (ptr - search_radius) : base_;
+        const T* search_end = std::min(end, ptr + search_radius + 1);
+
+        return std::upper_bound(search_begin, search_end, value, comp_);
     }
 
     const T* base_{nullptr};

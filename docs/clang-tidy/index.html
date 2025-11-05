@@ -24,14 +24,16 @@
     <div class="section">
         <h2>Headers (include/*.hpp)</h2>
         <pre>
-[1/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp.
+[1/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp.
 28531 warnings generated.
-[2/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp.
+[2/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp.
 58282 warnings generated.
-[3/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp.
+[3/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp.
 92404 warnings generated.
-[4/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_utility.hpp.
-102931 warnings generated.
+[4/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp.
+134512 warnings generated.
+[5/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_utility.hpp.
+145039 warnings generated.
 /home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:13:20: warning: invalid case style for constexpr variable 'kSeed' [readability-identifier-naming]
    13 | constexpr unsigned kSeed = 42u;
       |                    ^~~~~
@@ -190,61 +192,67 @@
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:558:1: warning: function 'to_segment_count' has inline specifier but is implicitly inlined [readability-redundant-inline-specifier]
   558 | inline constexpr SegmentCount to_segment_count() {
       | ^~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:564:34: warning: invalid case style for constexpr variable 'NumSegments' [readability-identifier-naming]
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:573:34: warning: invalid case style for constexpr variable 'NumSegments' [readability-identifier-naming]
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |                                  ^~~~~~~~~~~
       |                                  NUM_SEGMENTS
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |                   ~~~~~~~~~~~        ~~~~~~~~~~~
       |                   NUM_SEGMENTS       NUM_SEGMENTS
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:575:35: warning: use c++14 style type templates [modernize-type-traits]
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:584:35: warning: use c++14 style type templates [modernize-type-traits]
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |                          ~~~~~~~~ ^                                                            ~~~~~~
       |                                                 _t
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:575:59: warning: use c++14 style type templates [modernize-type-traits]
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:584:59: warning: use c++14 style type templates [modernize-type-traits]
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |                                                  ~~~~~~~~ ^                             ~~~~~~
       |                                                                                _t
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:816:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  816 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:843:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  843 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
       |             ^~~~~~~~~~~
       |             auto
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp:50:16: warning: escaped string literal can be written as a raw string literal [modernize-raw-string-literal]
    50 |         oss << "      \"model_type\": \"";
       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~
       |                R"(      "model_type": ")"
-Suppressed 102847 warnings (102847 in non-user code).
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:38:34: warning: invalid case style for constexpr variable 'NumSegments' [readability-identifier-naming]
+   38 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+      |                                  ^~~~~~~~~~~
+      |                                  NUM_SEGMENTS
+Suppressed 144927 warnings (144927 in non-user code).
 Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
         </pre>
     </div>
     <div class="section">
         <h2>Tests (tests/*.cpp)</h2>
         <pre>
-[1/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp.
+[1/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp.
 51362 warnings generated.
-[2/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp.
+[2/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp.
 102679 warnings generated.
-[3/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp.
+[3/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp.
 154174 warnings generated.
-[4/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp.
+[4/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp.
 205429 warnings generated.
-[5/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp.
+[5/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp.
 256702 warnings generated.
-[6/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp.
+[6/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp.
 308071 warnings generated.
-[7/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp.
+[7/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp.
 364280 warnings generated.
-[8/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp.
+[8/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp.
 415594 warnings generated.
-[9/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_property_tests.cpp.
-475972 warnings generated.
-[10/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp.
-527302 warnings generated.
-[11/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_unit_tests.cpp.
-578788 warnings generated.
-[12/12] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/property_tests.cpp.
-634837 warnings generated.
+[9/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp.
+470293 warnings generated.
+[10/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_property_tests.cpp.
+530671 warnings generated.
+[11/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp.
+582001 warnings generated.
+[12/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_unit_tests.cpp.
+633487 warnings generated.
+[13/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/property_tests.cpp.
+689536 warnings generated.
 /home/runner/work/JazzyIndex/JazzyIndex/build/_deps/rapidcheck-src/include/rapidcheck/Assertions.h:6:9: warning: variadic macro 'RC_INTERNAL_CONDITIONAL_RESULT' used; consider using a 'constexpr' variadic template function [cppcoreguidelines-macro-usage]
     6 | #define RC_INTERNAL_CONDITIONAL_RESULT(                                        \
       |         ^
@@ -5251,361 +5259,361 @@ note: this fix will not be applied because it overlaps with another fix
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:558:1: warning: function 'to_segment_count' has inline specifier but is implicitly inlined [readability-redundant-inline-specifier]
   558 | inline constexpr SegmentCount to_segment_count() {
       | ^~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:563:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::LARGE, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:173:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
-  562 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:572:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::LARGE, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:173:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  571 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  563 | class JazzyIndex {
+  572 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  567 |                   "NumSegments must be in range [1, 4096]");
+  576 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  568 | 
-  569 |     // Type constraint: KeyExtractor must be callable with const T&
+  577 | 
+  578 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  570 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  579 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  571 |                   "KeyExtractor must be callable with const T&");
+  580 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  572 | 
-  573 |     // Type constraint: KeyExtractor must return an arithmetic type
+  581 | 
+  582 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  583 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  585 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  577 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  586 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:563:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::LARGE, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:173:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
-  562 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:572:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::LARGE, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:173:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
+  571 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  563 | class JazzyIndex {
+  572 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  567 |                   "NumSegments must be in range [1, 4096]");
+  576 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  568 | 
-  569 |     // Type constraint: KeyExtractor must be callable with const T&
+  577 | 
+  578 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  570 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  579 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  571 |                   "KeyExtractor must be callable with const T&");
+  580 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  572 | 
-  573 |     // Type constraint: KeyExtractor must return an arithmetic type
+  581 | 
+  582 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  583 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  585 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  577 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  586 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:563:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::MEDIUM, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:250:101 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
-  562 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:572:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::MEDIUM, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:250:101 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  571 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  563 | class JazzyIndex {
+  572 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  567 |                   "NumSegments must be in range [1, 4096]");
+  576 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  568 | 
-  569 |     // Type constraint: KeyExtractor must be callable with const T&
+  577 | 
+  578 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  570 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  579 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  571 |                   "KeyExtractor must be callable with const T&");
+  580 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  572 | 
-  573 |     // Type constraint: KeyExtractor must return an arithmetic type
+  581 | 
+  582 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  583 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  585 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  577 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  586 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:563:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::MEDIUM, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:250:101 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
-  562 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:572:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::MEDIUM, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:250:101 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
+  571 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  563 | class JazzyIndex {
+  572 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  567 |                   "NumSegments must be in range [1, 4096]");
+  576 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  568 | 
-  569 |     // Type constraint: KeyExtractor must be callable with const T&
+  577 | 
+  578 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  570 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  579 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  571 |                   "KeyExtractor must be callable with const T&");
+  580 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  572 | 
-  573 |     // Type constraint: KeyExtractor must return an arithmetic type
+  581 | 
+  582 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  583 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  585 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  577 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  586 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:563:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::SMALL, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:44:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
-  562 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:572:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::SMALL, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:44:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  571 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  563 | class JazzyIndex {
+  572 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  567 |                   "NumSegments must be in range [1, 4096]");
+  576 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  568 | 
-  569 |     // Type constraint: KeyExtractor must be callable with const T&
+  577 | 
+  578 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  570 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  579 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  571 |                   "KeyExtractor must be callable with const T&");
+  580 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  572 | 
-  573 |     // Type constraint: KeyExtractor must return an arithmetic type
+  581 | 
+  582 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  583 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  585 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  577 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  586 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:563:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::SMALL, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:44:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
-  562 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:572:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::SMALL, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:44:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
+  571 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  563 | class JazzyIndex {
+  572 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  567 |                   "NumSegments must be in range [1, 4096]");
+  576 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  568 | 
-  569 |     // Type constraint: KeyExtractor must be callable with const T&
+  577 | 
+  578 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  570 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  579 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  571 |                   "KeyExtractor must be callable with const T&");
+  580 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  572 | 
-  573 |     // Type constraint: KeyExtractor must return an arithmetic type
+  581 | 
+  582 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  583 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  585 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  577 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  586 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:563:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::greater<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:197:102 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
-  562 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:572:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::greater<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:197:102 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  571 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  563 | class JazzyIndex {
+  572 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  567 |                   "NumSegments must be in range [1, 4096]");
+  576 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  568 | 
-  569 |     // Type constraint: KeyExtractor must be callable with const T&
+  577 | 
+  578 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  570 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  579 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  571 |                   "KeyExtractor must be callable with const T&");
+  580 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  572 | 
-  573 |     // Type constraint: KeyExtractor must return an arithmetic type
+  581 | 
+  582 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  583 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  585 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  577 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  586 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:563:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::greater<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:197:102 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
-  562 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:572:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::greater<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:197:102 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
+  571 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  563 | class JazzyIndex {
+  572 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  567 |                   "NumSegments must be in range [1, 4096]");
+  576 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  568 | 
-  569 |     // Type constraint: KeyExtractor must be callable with const T&
+  577 | 
+  578 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  570 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  579 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  571 |                   "KeyExtractor must be callable with const T&");
+  580 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  572 | 
-  573 |     // Type constraint: KeyExtractor must return an arithmetic type
+  581 | 
+  582 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  583 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  585 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  577 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  586 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:563:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:210:99 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
-  562 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:572:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:210:99 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  571 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  563 | class JazzyIndex {
+  572 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  567 |                   "NumSegments must be in range [1, 4096]");
+  576 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  568 | 
-  569 |     // Type constraint: KeyExtractor must be callable with const T&
+  577 | 
+  578 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  570 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  579 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  571 |                   "KeyExtractor must be callable with const T&");
+  580 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  572 | 
-  573 |     // Type constraint: KeyExtractor must return an arithmetic type
+  581 | 
+  582 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  583 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  585 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  577 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  586 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:563:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:210:99 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
-  562 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:572:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:210:99 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
+  571 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  563 | class JazzyIndex {
+  572 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  567 |                   "NumSegments must be in range [1, 4096]");
+  576 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  568 | 
-  569 |     // Type constraint: KeyExtractor must be callable with const T&
+  577 | 
+  578 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  570 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  579 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  571 |                   "KeyExtractor must be callable with const T&");
+  580 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  572 | 
-  573 |     // Type constraint: KeyExtractor must return an arithmetic type
+  581 | 
+  582 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  583 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  585 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  577 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  586 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:564:34: warning: invalid case style for constexpr variable 'NumSegments' [readability-identifier-naming]
-  564 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:573:34: warning: invalid case style for constexpr variable 'NumSegments' [readability-identifier-naming]
+  573 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |                                  ^~~~~~~~~~~
       |                                  NUM_SEGMENTS
-  565 | 
-  566 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  574 | 
+  575 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |                   ~~~~~~~~~~~        ~~~~~~~~~~~
       |                   NUM_SEGMENTS       NUM_SEGMENTS
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:575:35: warning: use c++14 style type templates [modernize-type-traits]
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:584:35: warning: use c++14 style type templates [modernize-type-traits]
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |                          ~~~~~~~~ ^                                                            ~~~~~~
       |                                                 _t
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:575:59: warning: use c++14 style type templates [modernize-type-traits]
-  575 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:584:59: warning: use c++14 style type templates [modernize-type-traits]
+  584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |                                                  ~~~~~~~~ ^                             ~~~~~~
       |                                                                                _t
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:611:33: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  611 |             segments_[0].params.constant.constant_idx = 0;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:620:33: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  620 |             segments_[0].params.constant.constant_idx = 0;
       |                                 ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:673:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  673 |                     seg.params.linear.slope = static_cast<float>(analysis.linear_a);
-      |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:674:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  674 |                     seg.params.linear.intercept = static_cast<float>(analysis.linear_b);
-      |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:677:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  677 |                     seg.params.quadratic.a = static_cast<float>(analysis.quad_a);
-      |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:678:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  678 |                     seg.params.quadratic.b = static_cast<float>(analysis.quad_b);
-      |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:679:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  679 |                     seg.params.quadratic.c = static_cast<float>(analysis.quad_c);
-      |                                ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:682:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  682 |                     seg.params.cubic.a = static_cast<float>(analysis.cubic_a);
+  682 |                     seg.params.linear.slope = static_cast<float>(analysis.linear_a);
       |                                ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:683:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  683 |                     seg.params.cubic.b = static_cast<float>(analysis.cubic_b);
+  683 |                     seg.params.linear.intercept = static_cast<float>(analysis.linear_b);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:684:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  684 |                     seg.params.cubic.c = static_cast<float>(analysis.cubic_c);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:686:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  686 |                     seg.params.quadratic.a = static_cast<float>(analysis.quad_a);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:685:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  685 |                     seg.params.cubic.d = static_cast<float>(analysis.cubic_d);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:687:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  687 |                     seg.params.quadratic.b = static_cast<float>(analysis.quad_b);
       |                                ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:688:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  688 |                     seg.params.constant.constant_idx = start;
+  688 |                     seg.params.quadratic.c = static_cast<float>(analysis.quad_c);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:816:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  816 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:691:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  691 |                     seg.params.cubic.a = static_cast<float>(analysis.cubic_a);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:692:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  692 |                     seg.params.cubic.b = static_cast<float>(analysis.cubic_b);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:693:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  693 |                     seg.params.cubic.c = static_cast<float>(analysis.cubic_c);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:694:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  694 |                     seg.params.cubic.d = static_cast<float>(analysis.cubic_d);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:697:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  697 |                     seg.params.constant.constant_idx = start;
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:843:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  843 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
       |             ^~~~~~~~~~~
       |             auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:858:37: warning: 1st argument 'rhs' (passed to 'lhs') looks like it might be swapped with the 2nd, 'lhs' (passed to 'rhs') [readability-suspicious-call-argument]
-  858 |         return !comp_(lhs, rhs) && !comp_(rhs, lhs);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:885:37: warning: 1st argument 'rhs' (passed to 'lhs') looks like it might be swapped with the 2nd, 'lhs' (passed to 'rhs') [readability-suspicious-call-argument]
+  885 |         return !comp_(lhs, rhs) && !comp_(rhs, lhs);
       |                                     ^~~~~ ~~~
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:21:10: note: in the call to 'operator()', declared here
    21 |     bool operator()(const T& lhs, const T& rhs) const {
@@ -5644,6 +5652,51 @@ note: this fix will not be applied because it overlaps with another fix
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp:86:59: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
    86 |                 oss << "\"constant_idx\": " << seg.params.constant.constant_idx;
       |                                                           ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:29:5: warning: function 'execute' should be marked [[nodiscard]] [modernize-use-nodiscard]
+   29 |     detail::SegmentAnalysis<T> execute() const {
+      |     ^
+      |     [[nodiscard]] 
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:38:34: warning: invalid case style for constexpr variable 'NumSegments' [readability-identifier-naming]
+   38 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+      |                                  ^~~~~~~~~~~
+      |                                  NUM_SEGMENTS
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:71:24: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+   71 |             seg.params.constant.constant_idx = 0;
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:103:13: warning: uninitialized record type: 'task' [cppcoreguidelines-pro-type-member-init]
+  103 |             BuildTask<T, Compare, KeyExtractor> task;
+      |             ^                                       
+      |                                                     {}
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:144:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  144 |                     seg.params.linear.slope = static_cast<float>(analysis.linear_a);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:145:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  145 |                     seg.params.linear.intercept = static_cast<float>(analysis.linear_b);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:148:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  148 |                     seg.params.quadratic.a = static_cast<float>(analysis.quad_a);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:149:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  149 |                     seg.params.quadratic.b = static_cast<float>(analysis.quad_b);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:150:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  150 |                     seg.params.quadratic.c = static_cast<float>(analysis.quad_c);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:153:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  153 |                     seg.params.cubic.a = static_cast<float>(analysis.cubic_a);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:154:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  154 |                     seg.params.cubic.b = static_cast<float>(analysis.cubic_b);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:155:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  155 |                     seg.params.cubic.c = static_cast<float>(analysis.cubic_c);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:156:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  156 |                     seg.params.cubic.d = static_cast<float>(analysis.cubic_d);
+      |                                ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:159:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  159 |                     seg.params.constant.constant_idx = seg.start_idx;
+      |                                ^
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:51:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
    50 |     for (int i = 0; i < 50; ++i) {
    51 |         data.push_back(i);
@@ -5919,6 +5972,37 @@ note: this fix will not be applied because it overlaps with another fix
   249 |     for (int i = 0; i < 100; ++i) {
   250 |         data.push_back(i);
       |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:26:5: warning: replace loop by 'std::ranges::all_of()' [readability-use-anyofallof]
+   26 |     for (const auto& val : data) {
+      |     ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:124:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  123 |     for (int i = 0; i < 1000; ++i) {
+  124 |         data.push_back(i);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:142:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  141 |     for (int i = 0; i < 1000; ++i) {
+  142 |         data.push_back(i * i);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:155:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  154 |     for (int i = 0; i < 500; ++i) {
+  155 |         data.push_back(i * i * i);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:247:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  246 |     for (int i = 0; i < 5000; ++i) {
+  247 |         data.push_back(std::sqrt(static_cast<double>(i)));
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:273:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  272 |     for (auto& task : tasks) {
+  273 |         futures.push_back(std::async(std::launch::async, [task]() {
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:281:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  280 |     for (auto& future : futures) {
+  281 |         results.push_back(future.get());
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:366:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  365 |     for (int i = 0; i < 5000; ++i) {
+  366 |         data.push_back({i * 2, "value_" + std::to_string(i)});  // Even keys only
+      |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:62:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
    61 |     for (int i = 0; i < 100; ++i) {
    62 |         data.push_back(i * 10);  // 0, 10, 20, ..., 990
@@ -5939,7 +6023,7 @@ note: this fix will not be applied because it overlaps with another fix
   227 |     for (int i = 0; i < 100; ++i) {
   228 |         data.push_back(i);
       |         ^
-Suppressed 630514 warnings (630360 in non-user code, 154 NOLINT).
+Suppressed 684926 warnings (684758 in non-user code, 168 NOLINT).
 Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
         </pre>
     </div>

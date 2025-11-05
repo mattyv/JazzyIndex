@@ -1,7 +1,7 @@
 # Jazzy Index - Proof of Concept 
 
 [![CI Tests](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml)
-[![Code Coverage](https://img.shields.io/badge/coverage-96.3%25-brightgreen)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html)
+[![Code Coverage](https://img.shields.io/badge/coverage-94.6%25-brightgreen)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html)
 [![Clang-Tidy](https://img.shields.io/badge/clang--tidy-report-blue)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/clang-tidy/index.html)
 
 ## Build & Test Status
@@ -23,7 +23,7 @@
 
 | Job | Status | Description |
 |-----|:------:|-------------|
-| **Code Coverage** | [![Coverage](https://img.shields.io/badge/coverage-96.3%25-brightgreen)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html) | Auto-updated on every push to main - [View Report](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html) |
+| **Code Coverage** | [![Coverage](https://img.shields.io/badge/coverage-94.6%25-brightgreen)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html) | Auto-updated on every push to main - [View Report](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html) |
 | **Clang-Tidy** | [![Report](https://img.shields.io/badge/clang--tidy-report-blue)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/clang-tidy/index.html) | Static analysis report auto-updated on every push to main - [View Report](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/clang-tidy/index.html) |
 
 **Total Test Configurations:** 16 compiler/build combinations + 4 Linux sanitizers + 1 Windows sanitizer + coverage + clang-tidy = **23 CI jobs**

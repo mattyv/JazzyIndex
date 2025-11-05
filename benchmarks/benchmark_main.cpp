@@ -17,6 +17,7 @@
 
 #include "fixtures.hpp"
 #include "jazzy_index_export.hpp"
+#include "jazzy_index_parallel.hpp"
 
 namespace {
 
@@ -364,6 +365,26 @@ void register_build_benchmark(std::size_t size, const std::string& distribution,
             ->Unit(benchmark::kMicrosecond));
 }
 
+// Parallel build time benchmarks
+template <std::size_t Segments>
+void register_parallel_build_benchmark(std::size_t size, const std::string& distribution,
+                                       const std::vector<std::uint64_t>& data) {
+    const std::string name = "JazzyIndexBuildParallel/" + distribution + "/S" +
+                            std::to_string(Segments) + "/N" + std::to_string(size);
+
+    benchmark::RegisterBenchmark(name.c_str(),
+                                 [data](benchmark::State& state) {
+                                     for (auto _ : state) {
+                                         jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> index;
+                                         index.build_parallel(data.data(), data.data() + data.size());
+                                         benchmark::DoNotOptimize(index);
+                                     }
+                                     state.counters["segments"] = Segments;
+                                     state.counters["size"] = static_cast<double>(data.size());
+                                 })
+        ->Unit(benchmark::kMicrosecond);
+}
+
 void register_build_suites() {
     std::vector<std::size_t> sizes = {1'000, 10'000};
     if (use_full_benchmarks) {
@@ -372,34 +393,46 @@ void register_build_suites() {
     }
 
     for (const std::size_t size : sizes) {
+        // Uniform distribution
         auto uniform_data = qi::bench::make_uniform_values(size);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "Uniform", uniform_data);
+            register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "Uniform", uniform_data);
         });
 
+        // Exponential distribution
         auto exp_data = qi::bench::make_exponential_values(size);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "Exponential", exp_data);
+            register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "Exponential", exp_data);
         });
 
+        // Zipf distribution
         auto zipf_data = qi::bench::make_zipf_values(size);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "Zipf", zipf_data);
+            register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "Zipf", zipf_data);
         });
 
+        // Quadratic distribution
         auto quadratic_data = qi::bench::make_quadratic_values(size);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "Quadratic", quadratic_data);
+            register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "Quadratic", quadratic_data);
         });
 
+        // Extreme polynomial distribution
         auto extreme_poly_data = qi::bench::make_extreme_polynomial_values(size);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "ExtremePoly", extreme_poly_data);
+            register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "ExtremePoly", extreme_poly_data);
         });
 
+        // Inverse polynomial distribution
         auto inverse_poly_data = qi::bench::make_inverse_polynomial_values(size);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "InversePoly", inverse_poly_data);
+            register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "InversePoly", inverse_poly_data);
         });
     }
 }

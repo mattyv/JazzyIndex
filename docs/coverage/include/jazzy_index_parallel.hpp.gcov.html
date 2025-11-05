@@ -1,0 +1,349 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage_filtered.info - include/jazzy_index_parallel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">include</a> - jazzy_index_parallel.hpp<span style="font-size: 80%;"> (source / <a href="jazzy_index_parallel.hpp.func-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage_filtered.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryMed">88.2&nbsp;%</td>
+            <td class="headerCovTableEntry">119</td>
+            <td class="headerCovTableEntry">105</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2025-11-05 07:38:24</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntry">41</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>              : #pragma once</span>
+<span id="L2"><span class="lineNum">       2</span>              : </span>
+<span id="L3"><span class="lineNum">       3</span>              : #include &lt;algorithm&gt;</span>
+<span id="L4"><span class="lineNum">       4</span>              : #include &lt;cstddef&gt;</span>
+<span id="L5"><span class="lineNum">       5</span>              : #include &lt;exception&gt;</span>
+<span id="L6"><span class="lineNum">       6</span>              : #include &lt;functional&gt;</span>
+<span id="L7"><span class="lineNum">       7</span>              : #include &lt;future&gt;</span>
+<span id="L8"><span class="lineNum">       8</span>              : #include &lt;stdexcept&gt;</span>
+<span id="L9"><span class="lineNum">       9</span>              : #include &lt;thread&gt;</span>
+<span id="L10"><span class="lineNum">      10</span>              : #include &lt;utility&gt;</span>
+<span id="L11"><span class="lineNum">      11</span>              : #include &lt;vector&gt;</span>
+<span id="L12"><span class="lineNum">      12</span>              : </span>
+<span id="L13"><span class="lineNum">      13</span>              : #include &quot;jazzy_index.hpp&quot;</span>
+<span id="L14"><span class="lineNum">      14</span>              : </span>
+<span id="L15"><span class="lineNum">      15</span>              : namespace jazzy {</span>
+<span id="L16"><span class="lineNum">      16</span>              : namespace parallel {</span>
+<span id="L17"><span class="lineNum">      17</span>              : </span>
+<span id="L18"><span class="lineNum">      18</span>              : // Task representing a single segment build operation</span>
+<span id="L19"><span class="lineNum">      19</span>              : template &lt;typename T, typename Compare, typename KeyExtractor&gt;</span>
+<span id="L20"><span class="lineNum">      20</span>              : struct BuildTask {</span>
+<span id="L21"><span class="lineNum">      21</span>              :     std::size_t segment_index;</span>
+<span id="L22"><span class="lineNum">      22</span>              :     std::size_t start_idx;</span>
+<span id="L23"><span class="lineNum">      23</span>              :     std::size_t end_idx;</span>
+<span id="L24"><span class="lineNum">      24</span>              :     const T* data;</span>
+<span id="L25"><span class="lineNum">      25</span>              :     Compare comp;</span>
+<span id="L26"><span class="lineNum">      26</span>              :     KeyExtractor key_extract;</span>
+<span id="L27"><span class="lineNum">      27</span>              : </span>
+<span id="L28"><span class="lineNum">      28</span>              :     // Execute the segment analysis</span>
+<span id="L29"><span class="lineNum">      29</span> <span class="tlaGNC tlaBgGNC">        5516 :     detail::SegmentAnalysis&lt;T&gt; execute() const {</span></span>
+<span id="L30"><span class="lineNum">      30</span> <span class="tlaGNC">        5516 :         return detail::analyze_segment(data, start_idx, end_idx, comp, key_extract);</span></span>
+<span id="L31"><span class="lineNum">      31</span>              :     }</span>
+<span id="L32"><span class="lineNum">      32</span>              : };</span>
+<span id="L33"><span class="lineNum">      33</span>              : </span>
+<span id="L34"><span class="lineNum">      34</span>              : // Helper class for parallel build operations</span>
+<span id="L35"><span class="lineNum">      35</span>              : template &lt;typename T, SegmentCount Segments, typename Compare = std::less&lt;&gt;, typename KeyExtractor = jazzy::identity&gt;</span>
+<span id="L36"><span class="lineNum">      36</span>              : class ParallelBuilder {</span>
+<span id="L37"><span class="lineNum">      37</span>              :     using IndexType = JazzyIndex&lt;T, Segments, Compare, KeyExtractor&gt;;</span>
+<span id="L38"><span class="lineNum">      38</span>              :     static constexpr std::size_t NumSegments = static_cast&lt;std::size_t&gt;(Segments);</span>
+<span id="L39"><span class="lineNum">      39</span>              : </span>
+<span id="L40"><span class="lineNum">      40</span>              : public:</span>
+<span id="L41"><span class="lineNum">      41</span>              :     // Prepare independent build tasks for each segment</span>
+<span id="L42"><span class="lineNum">      42</span>              :     // Users can execute these tasks in their own threading model</span>
+<span id="L43"><span class="lineNum">      43</span>              :     static std::vector&lt;BuildTask&lt;T, Compare, KeyExtractor&gt;&gt;</span>
+<span id="L44"><span class="lineNum">      44</span> <span class="tlaGNC">          27 :     prepare_build_tasks(IndexType&amp; index,</span></span>
+<span id="L45"><span class="lineNum">      45</span>              :                        const T* first,</span>
+<span id="L46"><span class="lineNum">      46</span>              :                        const T* last,</span>
+<span id="L47"><span class="lineNum">      47</span>              :                        Compare comp = Compare{},</span>
+<span id="L48"><span class="lineNum">      48</span>              :                        KeyExtractor key_extract = KeyExtractor{}) {</span>
+<span id="L49"><span class="lineNum">      49</span>              :         // Initialize basic index state</span>
+<span id="L50"><span class="lineNum">      50</span> <span class="tlaGNC">          27 :         index.base_ = first;</span></span>
+<span id="L51"><span class="lineNum">      51</span> <span class="tlaGNC">          27 :         index.size_ = static_cast&lt;std::size_t&gt;(last - first);</span></span>
+<span id="L52"><span class="lineNum">      52</span>              :         index.key_extract_ = key_extract;</span>
+<span id="L53"><span class="lineNum">      53</span>              :         index.comp_ = comp;</span>
+<span id="L54"><span class="lineNum">      54</span>              : </span>
+<span id="L55"><span class="lineNum">      55</span> <span class="tlaGNC">          27 :         if (index.size_ == 0) {</span></span>
+<span id="L56"><span class="lineNum">      56</span> <span class="tlaGNC">           2 :             return {};</span></span>
+<span id="L57"><span class="lineNum">      57</span>              :         }</span>
+<span id="L58"><span class="lineNum">      58</span>              : </span>
+<span id="L59"><span class="lineNum">      59</span> <span class="tlaGNC">          25 :         index.min_ = index.base_[0];</span></span>
+<span id="L60"><span class="lineNum">      60</span> <span class="tlaGNC">          25 :         index.max_ = index.base_[index.size_ - 1];</span></span>
+<span id="L61"><span class="lineNum">      61</span>              : </span>
+<span id="L62"><span class="lineNum">      62</span>              :         // Handle single element case immediately</span>
+<span id="L63"><span class="lineNum">      63</span> <span class="tlaGNC">          25 :         if (index.size_ == 1) {</span></span>
+<span id="L64"><span class="lineNum">      64</span> <span class="tlaGNC">           1 :             auto&amp; seg = index.segments_[0];</span></span>
+<span id="L65"><span class="lineNum">      65</span> <span class="tlaGNC">           1 :             seg.min_val = index.min_;</span></span>
+<span id="L66"><span class="lineNum">      66</span> <span class="tlaGNC">           1 :             seg.max_val = index.max_;</span></span>
+<span id="L67"><span class="lineNum">      67</span> <span class="tlaGNC">           1 :             seg.start_idx = 0;</span></span>
+<span id="L68"><span class="lineNum">      68</span> <span class="tlaGNC">           1 :             seg.end_idx = 1;</span></span>
+<span id="L69"><span class="lineNum">      69</span> <span class="tlaGNC">           1 :             seg.model_type = detail::ModelType::CONSTANT;</span></span>
+<span id="L70"><span class="lineNum">      70</span> <span class="tlaGNC">           1 :             seg.max_error = 0;</span></span>
+<span id="L71"><span class="lineNum">      71</span> <span class="tlaGNC">           1 :             seg.params.constant.constant_idx = 0;</span></span>
+<span id="L72"><span class="lineNum">      72</span> <span class="tlaGNC">           1 :             index.num_segments_ = 1;</span></span>
+<span id="L73"><span class="lineNum">      73</span> <span class="tlaGNC">           1 :             return {};</span></span>
+<span id="L74"><span class="lineNum">      74</span>              :         }</span>
+<span id="L75"><span class="lineNum">      75</span>              : </span>
+<span id="L76"><span class="lineNum">      76</span>              :         // Determine actual number of segments</span>
+<span id="L77"><span class="lineNum">      77</span> <span class="tlaGNC">          24 :         const std::size_t actual_segments = std::min(NumSegments, index.size_);</span></span>
+<span id="L78"><span class="lineNum">      78</span> <span class="tlaGNC">          24 :         index.num_segments_ = actual_segments;</span></span>
+<span id="L79"><span class="lineNum">      79</span>              : </span>
+<span id="L80"><span class="lineNum">      80</span>              :         // Verify data is sorted and initialize segment boundaries</span>
+<span id="L81"><span class="lineNum">      81</span> <span class="tlaGNC">          24 :         std::vector&lt;BuildTask&lt;T, Compare, KeyExtractor&gt;&gt; tasks;</span></span>
+<span id="L82"><span class="lineNum">      82</span> <span class="tlaGNC">          24 :         tasks.reserve(actual_segments);</span></span>
+<span id="L83"><span class="lineNum">      83</span>              : </span>
+<span id="L84"><span class="lineNum">      84</span> <span class="tlaGNC">        5799 :         for (std::size_t i = 0; i &lt; actual_segments; ++i) {</span></span>
+<span id="L85"><span class="lineNum">      85</span> <span class="tlaGNC">        5776 :             const std::size_t start = (i * index.size_) / actual_segments;</span></span>
+<span id="L86"><span class="lineNum">      86</span> <span class="tlaGNC">        5776 :             const std::size_t end = ((i + 1) * index.size_) / actual_segments;</span></span>
+<span id="L87"><span class="lineNum">      87</span>              : </span>
+<span id="L88"><span class="lineNum">      88</span> <span class="tlaGNC">        5776 :             auto&amp; seg = index.segments_[i];</span></span>
+<span id="L89"><span class="lineNum">      89</span> <span class="tlaGNC">        5776 :             seg.min_val = index.base_[start];</span></span>
+<span id="L90"><span class="lineNum">      90</span> <span class="tlaGNC">        5776 :             seg.max_val = index.base_[end - 1];</span></span>
+<span id="L91"><span class="lineNum">      91</span> <span class="tlaGNC">        5776 :             seg.start_idx = start;</span></span>
+<span id="L92"><span class="lineNum">      92</span> <span class="tlaGNC">        5776 :             seg.end_idx = end;</span></span>
+<span id="L93"><span class="lineNum">      93</span>              : </span>
+<span id="L94"><span class="lineNum">      94</span>              :             // Verify monotonicity (must be done sequentially)</span>
+<span id="L95"><span class="lineNum">      95</span> <span class="tlaGNC">        5776 :             if (i &gt; 0 &amp;&amp; comp(seg.min_val, index.segments_[i - 1].max_val)) {</span></span>
+<span id="L96"><span class="lineNum">      96</span> <span class="tlaGNC">           1 :                 throw std::runtime_error(</span></span>
+<span id="L97"><span class="lineNum">      97</span>              :                     &quot;Input data is not sorted. JazzyIndex requires sorted data. &quot;</span>
+<span id="L98"><span class="lineNum">      98</span>              :                     &quot;Please sort your data before building the index.&quot;</span>
+<span id="L99"><span class="lineNum">      99</span>              :                 );</span>
+<span id="L100"><span class="lineNum">     100</span>              :             }</span>
+<span id="L101"><span class="lineNum">     101</span>              : </span>
+<span id="L102"><span class="lineNum">     102</span>              :             // Create task for this segment</span>
+<span id="L103"><span class="lineNum">     103</span>              :             BuildTask&lt;T, Compare, KeyExtractor&gt; task;</span>
+<span id="L104"><span class="lineNum">     104</span> <span class="tlaGNC">        5775 :             task.segment_index = i;</span></span>
+<span id="L105"><span class="lineNum">     105</span> <span class="tlaGNC">        5775 :             task.start_idx = start;</span></span>
+<span id="L106"><span class="lineNum">     106</span> <span class="tlaGNC">        5775 :             task.end_idx = end;</span></span>
+<span id="L107"><span class="lineNum">     107</span> <span class="tlaGNC">        5775 :             task.data = index.base_;</span></span>
+<span id="L108"><span class="lineNum">     108</span>              :             task.comp = comp;</span>
+<span id="L109"><span class="lineNum">     109</span>              :             task.key_extract = key_extract;</span>
+<span id="L110"><span class="lineNum">     110</span>              : </span>
+<span id="L111"><span class="lineNum">     111</span> <span class="tlaGNC">        5775 :             tasks.push_back(std::move(task));</span></span>
+<span id="L112"><span class="lineNum">     112</span>              :         }</span>
+<span id="L113"><span class="lineNum">     113</span>              : </span>
+<span id="L114"><span class="lineNum">     114</span> <span class="tlaGNC">          23 :         return tasks;</span></span>
+<span id="L115"><span class="lineNum">     115</span> <span class="tlaGNC">          24 :     }</span></span>
+<span id="L116"><span class="lineNum">     116</span>              : </span>
+<span id="L117"><span class="lineNum">     117</span>              :     // Finalize the index after all segment analyses are complete</span>
+<span id="L118"><span class="lineNum">     118</span> <span class="tlaGNC">          24 :     static void finalize_build(IndexType&amp; index,</span></span>
+<span id="L119"><span class="lineNum">     119</span>              :                               const std::vector&lt;detail::SegmentAnalysis&lt;T&gt;&gt;&amp; results) {</span>
+<span id="L120"><span class="lineNum">     120</span> <span class="tlaGNC">          24 :         if (results.size() != index.num_segments_) {</span></span>
+<span id="L121"><span class="lineNum">     121</span> <span class="tlaGNC">           1 :             throw std::runtime_error(&quot;Result count does not match number of segments&quot;);</span></span>
+<span id="L122"><span class="lineNum">     122</span>              :         }</span>
+<span id="L123"><span class="lineNum">     123</span>              : </span>
+<span id="L124"><span class="lineNum">     124</span>              :         // Store analysis results in segments</span>
+<span id="L125"><span class="lineNum">     125</span> <span class="tlaGNC">        5541 :         for (std::size_t i = 0; i &lt; index.num_segments_; ++i) {</span></span>
+<span id="L126"><span class="lineNum">     126</span> <span class="tlaGNC">        5518 :             const auto&amp; analysis = results[i];</span></span>
+<span id="L127"><span class="lineNum">     127</span> <span class="tlaGNC">        5518 :             auto&amp; seg = index.segments_[i];</span></span>
+<span id="L128"><span class="lineNum">     128</span>              : </span>
+<span id="L129"><span class="lineNum">     129</span> <span class="tlaGNC">        5518 :             seg.model_type = analysis.best_model;</span></span>
+<span id="L130"><span class="lineNum">     130</span>              : </span>
+<span id="L131"><span class="lineNum">     131</span>              :             // Check if prediction error exceeds uint32_t limit</span>
+<span id="L132"><span class="lineNum">     132</span> <span class="tlaGNC">        5518 :             if (analysis.max_error &gt; std::numeric_limits&lt;uint32_t&gt;::max()) {</span></span>
+<span id="L133"><span class="lineNum">     133</span> <span class="tlaUNC tlaBgUNC">           0 :                 throw std::runtime_error(</span></span>
+<span id="L134"><span class="lineNum">     134</span>              :                     &quot;Segment prediction error exceeds uint32_t limit. &quot;</span>
+<span id="L135"><span class="lineNum">     135</span>              :                     &quot;Data distribution is too extreme for indexing. &quot;</span>
+<span id="L136"><span class="lineNum">     136</span>              :                     &quot;Consider using fewer segments or preprocessing the data.&quot;</span>
+<span id="L137"><span class="lineNum">     137</span>              :                 );</span>
+<span id="L138"><span class="lineNum">     138</span>              :             }</span>
+<span id="L139"><span class="lineNum">     139</span> <span class="tlaGNC tlaBgGNC">        5518 :             seg.max_error = static_cast&lt;uint32_t&gt;(analysis.max_error);</span></span>
+<span id="L140"><span class="lineNum">     140</span>              : </span>
+<span id="L141"><span class="lineNum">     141</span>              :             // Store model coefficients</span>
+<span id="L142"><span class="lineNum">     142</span> <span class="tlaGNC">        5518 :             switch (analysis.best_model) {</span></span>
+<span id="L143"><span class="lineNum">     143</span> <span class="tlaGNC">        4639 :                 case detail::ModelType::LINEAR:</span></span>
+<span id="L144"><span class="lineNum">     144</span> <span class="tlaGNC">        4639 :                     seg.params.linear.slope = static_cast&lt;float&gt;(analysis.linear_a);</span></span>
+<span id="L145"><span class="lineNum">     145</span> <span class="tlaGNC">        4639 :                     seg.params.linear.intercept = static_cast&lt;float&gt;(analysis.linear_b);</span></span>
+<span id="L146"><span class="lineNum">     146</span> <span class="tlaGNC">        4639 :                     break;</span></span>
+<span id="L147"><span class="lineNum">     147</span> <span class="tlaGNC">           1 :                 case detail::ModelType::QUADRATIC:</span></span>
+<span id="L148"><span class="lineNum">     148</span> <span class="tlaGNC">           1 :                     seg.params.quadratic.a = static_cast&lt;float&gt;(analysis.quad_a);</span></span>
+<span id="L149"><span class="lineNum">     149</span> <span class="tlaGNC">           1 :                     seg.params.quadratic.b = static_cast&lt;float&gt;(analysis.quad_b);</span></span>
+<span id="L150"><span class="lineNum">     150</span> <span class="tlaGNC">           1 :                     seg.params.quadratic.c = static_cast&lt;float&gt;(analysis.quad_c);</span></span>
+<span id="L151"><span class="lineNum">     151</span> <span class="tlaGNC">           1 :                     break;</span></span>
+<span id="L152"><span class="lineNum">     152</span> <span class="tlaUNC tlaBgUNC">           0 :                 case detail::ModelType::CUBIC:</span></span>
+<span id="L153"><span class="lineNum">     153</span> <span class="tlaUNC">           0 :                     seg.params.cubic.a = static_cast&lt;float&gt;(analysis.cubic_a);</span></span>
+<span id="L154"><span class="lineNum">     154</span> <span class="tlaUNC">           0 :                     seg.params.cubic.b = static_cast&lt;float&gt;(analysis.cubic_b);</span></span>
+<span id="L155"><span class="lineNum">     155</span> <span class="tlaUNC">           0 :                     seg.params.cubic.c = static_cast&lt;float&gt;(analysis.cubic_c);</span></span>
+<span id="L156"><span class="lineNum">     156</span> <span class="tlaUNC">           0 :                     seg.params.cubic.d = static_cast&lt;float&gt;(analysis.cubic_d);</span></span>
+<span id="L157"><span class="lineNum">     157</span> <span class="tlaUNC">           0 :                     break;</span></span>
+<span id="L158"><span class="lineNum">     158</span> <span class="tlaGNC tlaBgGNC">         878 :                 case detail::ModelType::CONSTANT:</span></span>
+<span id="L159"><span class="lineNum">     159</span> <span class="tlaGNC">         878 :                     seg.params.constant.constant_idx = seg.start_idx;</span></span>
+<span id="L160"><span class="lineNum">     160</span> <span class="tlaGNC">         878 :                     break;</span></span>
+<span id="L161"><span class="lineNum">     161</span> <span class="tlaUNC tlaBgUNC">           0 :                 default:</span></span>
+<span id="L162"><span class="lineNum">     162</span> <span class="tlaUNC">           0 :                     break;</span></span>
+<span id="L163"><span class="lineNum">     163</span>              :             }</span>
+<span id="L164"><span class="lineNum">     164</span>              :         }</span>
+<span id="L165"><span class="lineNum">     165</span>              : </span>
+<span id="L166"><span class="lineNum">     166</span>              :         // Compute uniformity and segment scale for O(1) lookups</span>
+<span id="L167"><span class="lineNum">     167</span> <span class="tlaGNC tlaBgGNC">          23 :         const double total_range = static_cast&lt;double&gt;(std::invoke(index.key_extract_, index.max_)) -</span></span>
+<span id="L168"><span class="lineNum">     168</span> <span class="tlaGNC">          23 :                                    static_cast&lt;double&gt;(std::invoke(index.key_extract_, index.min_));</span></span>
+<span id="L169"><span class="lineNum">     169</span> <span class="tlaGNC">          22 :         const double expected_spacing = (index.num_segments_ &gt; 1 &amp;&amp; total_range &gt;= detail::ZERO_RANGE_THRESHOLD)</span></span>
+<span id="L170"><span class="lineNum">     170</span> <span class="tlaGNC">          45 :             ? total_range / static_cast&lt;double&gt;(index.num_segments_)</span></span>
+<span id="L171"><span class="lineNum">     171</span>              :             : 0.0;</span>
+<span id="L172"><span class="lineNum">     172</span> <span class="tlaGNC">          23 :         const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;</span></span>
+<span id="L173"><span class="lineNum">     173</span>              : </span>
+<span id="L174"><span class="lineNum">     174</span> <span class="tlaGNC">          23 :         index.is_uniform_ = true;</span></span>
+<span id="L175"><span class="lineNum">     175</span> <span class="tlaGNC">          23 :         if (index.num_segments_ &gt; 1 &amp;&amp; total_range &gt;= detail::ZERO_RANGE_THRESHOLD) {</span></span>
+<span id="L176"><span class="lineNum">     176</span> <span class="tlaGNC">        3380 :             for (std::size_t i = 0; i &lt; index.num_segments_; ++i) {</span></span>
+<span id="L177"><span class="lineNum">     177</span> <span class="tlaGNC">        3370 :                 const auto&amp; seg = index.segments_[i];</span></span>
+<span id="L178"><span class="lineNum">     178</span> <span class="tlaGNC">        3370 :                 const double segment_range = static_cast&lt;double&gt;(std::invoke(index.key_extract_, seg.max_val)) -</span></span>
+<span id="L179"><span class="lineNum">     179</span> <span class="tlaGNC">        3370 :                                             static_cast&lt;double&gt;(std::invoke(index.key_extract_, seg.min_val));</span></span>
+<span id="L180"><span class="lineNum">     180</span> <span class="tlaGNC">        3370 :                 if (std::abs(segment_range - expected_spacing) &gt; tolerance) {</span></span>
+<span id="L181"><span class="lineNum">     181</span> <span class="tlaGNC">          10 :                     index.is_uniform_ = false;</span></span>
+<span id="L182"><span class="lineNum">     182</span> <span class="tlaGNC">          10 :                     break;</span></span>
+<span id="L183"><span class="lineNum">     183</span>              :                 }</span>
+<span id="L184"><span class="lineNum">     184</span>              :             }</span>
+<span id="L185"><span class="lineNum">     185</span>              :         }</span>
+<span id="L186"><span class="lineNum">     186</span>              : </span>
+<span id="L187"><span class="lineNum">     187</span>              :         // Compute scale factor for O(1) segment lookup if data is uniform</span>
+<span id="L188"><span class="lineNum">     188</span> <span class="tlaGNC">          23 :         if (index.is_uniform_ &amp;&amp; total_range &gt;= detail::ZERO_RANGE_THRESHOLD) {</span></span>
+<span id="L189"><span class="lineNum">     189</span> <span class="tlaGNC">          10 :             index.segment_scale_ = static_cast&lt;double&gt;(index.num_segments_) / total_range;</span></span>
+<span id="L190"><span class="lineNum">     190</span>              :         }</span>
+<span id="L191"><span class="lineNum">     191</span> <span class="tlaGNC">          23 :     }</span></span>
+<span id="L192"><span class="lineNum">     192</span>              : </span>
+<span id="L193"><span class="lineNum">     193</span>              :     // Convenience method: parallel build using std::async</span>
+<span id="L194"><span class="lineNum">     194</span> <span class="tlaGNC">          23 :     static void build_parallel(IndexType&amp; index,</span></span>
+<span id="L195"><span class="lineNum">     195</span>              :                               const T* first,</span>
+<span id="L196"><span class="lineNum">     196</span>              :                               const T* last,</span>
+<span id="L197"><span class="lineNum">     197</span>              :                               Compare comp = Compare{},</span>
+<span id="L198"><span class="lineNum">     198</span>              :                               KeyExtractor key_extract = KeyExtractor{}) {</span>
+<span id="L199"><span class="lineNum">     199</span>              :         // Prepare tasks</span>
+<span id="L200"><span class="lineNum">     200</span> <span class="tlaGNC">          23 :         auto tasks = prepare_build_tasks(index, first, last, comp, key_extract);</span></span>
+<span id="L201"><span class="lineNum">     201</span>              : </span>
+<span id="L202"><span class="lineNum">     202</span>              :         // Handle trivial cases (empty or single element)</span>
+<span id="L203"><span class="lineNum">     203</span> <span class="tlaGNC">          22 :         if (tasks.empty()) {</span></span>
+<span id="L204"><span class="lineNum">     204</span> <span class="tlaGNC">           2 :             return;</span></span>
+<span id="L205"><span class="lineNum">     205</span>              :         }</span>
+<span id="L206"><span class="lineNum">     206</span>              : </span>
+<span id="L207"><span class="lineNum">     207</span>              :         // Launch all tasks asynchronously using std::async</span>
+<span id="L208"><span class="lineNum">     208</span> <span class="tlaGNC">          20 :         std::vector&lt;std::future&lt;detail::SegmentAnalysis&lt;T&gt;&gt;&gt; futures;</span></span>
+<span id="L209"><span class="lineNum">     209</span> <span class="tlaGNC">          20 :         futures.reserve(tasks.size());</span></span>
+<span id="L210"><span class="lineNum">     210</span>              : </span>
+<span id="L211"><span class="lineNum">     211</span> <span class="tlaGNC">        5026 :         for (auto&amp; task : tasks) {</span></span>
+<span id="L212"><span class="lineNum">     212</span> <span class="tlaGNC">       10010 :             futures.push_back(std::async(std::launch::async, [task]() {</span></span>
+<span id="L213"><span class="lineNum">     213</span> <span class="tlaGNC">        5004 :                 return task.execute();</span></span>
+<span id="L214"><span class="lineNum">     214</span>              :             }));</span>
+<span id="L215"><span class="lineNum">     215</span>              :         }</span>
+<span id="L216"><span class="lineNum">     216</span>              : </span>
+<span id="L217"><span class="lineNum">     217</span>              :         // Collect results (preserving order)</span>
+<span id="L218"><span class="lineNum">     218</span> <span class="tlaGNC">          20 :         std::vector&lt;detail::SegmentAnalysis&lt;T&gt;&gt; results;</span></span>
+<span id="L219"><span class="lineNum">     219</span> <span class="tlaGNC">          20 :         results.reserve(tasks.size());</span></span>
+<span id="L220"><span class="lineNum">     220</span>              : </span>
+<span id="L221"><span class="lineNum">     221</span>              :         // Track first exception if any</span>
+<span id="L222"><span class="lineNum">     222</span> <span class="tlaGNC">          20 :         std::exception_ptr first_exception;</span></span>
+<span id="L223"><span class="lineNum">     223</span>              : </span>
+<span id="L224"><span class="lineNum">     224</span> <span class="tlaGNC">        5026 :         for (auto&amp; future : futures) {</span></span>
+<span id="L225"><span class="lineNum">     225</span>              :             try {</span>
+<span id="L226"><span class="lineNum">     226</span> <span class="tlaGNC">        5006 :                 results.push_back(future.get());</span></span>
+<span id="L227"><span class="lineNum">     227</span> <span class="tlaUNC tlaBgUNC">           0 :             } catch (...) {</span></span>
+<span id="L228"><span class="lineNum">     228</span>              :                 // Store first exception, continue collecting to avoid deadlock</span>
+<span id="L229"><span class="lineNum">     229</span> <span class="tlaUNC">           0 :                 if (!first_exception) {</span></span>
+<span id="L230"><span class="lineNum">     230</span> <span class="tlaUNC">           0 :                     first_exception = std::current_exception();</span></span>
+<span id="L231"><span class="lineNum">     231</span>              :                 }</span>
+<span id="L232"><span class="lineNum">     232</span>              :                 // Push a dummy result to maintain vector size</span>
+<span id="L233"><span class="lineNum">     233</span> <span class="tlaUNC">           0 :                 results.push_back(detail::SegmentAnalysis&lt;T&gt;{});</span></span>
+<span id="L234"><span class="lineNum">     234</span>              :             }</span>
+<span id="L235"><span class="lineNum">     235</span>              :         }</span>
+<span id="L236"><span class="lineNum">     236</span>              : </span>
+<span id="L237"><span class="lineNum">     237</span>              :         // Re-throw first exception if any occurred</span>
+<span id="L238"><span class="lineNum">     238</span> <span class="tlaGNC tlaBgGNC">          20 :         if (first_exception) {</span></span>
+<span id="L239"><span class="lineNum">     239</span> <span class="tlaUNC tlaBgUNC">           0 :             std::rethrow_exception(first_exception);</span></span>
+<span id="L240"><span class="lineNum">     240</span>              :         }</span>
+<span id="L241"><span class="lineNum">     241</span>              : </span>
+<span id="L242"><span class="lineNum">     242</span>              :         // Finalize the index</span>
+<span id="L243"><span class="lineNum">     243</span> <span class="tlaGNC tlaBgGNC">          20 :         finalize_build(index, results);</span></span>
+<span id="L244"><span class="lineNum">     244</span> <span class="tlaGNC">          22 :     }</span></span>
+<span id="L245"><span class="lineNum">     245</span>              : };</span>
+<span id="L246"><span class="lineNum">     246</span>              : </span>
+<span id="L247"><span class="lineNum">     247</span>              : }  // namespace parallel</span>
+<span id="L248"><span class="lineNum">     248</span>              : </span>
+<span id="L249"><span class="lineNum">     249</span>              : // Implement JazzyIndex parallel build methods</span>
+<span id="L250"><span class="lineNum">     250</span>              : template &lt;typename T, SegmentCount Segments, typename Compare, typename KeyExtractor&gt;</span>
+<span id="L251"><span class="lineNum">     251</span>              : inline std::vector&lt;parallel::BuildTask&lt;T, Compare, KeyExtractor&gt;&gt;</span>
+<span id="L252"><span class="lineNum">     252</span> <span class="tlaGNC">           4 : JazzyIndex&lt;T, Segments, Compare, KeyExtractor&gt;::prepare_build_tasks(</span></span>
+<span id="L253"><span class="lineNum">     253</span>              :     const T* first, const T* last,</span>
+<span id="L254"><span class="lineNum">     254</span>              :     Compare comp, KeyExtractor key_extract) {</span>
+<span id="L255"><span class="lineNum">     255</span>              :     return parallel::ParallelBuilder&lt;T, Segments, Compare, KeyExtractor&gt;::prepare_build_tasks(</span>
+<span id="L256"><span class="lineNum">     256</span> <span class="tlaGNC">           4 :         *this, first, last, comp, key_extract);</span></span>
+<span id="L257"><span class="lineNum">     257</span>              : }</span>
+<span id="L258"><span class="lineNum">     258</span>              : </span>
+<span id="L259"><span class="lineNum">     259</span>              : template &lt;typename T, SegmentCount Segments, typename Compare, typename KeyExtractor&gt;</span>
+<span id="L260"><span class="lineNum">     260</span> <span class="tlaGNC">           4 : inline void JazzyIndex&lt;T, Segments, Compare, KeyExtractor&gt;::finalize_build(</span></span>
+<span id="L261"><span class="lineNum">     261</span>              :     const std::vector&lt;detail::SegmentAnalysis&lt;T&gt;&gt;&amp; results) {</span>
+<span id="L262"><span class="lineNum">     262</span> <span class="tlaGNC">           4 :     parallel::ParallelBuilder&lt;T, Segments, Compare, KeyExtractor&gt;::finalize_build(*this, results);</span></span>
+<span id="L263"><span class="lineNum">     263</span> <span class="tlaGNC">           3 : }</span></span>
+<span id="L264"><span class="lineNum">     264</span>              : </span>
+<span id="L265"><span class="lineNum">     265</span>              : template &lt;typename T, SegmentCount Segments, typename Compare, typename KeyExtractor&gt;</span>
+<span id="L266"><span class="lineNum">     266</span> <span class="tlaGNC">          23 : inline void JazzyIndex&lt;T, Segments, Compare, KeyExtractor&gt;::build_parallel(</span></span>
+<span id="L267"><span class="lineNum">     267</span>              :     const T* first, const T* last,</span>
+<span id="L268"><span class="lineNum">     268</span>              :     Compare comp, KeyExtractor key_extract) {</span>
+<span id="L269"><span class="lineNum">     269</span> <span class="tlaGNC">          23 :     parallel::ParallelBuilder&lt;T, Segments, Compare, KeyExtractor&gt;::build_parallel(</span></span>
+<span id="L270"><span class="lineNum">     270</span>              :         *this, first, last, comp, key_extract);</span>
+<span id="L271"><span class="lineNum">     271</span> <span class="tlaGNC">          22 : }</span></span>
+<span id="L272"><span class="lineNum">     272</span>              : </span>
+<span id="L273"><span class="lineNum">     273</span>              : }  // namespace jazzy</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.0-1</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>
