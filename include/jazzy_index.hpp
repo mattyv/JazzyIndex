@@ -1043,79 +1043,56 @@ private:
             predicted_seg = num_segments_ - 1;
         }
 
-        // Check predicted segment first
+        // Check predicted segment first (fast path for accurate predictions)
         const auto& predicted = segments_[predicted_seg];
         if (!comp_(value, predicted.min_val) && !comp_(predicted.max_val, value)) {
             return &predicted;
         }
 
-        // Prediction was off - use exponential search nearby
-        const std::size_t max_radius = std::max<std::size_t>(
-            segment_finder_.max_error + 2,
-            4  // minimum search radius
-        );
+        // Prediction missed - use binary search within predicted range
+        // For good predictions (low max_error), this narrows the search space significantly
+        const std::size_t error_margin = segment_finder_.max_error + 2;
+        const std::size_t search_left = (predicted_seg >= error_margin)
+            ? (predicted_seg - error_margin)
+            : 0;
+        const std::size_t search_right = std::min(predicted_seg + error_margin + 1, num_segments_);
 
-        // Determine search direction
-        const bool search_left = comp_(value, predicted.min_val);
+        // Binary search in [search_left, search_right)
+        std::size_t left = search_left;
+        std::size_t right = search_right;
 
-        if (search_left) {
-            // Search leftward with exponential expansion
-            std::size_t right_boundary = predicted_seg;
+        while (left < right) {
+            const std::size_t mid = left + (right - left) / 2;
+            const auto& seg = segments_[mid];
 
-            for (std::size_t radius = 1; radius <= max_radius; radius <<= 1) {
-                if (right_boundary == 0) break;
-
-                const std::size_t left_pos = (predicted_seg >= radius) ? (predicted_seg - radius) : 0;
-                if (left_pos >= right_boundary) break;
-
-                // Check segments in range [left_pos, right_boundary)
-                for (std::size_t i = left_pos; i < right_boundary; ++i) {
-                    const auto& seg = segments_[i];
-                    if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
-                        return &seg;
-                    }
-                }
-
-                right_boundary = left_pos;
-            }
-
-            // Check remaining left segments
-            for (std::size_t i = 0; i < right_boundary; ++i) {
-                const auto& seg = segments_[i];
-                if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
-                    return &seg;
-                }
-            }
-        } else {
-            // Search rightward with exponential expansion
-            std::size_t left_boundary = predicted_seg + 1;
-
-            for (std::size_t radius = 1; radius <= max_radius; radius <<= 1) {
-                const std::size_t right_pos = std::min<std::size_t>(predicted_seg + radius + 1, num_segments_);
-                if (right_pos <= left_boundary) break;
-
-                // Check segments in range [left_boundary, right_pos)
-                for (std::size_t i = left_boundary; i < right_pos; ++i) {
-                    const auto& seg = segments_[i];
-                    if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
-                        return &seg;
-                    }
-                }
-
-                left_boundary = right_pos;
-            }
-
-            // Check remaining right segments
-            for (std::size_t i = left_boundary; i < num_segments_; ++i) {
-                const auto& seg = segments_[i];
-                if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
-                    return &seg;
-                }
+            if (comp_(value, seg.min_val)) {
+                right = mid;
+            } else if (comp_(seg.max_val, value)) {
+                left = mid + 1;
+            } else {
+                // Value is within this segment
+                return &seg;
             }
         }
 
-        // Value not found in any segment - shouldn't happen for values within range
-        // Return nullptr to indicate segment not found
+        // If not found in predicted range (rare), do full binary search
+        left = 0;
+        right = num_segments_;
+
+        while (left < right) {
+            const std::size_t mid = left + (right - left) / 2;
+            const auto& seg = segments_[mid];
+
+            if (comp_(value, seg.min_val)) {
+                right = mid;
+            } else if (comp_(seg.max_val, value)) {
+                left = mid + 1;
+            } else {
+                return &seg;
+            }
+        }
+
+        // Value not found in any segment
         return nullptr;
     }
 
