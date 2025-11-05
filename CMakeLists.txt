@@ -22,6 +22,7 @@ option(ENABLE_COVERAGE "Enable coverage instrumentation for tests" OFF)
 
 # Benchmark configuration
 set(BENCHMARK_REPETITIONS "1" CACHE STRING "Number of times to repeat each benchmark (default: 1)")
+set(BENCHMARK_THREADS "0" CACHE STRING "Number of threads per benchmark (0 = single-threaded, default: 0)")
 
 if(BUILD_TESTS OR BUILD_BENCHMARKS)
     include(FetchContent)
@@ -200,10 +201,13 @@ if(BUILD_BENCHMARKS)
 
         set(JAZZY_BENCHMARK_JSON ${CMAKE_BINARY_DIR}/jazzy_benchmarks.json)
 
-        # Build benchmark command with optional repetitions
+        # Build benchmark command with optional repetitions and threads
         set(BENCH_CMD $<TARGET_FILE:jazzy_index_benchmarks> --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_JSON})
         if(BENCHMARK_REPETITIONS GREATER 1)
             list(APPEND BENCH_CMD --benchmark_repetitions=${BENCHMARK_REPETITIONS} --benchmark_report_aggregates_only=true)
+        endif()
+        if(BENCHMARK_THREADS GREATER 0)
+            list(APPEND BENCH_CMD --benchmark_threads=${BENCHMARK_THREADS})
         endif()
 
         add_custom_command(
@@ -233,10 +237,13 @@ if(BUILD_BENCHMARKS)
         # Full benchmark suite (up to 1M keys)
         set(JAZZY_BENCHMARK_FULL_JSON ${CMAKE_BINARY_DIR}/jazzy_benchmarks_full.json)
 
-        # Build full benchmark command with optional repetitions
+        # Build full benchmark command with optional repetitions and threads
         set(BENCH_FULL_CMD $<TARGET_FILE:jazzy_index_benchmarks> --full-benchmarks --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_FULL_JSON})
         if(BENCHMARK_REPETITIONS GREATER 1)
             list(APPEND BENCH_FULL_CMD --benchmark_repetitions=${BENCHMARK_REPETITIONS} --benchmark_report_aggregates_only=true)
+        endif()
+        if(BENCHMARK_THREADS GREATER 0)
+            list(APPEND BENCH_FULL_CMD --benchmark_threads=${BENCHMARK_THREADS})
         endif()
 
         add_custom_command(
