@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <functional>
 #include <limits>
-#include <ranges>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -65,6 +65,16 @@ inline constexpr std::size_t INITIAL_SEARCH_RADIUS = 2;
 inline constexpr double UNIFORMITY_TOLERANCE = 0.30;
 // Allow 30% deviation in segment spacing for uniformity detection
 
+// Numerical stability and tolerance constants
+inline constexpr double ZERO_RANGE_THRESHOLD = std::numeric_limits<double>::epsilon();
+// Threshold for detecting zero range (constant segments) in floating-point comparisons
+
+inline constexpr double NUMERICAL_TOLERANCE = 1e-10;
+// Tolerance for matrix determinant checks in polynomial fitting (singular matrix detection)
+
+inline constexpr double MIN_DISTRIBUTION_SCALE = 1e-6;
+// Minimum scale parameter for distributions to prevent division by zero
+
 // Segment descriptor with optimal model
 template <typename T>
 struct alignas(64) Segment {  // Cache line aligned
@@ -72,7 +82,7 @@ struct alignas(64) Segment {  // Cache line aligned
     T min_val;
     T max_val;
     ModelType model_type;
-    uint16_t max_error;
+    uint32_t max_error;
 
     // Model parameters (hot path for predict())
     // Using float instead of double to keep struct within 64 bytes
@@ -102,7 +112,8 @@ struct alignas(64) Segment {  // Cache line aligned
     std::size_t end_idx;
 
     template <typename KeyExtractor = jazzy::identity>
-    [[nodiscard]] std::size_t predict(const T& value, KeyExtractor key_extract = KeyExtractor{}) const noexcept {
+    [[nodiscard]] std::size_t predict(const T& value, KeyExtractor key_extract = KeyExtractor{}) const
+        noexcept(std::is_nothrow_invocable_v<KeyExtractor, const T&>) {
         switch (model_type) {
             case ModelType::LINEAR: {
                 const double key_val = static_cast<double>(std::invoke(key_extract, value));
@@ -151,11 +162,14 @@ struct SegmentAnalysis {
 };
 
 // Fit linear model to segment: index = slope * value + intercept
-template <typename T, typename KeyExtractor = jazzy::identity>
+template <typename T, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
 [[nodiscard]] SegmentAnalysis<T> analyze_segment(const T* data,
                                                    std::size_t start,
                                                    std::size_t end,
-                                                   KeyExtractor key_extract = KeyExtractor{}) noexcept {
+                                                   Compare comp = Compare{},
+                                                   KeyExtractor key_extract = KeyExtractor{})
+    noexcept(std::is_nothrow_invocable_v<KeyExtractor, const T&> &&
+             std::is_nothrow_invocable_v<Compare, const T&, const T&>) {
     SegmentAnalysis<T> result{};
 
     auto make_constant = [&result, start]() {
@@ -176,7 +190,7 @@ template <typename T, typename KeyExtractor = jazzy::identity>
     const double value_range = max_val - min_val;
 
     // Check for constant segment (zero range)
-    if (value_range < std::numeric_limits<double>::epsilon()) {
+    if (value_range < detail::ZERO_RANGE_THRESHOLD) {
         return make_constant();
     }
 
@@ -200,12 +214,17 @@ template <typename T, typename KeyExtractor = jazzy::identity>
     bool all_same = true;
     const T first_val = data[start];
 
+    // Helper for equality check using comparator (a == b iff !(a < b) && !(b < a))
+    auto equal = [&comp](const T& a, const T& b) {
+        return !comp(a, b) && !comp(b, a);
+    };
+
     for (std::size_t i = start; i < end; ++i) {
         const T current_val = data[i];
         const double key_val = static_cast<double>(std::invoke(key_extract, current_val));
 
-        // Check if all values are identical
-        if (all_same && current_val != first_val) {
+        // Check if all values are identical using comparator
+        if (all_same && !equal(current_val, first_val)) {
             all_same = false;
         }
 
@@ -265,7 +284,7 @@ template <typename T, typename KeyExtractor = jazzy::identity>
                      - sum_x3 * (sum_x3 * n_double - sum_x * sum_x2)
                      + sum_x2 * (sum_x3 * sum_x - sum_x2 * sum_x2);
 
-    if (std::abs(det) > 1e-10) {
+    if (std::abs(det) > NUMERICAL_TOLERANCE) {
         // Cramer's rule for a, b, c
         const double det_a = sum_x2y * (sum_x2 * n_double - sum_x * sum_x)
                            - sum_xy * (sum_x3 * n_double - sum_x * sum_x2)
@@ -353,7 +372,7 @@ template <typename T, typename KeyExtractor = jazzy::identity>
                                          sum_x4, sum_x3, sum_x2,
                                          sum_x3, sum_x2, sum_x);
 
-                    if (std::abs(det4) > 1e-10) {
+                    if (std::abs(det4) > NUMERICAL_TOLERANCE) {
                         // Compute determinants for Cramer's rule (replace each column with RHS)
                         const double det_a =
                             sum_x3y * det3x3(sum_x4, sum_x3, sum_x2,
@@ -473,7 +492,7 @@ template <typename T, typename KeyExtractor = jazzy::identity>
 
                             // Check critical points (where f''(x) = 0)
                             // f''(x) = 6*a*x + 2*b = 0 => x = -b/(3*a)
-                            if (cubic_is_monotonic && std::abs(cubic_a_orig) > 1e-10) {
+                            if (cubic_is_monotonic && std::abs(cubic_a_orig) > NUMERICAL_TOLERANCE) {
                                 const double critical_x = -cubic_b_orig / (3.0 * cubic_a_orig);
                                 if (critical_x >= min_val && critical_x <= max_val) {
                                     if (cubic_derivative(critical_x) < 0.0) {
@@ -547,6 +566,20 @@ class JazzyIndex {
     static_assert(NumSegments > 0 && NumSegments <= 4096,
                   "NumSegments must be in range [1, 4096]");
 
+    // Type constraint: KeyExtractor must be callable with const T&
+    static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+                  "KeyExtractor must be callable with const T&");
+
+    // Type constraint: KeyExtractor must return an arithmetic type
+    using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+    using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+    static_assert(std::is_arithmetic_v<KeyTypeClean>,
+                  "KeyExtractor must return an arithmetic type (int, double, etc.)");
+
+    // Type constraint: Compare must be callable with two const T& and return bool
+    static_assert(std::is_invocable_r_v<bool, Compare, const T&, const T&>,
+                  "Compare must be callable with (const T&, const T&) and return bool");
+
 public:
     JazzyIndex() = default;
 
@@ -587,7 +620,7 @@ public:
         // Precompute uniformity parameters before loop
         const double total_range = static_cast<double>(std::invoke(key_extract_, max_)) -
                                    static_cast<double>(std::invoke(key_extract_, min_));
-        const double expected_spacing = (num_segments_ > 1 && total_range >= std::numeric_limits<double>::epsilon())
+        const double expected_spacing = (num_segments_ > 1 && total_range >= detail::ZERO_RANGE_THRESHOLD)
             ? total_range / static_cast<double>(num_segments_)
             : 0.0;
         const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
@@ -603,8 +636,16 @@ public:
             seg.start_idx = start;
             seg.end_idx = end;
 
+            // Verify monotonicity: check that this segment's min is >= previous segment's max
+            if (i > 0 && comp_(seg.min_val, segments_[i - 1].max_val)) {
+                throw std::runtime_error(
+                    "Input data is not sorted. JazzyIndex requires sorted data. "
+                    "Please sort your data before building the index."
+                );
+            }
+
             // Check uniformity inline (while min/max values are hot in cache)
-            if (is_uniform_ && num_segments_ > 1 && total_range >= std::numeric_limits<double>::epsilon()) {
+            if (is_uniform_ && num_segments_ > 1 && total_range >= detail::ZERO_RANGE_THRESHOLD) {
                 const double segment_range = static_cast<double>(std::invoke(key_extract_, seg.max_val)) -
                                             static_cast<double>(std::invoke(key_extract_, seg.min_val));
                 if (std::abs(segment_range - expected_spacing) > tolerance) {
@@ -613,10 +654,19 @@ public:
             }
 
             // Analyze segment and choose best model
-            const auto analysis = detail::analyze_segment(base_, start, end, key_extract_);
+            const auto analysis = detail::analyze_segment(base_, start, end, comp_, key_extract_);
 
             seg.model_type = analysis.best_model;
-            seg.max_error = static_cast<uint16_t>(std::min<std::size_t>(analysis.max_error, std::numeric_limits<uint16_t>::max()));
+
+            // Check if prediction error exceeds uint32_t limit
+            if (analysis.max_error > std::numeric_limits<uint32_t>::max()) {
+                throw std::runtime_error(
+                    "Segment prediction error exceeds uint32_t limit. "
+                    "Data distribution is too extreme for indexing. "
+                    "Consider using fewer segments or preprocessing the data."
+                );
+            }
+            seg.max_error = static_cast<uint32_t>(analysis.max_error);
 
             switch (analysis.best_model) {
                 case detail::ModelType::LINEAR:
@@ -643,14 +693,15 @@ public:
         }
 
         // Compute scale factor for O(1) segment lookup if data is uniform
-        if (is_uniform_ && total_range >= std::numeric_limits<double>::epsilon()) {
+        if (is_uniform_ && total_range >= detail::ZERO_RANGE_THRESHOLD) {
             segment_scale_ = static_cast<double>(num_segments_) / total_range;
         }
     }
 
     [[nodiscard]] const T* find(const T& key) const {
-        if (size_ == 0) {
-            return base_;
+        // Return end iterator if index not built or empty
+        if (!is_built() || size_ == 0) {
+            return base_ + size_;
         }
 
         // Bounds check
@@ -745,6 +796,7 @@ public:
 
     [[nodiscard]] std::size_t size() const noexcept { return size_; }
     [[nodiscard]] std::size_t num_segments() const noexcept { return num_segments_; }
+    [[nodiscard]] bool is_built() const noexcept { return base_ != nullptr; }
 
     // Friend declaration for export functionality
     template <typename U, SegmentCount S, typename C, typename K>

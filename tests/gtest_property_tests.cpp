@@ -116,6 +116,7 @@ TEST(PropertyTests, FindsDuplicates) {
 // Property: Size is preserved
 TEST(PropertyTests, SizePreserved) {
     const bool result = rc::check("Size preserved", [](std::vector<value_type> values) {
+        std::sort(values.begin(), values.end());  // Sort data before building index
         qi_index index;
         index.build(values.data(), values.data() + values.size());
         RC_ASSERT(index.size() == values.size());
