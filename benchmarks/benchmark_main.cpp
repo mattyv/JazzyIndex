@@ -4,11 +4,13 @@
 #include <cstdint>
 #include <functional>
 #include <fstream>
+#include <future>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 #include <sys/stat.h>
@@ -17,6 +19,12 @@
 #include "jazzy_index_export.hpp"
 
 namespace {
+
+// Global dataset cache for parallel pre-generation
+std::unordered_map<std::string, std::shared_ptr<std::vector<std::uint64_t>>> dataset_cache;
+
+// Optional: number of threads for benchmark execution (0 = single-threaded)
+int benchmark_threads = 0;
 
 // Global flag to control benchmark dataset sizes
 static bool use_full_benchmarks = false;
@@ -52,6 +60,75 @@ template <typename F>
 void for_each_segment_count(F&& f) {
     for_each_segment_count_impl(std::forward<F>(f),
                                 std::integer_sequence<std::size_t, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512>{});
+}
+
+// Parallel dataset generation
+template <typename Generator>
+std::shared_ptr<std::vector<std::uint64_t>> get_or_generate_dataset(
+    const std::string& name, std::size_t size, Generator&& gen) {
+    const std::string key = name + "_" + std::to_string(size);
+
+    auto it = dataset_cache.find(key);
+    if (it != dataset_cache.end()) {
+        return it->second;
+    }
+
+    // Generate and cache
+    auto data = std::make_shared<std::vector<std::uint64_t>>(gen(size));
+    dataset_cache[key] = data;
+    return data;
+}
+
+// Pre-generate all datasets in parallel (called once at startup)
+void pre_generate_datasets_parallel(const std::vector<std::size_t>& sizes) {
+    std::cout << "Pre-generating datasets in parallel..." << std::endl;
+
+    struct Distribution {
+        std::string name;
+        std::function<std::vector<std::uint64_t>(std::size_t)> generator;
+    };
+
+    std::vector<Distribution> distributions = {
+        {"Uniform", [](std::size_t s) { return qi::bench::make_uniform_values(s); }},
+        {"Exponential", [](std::size_t s) { return qi::bench::make_exponential_values(s); }},
+        {"Clustered", [](std::size_t s) { return qi::bench::make_clustered_values(s); }},
+        {"Lognormal", [](std::size_t s) { return qi::bench::make_lognormal_values(s); }},
+        {"Zipf", [](std::size_t s) { return qi::bench::make_zipf_values(s); }},
+        {"Mixed", [](std::size_t s) { return qi::bench::make_mixed_values(s); }},
+        {"Quadratic", [](std::size_t s) { return qi::bench::make_quadratic_values(s); }},
+        {"ExtremePoly", [](std::size_t s) { return qi::bench::make_extreme_polynomial_values(s); }},
+        {"InversePoly", [](std::size_t s) { return qi::bench::make_inverse_polynomial_values(s); }}
+    };
+
+    std::vector<std::future<void>> futures;
+
+    // Launch parallel generation
+    for (const auto& dist : distributions) {
+        for (std::size_t size : sizes) {
+            futures.push_back(std::async(std::launch::async, [&dist, size]() {
+                const std::string key = dist.name + "_" + std::to_string(size);
+                std::cout << "  Generating " << dist.name << " (N=" << size << ")..." << std::endl;
+                auto data = std::make_shared<std::vector<std::uint64_t>>(dist.generator(size));
+                dataset_cache[key] = data;
+            }));
+        }
+    }
+
+    // Wait for all to complete
+    for (auto& f : futures) {
+        f.wait();
+    }
+
+    std::cout << "Dataset generation complete! Generated " << dataset_cache.size() << " datasets." << std::endl;
+}
+
+// Helper to optionally add threading to benchmarks
+template<typename Benchmark>
+Benchmark* maybe_add_threads(Benchmark* bench) {
+    if (benchmark_threads > 0) {
+        return bench->Threads(benchmark_threads);
+    }
+    return bench;
 }
 
 // Baseline: std::lower_bound benchmarks for comparison
@@ -325,7 +402,10 @@ void register_uniform_suite(std::size_t size) {
         return;
     }
 
-    auto data = std::make_shared<std::vector<std::uint64_t>>(qi::bench::make_uniform_values(size));
+    // Use cached dataset (already generated in parallel)
+    auto data = get_or_generate_dataset("Uniform", size, [](std::size_t s) {
+        return qi::bench::make_uniform_values(s);
+    });
     const std::uint64_t mid_target = (*data)[data->size() / 2];
     const std::uint64_t end_target = data->back();
     const std::uint64_t miss_target =
@@ -380,7 +460,8 @@ void register_distribution_suite(const std::string& name,
         return;
     }
 
-    auto data = std::make_shared<std::vector<std::uint64_t>>(generator(size));
+    // Use cached dataset (already generated in parallel)
+    auto data = get_or_generate_dataset(name, size, std::forward<Generator>(generator));
     if (data->empty()) {
         return;
     }
@@ -731,6 +812,19 @@ int main(int argc, char** argv) {
             }
             --argc;
             --i;
+        } else if (arg.find("--benchmark_threads=") == 0) {
+            try {
+                benchmark_threads = std::stoi(arg.substr(20));  // Length of "--benchmark_threads="
+                std::cout << "Will run benchmarks with " << benchmark_threads << " threads" << std::endl;
+            } catch (...) {
+                std::cerr << "Invalid value for --benchmark_threads" << std::endl;
+            }
+            // Remove this flag so benchmark library doesn't see it
+            for (int j = i; j < argc - 1; ++j) {
+                argv[j] = argv[j + 1];
+            }
+            --argc;
+            --i;
         }
     }
 
@@ -740,6 +834,14 @@ int main(int argc, char** argv) {
         std::cout << "  python3 scripts/plot_index_structure.py " << output_dir << std::endl;
         return 0;
     }
+
+    // Pre-generate all datasets in parallel (major speedup!)
+    std::vector<std::size_t> dataset_sizes = {100, 1'000, 10'000};
+    if (use_full_benchmarks) {
+        dataset_sizes.push_back(100'000);
+        dataset_sizes.push_back(1'000'000);
+    }
+    pre_generate_datasets_parallel(dataset_sizes);
 
     // Register baseline std::lower_bound benchmarks first
     register_lower_bound_suites();
