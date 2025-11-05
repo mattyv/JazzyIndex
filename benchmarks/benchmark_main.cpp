@@ -155,35 +155,38 @@ void register_lower_bound_uniform_suite(std::size_t size) {
 
     const std::string base = "LowerBound/Uniform/N" + std::to_string(size);
 
-    benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
-                                 [data, mid_target](benchmark::State& state) {
-                                     for (auto _ : state) {
-                                         const auto* result = find_with_lower_bound(*data, mid_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                     [data, mid_target](benchmark::State& state) {
+                                         for (auto _ : state) {
+                                             const auto* result = find_with_lower_bound(*data, mid_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
-                                 [data, end_target](benchmark::State& state) {
-                                     for (auto _ : state) {
-                                         const auto* result = find_with_lower_bound(*data, end_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                     [data, end_target](benchmark::State& state) {
+                                         for (auto _ : state) {
+                                             const auto* result = find_with_lower_bound(*data, end_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
-                                 [data, miss_target](benchmark::State& state) {
-                                     for (auto _ : state) {
-                                         const auto* result = find_with_lower_bound(*data, miss_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                     [data, miss_target](benchmark::State& state) {
+                                         for (auto _ : state) {
+                                             const auto* result = find_with_lower_bound(*data, miss_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 }
 
 template <typename Generator>
@@ -206,35 +209,38 @@ void register_lower_bound_distribution_suite(const std::string& name,
 
     const std::string base = "LowerBound/" + name + "/N" + std::to_string(size);
 
-    benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
-                                 [data, mid_target](benchmark::State& state) {
-                                     for (auto _ : state) {
-                                         const auto* result = find_with_lower_bound(*data, mid_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                     [data, mid_target](benchmark::State& state) {
+                                         for (auto _ : state) {
+                                             const auto* result = find_with_lower_bound(*data, mid_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
-                                 [data, end_target](benchmark::State& state) {
-                                     for (auto _ : state) {
-                                         const auto* result = find_with_lower_bound(*data, end_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                     [data, end_target](benchmark::State& state) {
+                                         for (auto _ : state) {
+                                             const auto* result = find_with_lower_bound(*data, end_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
-                                 [data, miss_target](benchmark::State& state) {
-                                     for (auto _ : state) {
-                                         const auto* result = find_with_lower_bound(*data, miss_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                     [data, miss_target](benchmark::State& state) {
+                                         for (auto _ : state) {
+                                             const auto* result = find_with_lower_bound(*data, miss_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 }
 
 // Lower bound benchmarks for key-value pairs
@@ -265,38 +271,41 @@ void register_lower_bound_keyvalue_suite(const std::string& name,
 
     const std::string base = "LowerBound/" + name + "KV/N" + std::to_string(size);
 
-    benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
-                                 [data, mid_key](benchmark::State& state) {
-                                     KeyValue target{mid_key, ""};
-                                     for (auto _ : state) {
-                                         const auto* result = find_with_lower_bound(*data, target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                     [data, mid_key](benchmark::State& state) {
+                                         KeyValue target{mid_key, ""};
+                                         for (auto _ : state) {
+                                             const auto* result = find_with_lower_bound(*data, target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
-                                 [data, end_key](benchmark::State& state) {
-                                     KeyValue target{end_key, ""};
-                                     for (auto _ : state) {
-                                         const auto* result = find_with_lower_bound(*data, target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                     [data, end_key](benchmark::State& state) {
+                                         KeyValue target{end_key, ""};
+                                         for (auto _ : state) {
+                                             const auto* result = find_with_lower_bound(*data, target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
-                                 [data, miss_key](benchmark::State& state) {
-                                     KeyValue target{miss_key, ""};
-                                     for (auto _ : state) {
-                                         const auto* result = find_with_lower_bound(*data, target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                     [data, miss_key](benchmark::State& state) {
+                                         KeyValue target{miss_key, ""};
+                                         for (auto _ : state) {
+                                             const auto* result = find_with_lower_bound(*data, target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 }
 
 void register_lower_bound_suites() {
@@ -341,17 +350,18 @@ void register_build_benchmark(std::size_t size, const std::string& distribution,
     const std::string name = "JazzyIndexBuild/" + distribution + "/S" +
                             std::to_string(Segments) + "/N" + std::to_string(size);
 
-    benchmark::RegisterBenchmark(name.c_str(),
-                                 [data](benchmark::State& state) {
-                                     for (auto _ : state) {
-                                         jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> index;
-                                         index.build(data.data(), data.data() + data.size());
-                                         benchmark::DoNotOptimize(index);
-                                     }
-                                     state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data.size());
-                                 })
-        ->Unit(benchmark::kMicrosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark(name.c_str(),
+                                     [data](benchmark::State& state) {
+                                         for (auto _ : state) {
+                                             jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> index;
+                                             index.build(data.data(), data.data() + data.size());
+                                             benchmark::DoNotOptimize(index);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data.size());
+                                     })
+            ->Unit(benchmark::kMicrosecond));
 }
 
 void register_build_suites() {
@@ -583,53 +593,56 @@ void register_keyvalue_suite(const std::string& name,
     const std::string base = "JazzyIndex/" + name + "KV/S" + std::to_string(Segments) +
                              "/N" + std::to_string(size);
 
-    benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
-                                 [data, mid_key](benchmark::State& state) {
-                                     jazzy::JazzyIndex<KeyValue, jazzy::to_segment_count<Segments>(),
-                                                       std::less<>, decltype(&KeyValue::key)> index;
-                                     index.build(data->data(), data->data() + data->size(),
-                                                std::less<>{}, &KeyValue::key);
-                                     KeyValue target{mid_key, ""};
-                                     for (auto _ : state) {
-                                         const auto* result = index.find(target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                     [data, mid_key](benchmark::State& state) {
+                                         jazzy::JazzyIndex<KeyValue, jazzy::to_segment_count<Segments>(),
+                                                           std::less<>, decltype(&KeyValue::key)> index;
+                                         index.build(data->data(), data->data() + data->size(),
+                                                    std::less<>{}, &KeyValue::key);
+                                         KeyValue target{mid_key, ""};
+                                         for (auto _ : state) {
+                                             const auto* result = index.find(target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
-                                 [data, end_key](benchmark::State& state) {
-                                     jazzy::JazzyIndex<KeyValue, jazzy::to_segment_count<Segments>(),
-                                                       std::less<>, decltype(&KeyValue::key)> index;
-                                     index.build(data->data(), data->data() + data->size(),
-                                                std::less<>{}, &KeyValue::key);
-                                     KeyValue target{end_key, ""};
-                                     for (auto _ : state) {
-                                         const auto* result = index.find(target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                     [data, end_key](benchmark::State& state) {
+                                         jazzy::JazzyIndex<KeyValue, jazzy::to_segment_count<Segments>(),
+                                                           std::less<>, decltype(&KeyValue::key)> index;
+                                         index.build(data->data(), data->data() + data->size(),
+                                                    std::less<>{}, &KeyValue::key);
+                                         KeyValue target{end_key, ""};
+                                         for (auto _ : state) {
+                                             const auto* result = index.find(target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
-                                 [data, miss_key](benchmark::State& state) {
-                                     jazzy::JazzyIndex<KeyValue, jazzy::to_segment_count<Segments>(),
-                                                       std::less<>, decltype(&KeyValue::key)> index;
-                                     index.build(data->data(), data->data() + data->size(),
-                                                std::less<>{}, &KeyValue::key);
-                                     KeyValue target{miss_key, ""};
-                                     for (auto _ : state) {
-                                         const auto* result = index.find(target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                     [data, miss_key](benchmark::State& state) {
+                                         jazzy::JazzyIndex<KeyValue, jazzy::to_segment_count<Segments>(),
+                                                           std::less<>, decltype(&KeyValue::key)> index;
+                                         index.build(data->data(), data->data() + data->size(),
+                                                    std::less<>{}, &KeyValue::key);
+                                         KeyValue target{miss_key, ""};
+                                         for (auto _ : state) {
+                                             const auto* result = index.find(target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 }
 
 void register_keyvalue_suites() {
