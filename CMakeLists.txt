@@ -176,15 +176,6 @@ if(BUILD_BENCHMARKS)
         ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
     )
 
-    # Multi-threading limits benchmark
-    add_executable(benchmark_threading_limits
-        benchmarks/benchmark_threading_limits.cpp
-    )
-    target_link_libraries(benchmark_threading_limits PRIVATE jazzy_index benchmark::benchmark)
-    target_include_directories(benchmark_threading_limits PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
-    )
-
     find_package(Python3 COMPONENTS Interpreter)
     if(Python3_Interpreter_FOUND)
         set(JAZZY_VENV_DIR ${CMAKE_BINARY_DIR}/jazzy_venv)
