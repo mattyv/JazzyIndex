@@ -160,11 +160,36 @@ struct alignas(64) Segment {  // Cache line aligned
     std::size_t start_idx;
     std::size_t end_idx;
 
+    // Inline prediction for maximum performance in hot path
     template <typename KeyExtractor = jazzy::identity>
     [[nodiscard]] std::size_t predict(const T& value, KeyExtractor key_extract = KeyExtractor{}) const
         noexcept(std::is_nothrow_invocable_v<KeyExtractor, const T&>) {
         const double key_val = static_cast<double>(std::invoke(key_extract, value));
-        return predict_with_model(key_val, model_type, params, start_idx);
+
+        switch (model_type) {
+            case ModelType::LINEAR: {
+                const double pred = std::fma(key_val, params.linear.slope, params.linear.intercept);
+                return static_cast<std::size_t>(std::max(0.0, pred));
+            }
+            case ModelType::QUADRATIC: {
+                const double pred = std::fma(key_val,
+                                            std::fma(key_val, params.quadratic.a, params.quadratic.b),
+                                            params.quadratic.c);
+                return static_cast<std::size_t>(std::max(0.0, pred));
+            }
+            case ModelType::CUBIC: {
+                const double pred = std::fma(key_val,
+                                            std::fma(key_val,
+                                                    std::fma(key_val, params.cubic.a, params.cubic.b),
+                                                    params.cubic.c),
+                                            params.cubic.d);
+                return static_cast<std::size_t>(std::max(0.0, pred));
+            }
+            case ModelType::CONSTANT:
+                return params.constant.constant_idx;
+            default:
+                return start_idx;
+        }
     }
 };
 
