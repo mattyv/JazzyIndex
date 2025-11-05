@@ -167,6 +167,48 @@ The cache stores all generated datasets in memory. For `--full-benchmarks`:
 
 This is acceptable for modern systems and provides significant time savings.
 
+## Optional: Multi-Threaded Benchmark Execution
+
+### --benchmark_threads=N Flag
+
+You can optionally run each benchmark with multiple threads using the `--benchmark_threads=N` flag. This runs N threads executing benchmark iterations in parallel, which can speed up benchmark execution.
+
+```bash
+# Single-threaded (default)
+./build/jazzy_index_benchmarks
+
+# Multi-threaded (4 threads per benchmark)
+./build/jazzy_index_benchmarks --benchmark_threads=4
+```
+
+**How it works:**
+- Each benchmark spawns N threads
+- Each thread executes benchmark iterations independently
+- Results are aggregated across threads
+- Google Benchmark reports per-thread metrics
+
+**When to use:**
+- ✓ On systems with many cores (8+) to utilize more CPU
+- ✓ To speed up total benchmark execution time
+- ✓ On Apple Silicon Macs to use both P and E cores
+- ⚠️ Be aware that results may vary slightly due to thread scheduling
+
+**Example output:**
+```bash
+$ ./build/jazzy_index_benchmarks --benchmark_threads=4 --benchmark_filter="Uniform/S1/N100"
+
+Running benchmarks with 4 threads per benchmark
+Dataset generation complete! Generated 27 datasets.
+
+Benchmark                                           Time       CPU   Iterations
+---------------------------------------------------------------------------------
+JazzyIndex/Uniform/S1/N100/FoundMiddle/threads:4  1.63 ns  5.36 ns   18666668
+JazzyIndex/Uniform/S1/N100/FoundEnd/threads:4     1.82 ns  5.89 ns   16000000
+...
+```
+
+**Note:** This is different from parallel data generation (which is automatic). Data generation happens once in parallel at startup, then benchmarks run with the specified thread count.
+
 ## Usage Examples
 
 ### Standard Quick Benchmarks
