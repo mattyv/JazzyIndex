@@ -21,3 +21,4 @@ docs/images/index_data/*.json
 # Benchmark results (JSON output)
 *_results.json
 threading_results*.json
+benchmark_parallelism_test/
