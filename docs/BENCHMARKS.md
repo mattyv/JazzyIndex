@@ -8,7 +8,9 @@ Comprehensive performance analysis of JazzyIndex vs. `std::lower_bound` across m
 - [Performance by Segment Group](#performance-by-segment-group)
 - [Distribution Analysis](#distribution-analysis)
 - [Segment Count Selection Guide](#segment-count-selection-guide)
+- [Range Function Benchmarks (Work in Progress)](#range-function-benchmarks-work-in-progress)
 - [Running Benchmarks](#running-benchmarks)
+- [Key Takeaways](#key-takeaways)
 
 ## Overview
 
@@ -231,6 +233,61 @@ Examples:
 - 10K elements, 256 segments: ~80KB + 8KB = **88KB**
 - 100K elements, 512 segments: ~800KB + 16KB = **816KB**
 - 1M elements, 1024 segments: ~8MB + 32KB = **~8MB**
+
+---
+
+## Range Function Benchmarks (Work in Progress)
+
+JazzyIndex now supports range query functions (`equal_range`, `find_lower_bound`, `find_upper_bound`) that complement the core `find()` operation. These functions are benchmarked separately to measure their performance characteristics.
+
+### Range Functions Tested
+
+- **`equal_range(value)`** - Returns `[lower, upper)` pair for all elements equal to value
+- **`find_lower_bound(value)`** - Returns pointer to first element ≥ value
+- **`find_upper_bound(value)`** - Returns pointer to first element > value
+
+### Benchmark Coverage
+
+Range function benchmarks test the same distributions and scenarios as the main benchmarks:
+- **Distributions:** All 9 distributions (Uniform, Exponential, Clustered, etc.)
+- **Segment counts:** All 10 counts (1, 2, 4, 8, 16, 32, 64, 128, 256, 512)
+- **Scenarios:** FoundMiddle, FoundEnd, NotFound
+- **Dataset sizes:** 100, 1,000, 10,000 elements
+
+This results in **2,673 total benchmark cases** (compared to 891 for the main `find()` benchmarks).
+
+### Running Range Benchmarks
+
+```bash
+# Build the range benchmark executable
+cmake --build build --target benchmark_range_functions
+
+# Run with multithreading (4 threads per benchmark)
+./build/benchmark_range_functions \
+  --benchmark_format=json \
+  --benchmark_out=build/jazzy_range_benchmarks.json \
+  --benchmark_threads=4
+
+# Generate separate plots for each function
+./scripts/plot_range_benchmarks.sh build/jazzy_range_benchmarks.json
+```
+
+**Output:**
+- `docs/images/benchmarks/jazzy_equalrange_benchmarks_{low,medium,high}.png`
+- `docs/images/benchmarks/jazzy_lowerbound_benchmarks_{low,medium,high}.png`
+- `docs/images/benchmarks/jazzy_upperbound_benchmarks_{low,medium,high}.png`
+
+### Known Performance Issues
+
+The range functions are **functionally correct** (validated against STL behavior) but have identified optimization opportunities:
+
+1. **Linear duplicate scanning** - Current O(k) backward scan for k duplicates should use exponential search → O(log k). Impact: 10µs on 10K duplicates vs optimal ~14ns.
+
+2. **equal_range inefficiency** - Currently calls `find_lower_bound` and `find_upper_bound` independently (2× work). Should use combined single-pass search.
+
+3. **Code duplication** - 90% overlap between lower_bound and upper_bound implementations.
+
+See [README.md](../README.md#range-query-functions-work-in-progress) for full details on current status and planned improvements.
 
 ---
 
