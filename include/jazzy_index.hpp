@@ -990,7 +990,6 @@ private:
         }
 
         // Create data points: (segment.min_val -> segment_index)
-        // We're modeling: segment_index = f(value)
         const double min_val = static_cast<double>(std::invoke(key_extract_, segments_[0].min_val));
         const double max_val = static_cast<double>(std::invoke(key_extract_, segments_[num_segments_ - 1].max_val));
         const double value_range = max_val - min_val;
@@ -1004,24 +1003,122 @@ private:
             return;
         }
 
-        // Fit linear model: segment_index = slope * value + intercept
-        const double slope = static_cast<double>(num_segments_ - 1) / value_range;
-        const double intercept = -slope * min_val;
+        // Normalize values for numerical stability
+        const double x_scale = value_range;
+        const double x_min = min_val;
 
-        // Measure linear prediction error
-        std::size_t max_error = 0;
+        // Accumulate sums for polynomial fitting in a single pass
+        double sum_x = 0, sum_x2 = 0, sum_x3 = 0, sum_x4 = 0, sum_x5 = 0, sum_x6 = 0;
+        double sum_y = 0, sum_xy = 0, sum_x2y = 0, sum_x3y = 0;
+
+        // First, try linear model
+        std::size_t linear_max_error = 0;
+        double linear_slope = static_cast<double>(num_segments_ - 1) / value_range;
+        double linear_intercept = -linear_slope * min_val;
+
         for (std::size_t i = 0; i < num_segments_; ++i) {
             const double seg_min = static_cast<double>(std::invoke(key_extract_, segments_[i].min_val));
-            const double predicted = std::fma(seg_min, slope, intercept);
-            const double error = std::abs(predicted - static_cast<double>(i));
-            max_error = std::max(max_error, static_cast<std::size_t>(std::ceil(error)));
+            const double x_normalized = (seg_min - x_min) / x_scale;
+            const double y = static_cast<double>(i);
+
+            // Compute linear prediction error
+            const double linear_pred = std::fma(seg_min, linear_slope, linear_intercept);
+            const double linear_error = std::abs(linear_pred - y);
+            linear_max_error = std::max(linear_max_error, static_cast<std::size_t>(std::ceil(linear_error)));
+
+            // Accumulate sums for higher-order models
+            const double x = x_normalized;
+            const double x2 = x * x;
+            const double x3 = x2 * x;
+            const double x4 = x2 * x2;
+            const double x5 = x3 * x2;
+            const double x6 = x3 * x3;
+
+            sum_x += x;
+            sum_x2 += x2;
+            sum_x3 += x3;
+            sum_x4 += x4;
+            sum_x5 += x5;
+            sum_x6 += x6;
+            sum_y += y;
+            sum_xy += x * y;
+            sum_x2y += x2 * y;
+            sum_x3y += x3 * y;
         }
 
-        // For now, use linear model (future: could try quadratic/cubic for complex distributions)
+        const double n = static_cast<double>(num_segments_);
+
+        // If linear is good enough (max_error <= 3), use it
+        if (linear_max_error <= 3) {
+            segment_finder_.model_type = detail::ModelType::LINEAR;
+            segment_finder_.max_error = static_cast<uint32_t>(linear_max_error);
+            segment_finder_.params.linear.slope = static_cast<float>(linear_slope);
+            segment_finder_.params.linear.intercept = static_cast<float>(linear_intercept);
+            return;
+        }
+
+        // Try quadratic model
+        // System: [Σx⁴  Σx³  Σx²] [a]   [Σx²y]
+        //         [Σx³  Σx²  Σx ] [b] = [Σxy ]
+        //         [Σx²  Σx   n  ] [c]   [Σy  ]
+
+        const double det = sum_x4 * (sum_x2 * n - sum_x * sum_x)
+                         - sum_x3 * (sum_x3 * n - sum_x * sum_x2)
+                         + sum_x2 * (sum_x3 * sum_x - sum_x2 * sum_x2);
+
+        if (std::abs(det) > detail::NUMERICAL_TOLERANCE) {
+            const double det_a = sum_x2y * (sum_x2 * n - sum_x * sum_x)
+                               - sum_xy * (sum_x3 * n - sum_x * sum_x2)
+                               + sum_y * (sum_x3 * sum_x - sum_x2 * sum_x2);
+            const double det_b = sum_x4 * (sum_xy * n - sum_y * sum_x)
+                               - sum_x3 * (sum_x2y * n - sum_y * sum_x2)
+                               + sum_x2 * (sum_x2y * sum_x - sum_xy * sum_x2);
+            const double det_c = sum_x4 * (sum_x2 * sum_y - sum_x * sum_xy)
+                               - sum_x3 * (sum_x3 * sum_y - sum_x * sum_x2y)
+                               + sum_x2 * (sum_x3 * sum_xy - sum_x2 * sum_x2y);
+
+            const double a = det_a / det;
+            const double b = det_b / det;
+            const double c = det_c / det;
+
+            // Measure quadratic error
+            std::size_t quad_max_error = 0;
+            for (std::size_t i = 0; i < num_segments_; ++i) {
+                const double seg_min = static_cast<double>(std::invoke(key_extract_, segments_[i].min_val));
+                const double x_normalized = (seg_min - x_min) / x_scale;
+                const double pred = std::fma(x_normalized, std::fma(x_normalized, a, b), c);
+                const double error = std::abs(pred - static_cast<double>(i));
+                quad_max_error = std::max(quad_max_error, static_cast<std::size_t>(std::ceil(error)));
+            }
+
+            // Use quadratic if it's significantly better (at least 20% improvement)
+            if (quad_max_error < linear_max_error * 0.8) {
+                // Transform coefficients from normalized space to original space
+                const double x_scale_sq = x_scale * x_scale;
+                const double quad_a = a / x_scale_sq;
+                const double quad_b = b / x_scale - 2.0 * a * x_min / x_scale_sq;
+                const double quad_c = a * x_min * x_min / x_scale_sq - b * x_min / x_scale + c;
+
+                // Check monotonicity
+                const double deriv_at_min = 2.0 * quad_a * min_val + quad_b;
+                const double deriv_at_max = 2.0 * quad_a * max_val + quad_b;
+
+                if (deriv_at_min >= 0.0 && deriv_at_max >= 0.0) {
+                    segment_finder_.model_type = detail::ModelType::QUADRATIC;
+                    segment_finder_.max_error = static_cast<uint32_t>(quad_max_error);
+                    segment_finder_.params.quadratic.a = static_cast<float>(quad_a);
+                    segment_finder_.params.quadratic.b = static_cast<float>(quad_b);
+                    segment_finder_.params.quadratic.c = static_cast<float>(quad_c);
+                    return;
+                }
+            }
+        }
+
+        // Fall back to linear if quadratic didn't help or wasn't monotonic
         segment_finder_.model_type = detail::ModelType::LINEAR;
-        segment_finder_.max_error = static_cast<uint32_t>(std::min<std::size_t>(max_error, std::numeric_limits<uint32_t>::max()));
-        segment_finder_.params.linear.slope = static_cast<float>(slope);
-        segment_finder_.params.linear.intercept = static_cast<float>(intercept);
+        segment_finder_.max_error = static_cast<uint32_t>(linear_max_error);
+        segment_finder_.params.linear.slope = static_cast<float>(linear_slope);
+        segment_finder_.params.linear.intercept = static_cast<float>(linear_intercept);
     }
 
     [[nodiscard]] const detail::Segment<T>* find_segment(const T& value) const noexcept {
