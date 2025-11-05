@@ -126,13 +126,20 @@ def get_cpu_name() -> str:
 def parse_benchmark_name(name: str) -> BenchmarkKey:
     """
     Parse benchmark names of the form:
-        JazzyIndex/<Distribution>/S<Segments>/N<Size>/<Scenario>
-        LowerBound/<Distribution>/N<Size>/<Scenario>
+        JazzyIndex/<Distribution>/S<Segments>/N<Size>/<Scenario>[/threads:N]
+        LowerBound/<Distribution>/N<Size>/<Scenario>[/threads:N]
 
     Returns: (implementation, distribution, scenario, segments, size)
     where implementation is "JazzyIndex" or "LowerBound", segments is None for LowerBound
+
+    Note: The optional /threads:N suffix (added by Google Benchmark when using
+    multithreading) is stripped before parsing.
     """
     parts = name.split("/")
+
+    # Strip optional threads:N suffix
+    if parts and parts[-1].startswith("threads:"):
+        parts = parts[:-1]
 
     # Parse JazzyIndex format
     if parts[0] == "JazzyIndex":
