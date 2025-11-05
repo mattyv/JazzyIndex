@@ -573,7 +573,8 @@ class JazzyIndex {
 
     // Type constraint: KeyExtractor must return an arithmetic type
     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
-    static_assert(std::is_arithmetic_v<std::remove_cvref_t<KeyType>>,
+    using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+    static_assert(std::is_arithmetic_v<KeyTypeClean>,
                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
 
     // Type constraint: Compare must be callable with two const T& and return bool
