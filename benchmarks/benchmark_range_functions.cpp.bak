@@ -1,0 +1,302 @@
+// Benchmarks for equal_range, find_lower_bound, and find_upper_bound
+// These benchmarks test the new range query functions added to JazzyIndex
+
+#include <benchmark/benchmark.h>
+
+#include <algorithm>
+#include <cstdint>
+#include <functional>
+#include <limits>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "fixtures.hpp"
+#include "jazzy_index_export.hpp"
+
+namespace {
+
+// Global dataset cache
+std::unordered_map<std::string, std::shared_ptr<std::vector<std::uint64_t>>> range_dataset_cache;
+
+// Helper to get or generate datasets
+std::shared_ptr<std::vector<std::uint64_t>> get_or_generate_range_dataset(
+    const std::string& name,
+    std::size_t size,
+    std::function<std::vector<std::uint64_t>(std::size_t)> gen) {
+    std::string key = name + "_" + std::to_string(size);
+    auto it = range_dataset_cache.find(key);
+    if (it != range_dataset_cache.end()) {
+        return it->second;
+    }
+
+    auto data = std::make_shared<std::vector<std::uint64_t>>(gen(size));
+    range_dataset_cache[key] = data;
+    return data;
+}
+
+// Benchmark JazzyIndex::equal_range
+template <std::size_t Segments>
+void BM_JazzyIndex_EqualRange(benchmark::State& state, const std::string& distribution) {
+    const std::size_t size = state.range(0);
+
+    // Generate dataset based on distribution
+    auto data = [&]() {
+        if (distribution == "Uniform") {
+            return get_or_generate_range_dataset("Uniform", size, [](std::size_t s) { return qi::bench::make_uniform_values(s); });
+        } else if (distribution == "Clustered") {
+            return get_or_generate_range_dataset("Clustered", size, [](std::size_t s) { return qi::bench::make_clustered_values(s); });
+        } else if (distribution == "Exponential") {
+            return get_or_generate_range_dataset("Exponential", size, [](std::size_t s) { return qi::bench::make_exponential_values(s); });
+        } else if (distribution == "Zipf") {
+            return get_or_generate_range_dataset("Zipf", size, [](std::size_t s) { return qi::bench::make_zipf_values(s); });
+        } else {
+            return get_or_generate_range_dataset("Mixed", size, [](std::size_t s) { return qi::bench::make_mixed_values(s); });
+        }
+    }();
+
+    auto index = qi::bench::make_index<Segments>(*data);
+    const std::uint64_t target = (*data)[data->size() / 2];
+
+    for (auto _ : state) {
+        auto [lower, upper] = index.equal_range(target);
+        benchmark::DoNotOptimize(lower);
+        benchmark::DoNotOptimize(upper);
+    }
+
+    state.counters["segments"] = Segments;
+    state.counters["size"] = static_cast<double>(size);
+}
+
+// Benchmark std::equal_range for comparison
+void BM_Std_EqualRange(benchmark::State& state, const std::string& distribution) {
+    const std::size_t size = state.range(0);
+
+    auto data = [&]() {
+        if (distribution == "Uniform") {
+            return get_or_generate_range_dataset("Uniform", size, [](std::size_t s) { return qi::bench::make_uniform_values(s); });
+        } else if (distribution == "Clustered") {
+            return get_or_generate_range_dataset("Clustered", size, [](std::size_t s) { return qi::bench::make_clustered_values(s); });
+        } else if (distribution == "Exponential") {
+            return get_or_generate_range_dataset("Exponential", size, [](std::size_t s) { return qi::bench::make_exponential_values(s); });
+        } else if (distribution == "Zipf") {
+            return get_or_generate_range_dataset("Zipf", size, [](std::size_t s) { return qi::bench::make_zipf_values(s); });
+        } else {
+            return get_or_generate_range_dataset("Mixed", size, [](std::size_t s) { return qi::bench::make_mixed_values(s); });
+        }
+    }();
+
+    const std::uint64_t target = (*data)[data->size() / 2];
+
+    for (auto _ : state) {
+        auto [lower, upper] = std::equal_range(data->begin(), data->end(), target);
+        benchmark::DoNotOptimize(lower);
+        benchmark::DoNotOptimize(upper);
+    }
+
+    state.counters["size"] = static_cast<double>(size);
+}
+
+// Benchmark JazzyIndex::find_lower_bound
+template <std::size_t Segments>
+void BM_JazzyIndex_LowerBound(benchmark::State& state, const std::string& distribution) {
+    const std::size_t size = state.range(0);
+
+    auto data = [&]() {
+        if (distribution == "Uniform") {
+            return get_or_generate_range_dataset("Uniform", size, qi::bench::make_uniform_values);
+        } else if (distribution == "Clustered") {
+            return get_or_generate_range_dataset("Clustered", size, qi::bench::make_clustered_values);
+        } else if (distribution == "Exponential") {
+            return get_or_generate_range_dataset("Exponential", size, qi::bench::make_exponential_values);
+        } else if (distribution == "Zipf") {
+            return get_or_generate_range_dataset("Zipf", size, qi::bench::make_zipf_values);
+        } else {
+            return get_or_generate_range_dataset("Mixed", size, qi::bench::make_mixed_values);
+        }
+    }();
+
+    auto index = qi::bench::make_index<Segments>(*data);
+    const std::uint64_t target = (*data)[data->size() / 2];
+
+    for (auto _ : state) {
+        const auto* lower = index.find_lower_bound(target);
+        benchmark::DoNotOptimize(lower);
+    }
+
+    state.counters["segments"] = Segments;
+    state.counters["size"] = static_cast<double>(size);
+}
+
+// Benchmark std::lower_bound for comparison
+void BM_Std_LowerBound(benchmark::State& state, const std::string& distribution) {
+    const std::size_t size = state.range(0);
+
+    auto data = [&]() {
+        if (distribution == "Uniform") {
+            return get_or_generate_range_dataset("Uniform", size, qi::bench::make_uniform_values);
+        } else if (distribution == "Clustered") {
+            return get_or_generate_range_dataset("Clustered", size, qi::bench::make_clustered_values);
+        } else if (distribution == "Exponential") {
+            return get_or_generate_range_dataset("Exponential", size, qi::bench::make_exponential_values);
+        } else if (distribution == "Zipf") {
+            return get_or_generate_range_dataset("Zipf", size, qi::bench::make_zipf_values);
+        } else {
+            return get_or_generate_range_dataset("Mixed", size, qi::bench::make_mixed_values);
+        }
+    }();
+
+    const std::uint64_t target = (*data)[data->size() / 2];
+
+    for (auto _ : state) {
+        auto lower = std::lower_bound(data->begin(), data->end(), target);
+        benchmark::DoNotOptimize(lower);
+    }
+
+    state.counters["size"] = static_cast<double>(size);
+}
+
+// Benchmark JazzyIndex::find_upper_bound
+template <std::size_t Segments>
+void BM_JazzyIndex_UpperBound(benchmark::State& state, const std::string& distribution) {
+    const std::size_t size = state.range(0);
+
+    auto data = [&]() {
+        if (distribution == "Uniform") {
+            return get_or_generate_range_dataset("Uniform", size, qi::bench::make_uniform_values);
+        } else if (distribution == "Clustered") {
+            return get_or_generate_range_dataset("Clustered", size, qi::bench::make_clustered_values);
+        } else if (distribution == "Exponential") {
+            return get_or_generate_range_dataset("Exponential", size, qi::bench::make_exponential_values);
+        } else if (distribution == "Zipf") {
+            return get_or_generate_range_dataset("Zipf", size, qi::bench::make_zipf_values);
+        } else {
+            return get_or_generate_range_dataset("Mixed", size, qi::bench::make_mixed_values);
+        }
+    }();
+
+    auto index = qi::bench::make_index<Segments>(*data);
+    const std::uint64_t target = (*data)[data->size() / 2];
+
+    for (auto _ : state) {
+        const auto* upper = index.find_upper_bound(target);
+        benchmark::DoNotOptimize(upper);
+    }
+
+    state.counters["segments"] = Segments;
+    state.counters["size"] = static_cast<double>(size);
+}
+
+// Benchmark std::upper_bound for comparison
+void BM_Std_UpperBound(benchmark::State& state, const std::string& distribution) {
+    const std::size_t size = state.range(0);
+
+    auto data = [&]() {
+        if (distribution == "Uniform") {
+            return get_or_generate_range_dataset("Uniform", size, qi::bench::make_uniform_values);
+        } else if (distribution == "Clustered") {
+            return get_or_generate_range_dataset("Clustered", size, qi::bench::make_clustered_values);
+        } else if (distribution == "Exponential") {
+            return get_or_generate_range_dataset("Exponential", size, qi::bench::make_exponential_values);
+        } else if (distribution == "Zipf") {
+            return get_or_generate_range_dataset("Zipf", size, qi::bench::make_zipf_values);
+        } else {
+            return get_or_generate_range_dataset("Mixed", size, qi::bench::make_mixed_values);
+        }
+    }();
+
+    const std::uint64_t target = (*data)[data->size() / 2];
+
+    for (auto _ : state) {
+        auto upper = std::upper_bound(data->begin(), data->end(), target);
+        benchmark::DoNotOptimize(upper);
+    }
+
+    state.counters["size"] = static_cast<double>(size);
+}
+
+}  // namespace
+
+// Wrapper functions to work around BENCHMARK_CAPTURE limitations with templates
+void BM_JazzyIndex_EqualRange_64_Uniform(benchmark::State& state) {
+    BM_JazzyIndex_EqualRange<64>(state, "Uniform");
+}
+void BM_JazzyIndex_EqualRange_256_Uniform(benchmark::State& state) {
+    BM_JazzyIndex_EqualRange<256>(state, "Uniform");
+}
+void BM_JazzyIndex_EqualRange_512_Uniform(benchmark::State& state) {
+    BM_JazzyIndex_EqualRange<512>(state, "Uniform");
+}
+
+void BM_JazzyIndex_EqualRange_64_Clustered(benchmark::State& state) {
+    BM_JazzyIndex_EqualRange<64>(state, "Clustered");
+}
+void BM_JazzyIndex_EqualRange_256_Clustered(benchmark::State& state) {
+    BM_JazzyIndex_EqualRange<256>(state, "Clustered");
+}
+void BM_JazzyIndex_EqualRange_512_Clustered(benchmark::State& state) {
+    BM_JazzyIndex_EqualRange<512>(state, "Clustered");
+}
+
+void BM_JazzyIndex_LowerBound_64_Uniform(benchmark::State& state) {
+    BM_JazzyIndex_LowerBound<64>(state, "Uniform");
+}
+void BM_JazzyIndex_LowerBound_256_Uniform(benchmark::State& state) {
+    BM_JazzyIndex_LowerBound<256>(state, "Uniform");
+}
+void BM_JazzyIndex_LowerBound_512_Uniform(benchmark::State& state) {
+    BM_JazzyIndex_LowerBound<512>(state, "Uniform");
+}
+
+void BM_JazzyIndex_UpperBound_64_Uniform(benchmark::State& state) {
+    BM_JazzyIndex_UpperBound<64>(state, "Uniform");
+}
+void BM_JazzyIndex_UpperBound_256_Uniform(benchmark::State& state) {
+    BM_JazzyIndex_UpperBound<256>(state, "Uniform");
+}
+void BM_JazzyIndex_UpperBound_512_Uniform(benchmark::State& state) {
+    BM_JazzyIndex_UpperBound<512>(state, "Uniform");
+}
+
+// Register benchmarks for equal_range - Uniform
+BENCHMARK_CAPTURE(BM_Std_EqualRange, Uniform, "Uniform")
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_EqualRange_64_Uniform)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_EqualRange_256_Uniform)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_EqualRange_512_Uniform)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+
+// Register benchmarks for equal_range - Clustered
+BENCHMARK_CAPTURE(BM_Std_EqualRange, Clustered, "Clustered")
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_EqualRange_64_Clustered)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_EqualRange_256_Clustered)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_EqualRange_512_Clustered)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+
+// Register benchmarks for lower_bound - Uniform
+BENCHMARK_CAPTURE(BM_Std_LowerBound, Uniform, "Uniform")
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_LowerBound_64_Uniform)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_LowerBound_256_Uniform)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_LowerBound_512_Uniform)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+
+// Register benchmarks for upper_bound - Uniform
+BENCHMARK_CAPTURE(BM_Std_UpperBound, Uniform, "Uniform")
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_UpperBound_64_Uniform)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_UpperBound_256_Uniform)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+BENCHMARK(BM_JazzyIndex_UpperBound_512_Uniform)
+    ->RangeMultiplier(10)->Range(100, 10000)->Unit(benchmark::kNanosecond);
+
+BENCHMARK_MAIN();
