@@ -23,6 +23,9 @@ namespace {
 // Global dataset cache for parallel pre-generation
 std::unordered_map<std::string, std::shared_ptr<std::vector<std::uint64_t>>> dataset_cache;
 
+// Optional: number of threads for benchmark execution (0 = single-threaded)
+static int benchmark_threads = 0;
+
 // Global flag to control benchmark dataset sizes
 static bool use_full_benchmarks = false;
 
@@ -117,6 +120,15 @@ void pre_generate_datasets_parallel(const std::vector<std::size_t>& sizes) {
     }
 
     std::cout << "Dataset generation complete! Generated " << dataset_cache.size() << " datasets." << std::endl;
+}
+
+// Helper to optionally add threading to benchmarks
+template<typename BenchmarkType>
+auto maybe_add_threads(BenchmarkType* bench) -> decltype(bench) {
+    if (benchmark_threads > 0) {
+        return bench->Threads(benchmark_threads);
+    }
+    return bench;
 }
 
 // Baseline: std::lower_bound benchmarks for comparison
@@ -402,41 +414,44 @@ void register_uniform_suite(std::size_t size) {
     const std::string base =
         "JazzyIndex/Uniform/S" + std::to_string(Segments) + "/N" + std::to_string(size);
 
-    benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
-                                 [data, mid_target](benchmark::State& state) {
-                                     auto index = qi::bench::make_index<Segments>(*data);
-                                     for (auto _ : state) {
-                                         const auto* result = index.find(mid_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                     [data, mid_target](benchmark::State& state) {
+                                         auto index = qi::bench::make_index<Segments>(*data);
+                                         for (auto _ : state) {
+                                             const auto* result = index.find(mid_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
-                                 [data, end_target](benchmark::State& state) {
-                                     auto index = qi::bench::make_index<Segments>(*data);
-                                     for (auto _ : state) {
-                                         const auto* result = index.find(end_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                     [data, end_target](benchmark::State& state) {
+                                         auto index = qi::bench::make_index<Segments>(*data);
+                                         for (auto _ : state) {
+                                             const auto* result = index.find(end_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
-                                 [data, miss_target](benchmark::State& state) {
-                                     auto index = qi::bench::make_index<Segments>(*data);
-                                     for (auto _ : state) {
-                                         const auto* result = index.find(miss_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                     [data, miss_target](benchmark::State& state) {
+                                         auto index = qi::bench::make_index<Segments>(*data);
+                                         for (auto _ : state) {
+                                             const auto* result = index.find(miss_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
 }
 
@@ -462,41 +477,44 @@ void register_distribution_suite(const std::string& name,
     const std::string base = "JazzyIndex/" + name + "/S" + std::to_string(Segments) +
                              "/N" + std::to_string(size);
 
-    benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
-                                 [data, mid_target](benchmark::State& state) {
-                                     auto index = qi::bench::make_index<Segments>(*data);
-                                     for (auto _ : state) {
-                                         const auto* result = index.find(mid_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                     [data, mid_target](benchmark::State& state) {
+                                         auto index = qi::bench::make_index<Segments>(*data);
+                                         for (auto _ : state) {
+                                             const auto* result = index.find(mid_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
-                                 [data, end_target](benchmark::State& state) {
-                                     auto index = qi::bench::make_index<Segments>(*data);
-                                     for (auto _ : state) {
-                                         const auto* result = index.find(end_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                     [data, end_target](benchmark::State& state) {
+                                         auto index = qi::bench::make_index<Segments>(*data);
+                                         for (auto _ : state) {
+                                             const auto* result = index.find(end_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
-    benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
-                                 [data, miss_target](benchmark::State& state) {
-                                     auto index = qi::bench::make_index<Segments>(*data);
-                                     for (auto _ : state) {
-                                         const auto* result = index.find(miss_target);
-                                         benchmark::DoNotOptimize(result);
-                                     }
-                                     state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data->size());
-                                 })
-        ->Unit(benchmark::kNanosecond);
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                     [data, miss_target](benchmark::State& state) {
+                                         auto index = qi::bench::make_index<Segments>(*data);
+                                         for (auto _ : state) {
+                                             const auto* result = index.find(miss_target);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 
 }
 
@@ -794,6 +812,20 @@ int main(int argc, char** argv) {
             --i;
         } else if (arg == "--full-benchmarks") {
             use_full_benchmarks = true;
+            // Remove this flag so benchmark library doesn't see it
+            for (int j = i; j < argc - 1; ++j) {
+                argv[j] = argv[j + 1];
+            }
+            --argc;
+            --i;
+        } else if (arg.find("--benchmark_threads=") == 0) {
+            try {
+                benchmark_threads = std::stoi(arg.substr(20));  // Length of "--benchmark_threads="
+                std::cout << "Running benchmarks with " << benchmark_threads << " threads per benchmark" << std::endl;
+            } catch (...) {
+                std::cerr << "Error: Invalid value for --benchmark_threads" << std::endl;
+                return 1;
+            }
             // Remove this flag so benchmark library doesn't see it
             for (int j = i; j < argc - 1; ++j) {
                 argv[j] = argv[j + 1];
