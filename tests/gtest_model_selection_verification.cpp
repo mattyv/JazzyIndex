@@ -15,13 +15,19 @@
 
 namespace {
 
-// Helper to extract model types from JSON export
+// Helper to extract SEGMENT model types from JSON export (excludes segment_finder)
 std::vector<std::string> extract_model_types(const std::string& json) {
     std::vector<std::string> models;
+
+    // Find the "segments" array section
+    std::size_t segments_start = json.find("\"segments\":");
+    if (segments_start == std::string::npos) return models;
+
+    // Extract only model_types within the segments array
     std::regex model_regex(R"xxx("model_type":\s*"(\w+)")xxx");
     std::smatch match;
 
-    std::string::const_iterator search_start(json.cbegin());
+    std::string::const_iterator search_start(json.begin() + segments_start);
     while (std::regex_search(search_start, json.cend(), match, model_regex)) {
         models.push_back(match[1]);
         search_start = match.suffix().first;

@@ -75,6 +75,58 @@ inline constexpr double NUMERICAL_TOLERANCE = 1e-10;
 inline constexpr double MIN_DISTRIBUTION_SCALE = 1e-6;
 // Minimum scale parameter for distributions to prevent division by zero
 
+// Model for finding which segment contains a value
+// Treats segment boundaries as data points and fits a model
+struct SegmentFinderModel {
+    ModelType model_type{ModelType::LINEAR};
+    uint32_t max_error{0};
+
+    // Model parameters (same structure as Segment for consistency)
+    union {
+        struct {
+            float slope;
+            float intercept;
+        } linear;
+        struct {
+            float a;
+            float b;
+            float c;
+        } quadratic;
+        struct {
+            float a;
+            float b;
+            float c;
+            float d;
+        } cubic;
+    } params{};
+
+    // Predict segment index from a value
+    [[nodiscard]] std::size_t predict(double value) const noexcept {
+        switch (model_type) {
+            case ModelType::LINEAR: {
+                const double pred = std::fma(value, params.linear.slope, params.linear.intercept);
+                return static_cast<std::size_t>(std::max(0.0, pred));
+            }
+            case ModelType::QUADRATIC: {
+                const double pred = std::fma(value,
+                                            std::fma(value, params.quadratic.a, params.quadratic.b),
+                                            params.quadratic.c);
+                return static_cast<std::size_t>(std::max(0.0, pred));
+            }
+            case ModelType::CUBIC: {
+                const double pred = std::fma(value,
+                                            std::fma(value,
+                                                    std::fma(value, params.cubic.a, params.cubic.b),
+                                                    params.cubic.c),
+                                            params.cubic.d);
+                return static_cast<std::size_t>(std::max(0.0, pred));
+            }
+            default:
+                return 0;
+        }
+    }
+};
+
 // Segment descriptor with optimal model
 template <typename T>
 struct alignas(64) Segment {  // Cache line aligned
@@ -622,18 +674,9 @@ public:
             return;
         }
 
-        // Build quantile-based segments with single-pass uniformity detection
+        // Build quantile-based segments
         const std::size_t actual_segments = std::min(NumSegments, size_);
         num_segments_ = actual_segments;
-
-        // Precompute uniformity parameters before loop
-        const double total_range = static_cast<double>(std::invoke(key_extract_, max_)) -
-                                   static_cast<double>(std::invoke(key_extract_, min_));
-        const double expected_spacing = (num_segments_ > 1 && total_range >= detail::ZERO_RANGE_THRESHOLD)
-            ? total_range / static_cast<double>(num_segments_)
-            : 0.0;
-        const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
-        is_uniform_ = true;  // Assume uniform until proven otherwise
 
         for (std::size_t i = 0; i < actual_segments; ++i) {
             const std::size_t start = (i * size_) / actual_segments;
@@ -651,15 +694,6 @@ public:
                     "Input data is not sorted. JazzyIndex requires sorted data. "
                     "Please sort your data before building the index."
                 );
-            }
-
-            // Check uniformity inline (while min/max values are hot in cache)
-            if (is_uniform_ && num_segments_ > 1 && total_range >= detail::ZERO_RANGE_THRESHOLD) {
-                const double segment_range = static_cast<double>(std::invoke(key_extract_, seg.max_val)) -
-                                            static_cast<double>(std::invoke(key_extract_, seg.min_val));
-                if (std::abs(segment_range - expected_spacing) > tolerance) {
-                    is_uniform_ = false;
-                }
             }
 
             // Analyze segment and choose best model
@@ -701,10 +735,8 @@ public:
             }
         }
 
-        // Compute scale factor for O(1) segment lookup if data is uniform
-        if (is_uniform_ && total_range >= detail::ZERO_RANGE_THRESHOLD) {
-            segment_scale_ = static_cast<double>(num_segments_) / total_range;
-        }
+        // Build model for finding segments
+        build_segment_finder();
     }
 
     [[nodiscard]] const T* find(const T& key) const {
@@ -831,10 +863,24 @@ public:
     [[nodiscard]] const T* find_lower_bound(const T& value) const {
         const T* end = base_ + size_;
 
+        // Handle empty case
+        if (size_ == 0) {
+            return end;
+        }
+
+        // Handle out-of-range values
+        if (comp_(value, base_[0])) {
+            return base_;  // Value less than min, return beginning
+        }
+        if (comp_(base_[size_ - 1], value)) {
+            return end;  // Value greater than max, return end
+        }
+
         // Use the existing prediction mechanism to get close
         const auto* seg = find_segment(value);
         if (seg == nullptr) {
-            return end;
+            // Shouldn't happen for in-range values, but fall back to binary search
+            return std::lower_bound(base_, end, value, comp_);
         }
 
         std::size_t predicted_index = seg->predict(value, key_extract_);
@@ -867,10 +913,24 @@ public:
     [[nodiscard]] const T* find_upper_bound(const T& value) const {
         const T* end = base_ + size_;
 
+        // Handle empty case
+        if (size_ == 0) {
+            return end;
+        }
+
+        // Handle out-of-range values
+        if (comp_(value, base_[0])) {
+            return base_;  // Value less than min, return beginning
+        }
+        if (comp_(base_[size_ - 1], value)) {
+            return end;  // Value greater than max, return end
+        }
+
         // Similar to lower_bound, but finds one past the last occurrence
         const auto* seg = find_segment(value);
         if (seg == nullptr) {
-            return end;
+            // Shouldn't happen for in-range values, but fall back to binary search
+            return std::upper_bound(base_, end, value, comp_);
         }
 
         std::size_t predicted_index = seg->predict(value, key_extract_);
@@ -927,54 +987,145 @@ public:
 
 private:
 
+    // Build a model over segment boundaries to predict which segment contains a value
+    void build_segment_finder() {
+        if (num_segments_ <= 1) {
+            // Single segment: constant model always returns segment 0
+            segment_finder_.model_type = detail::ModelType::LINEAR;
+            segment_finder_.max_error = 0;
+            segment_finder_.params.linear.slope = 0.0f;
+            segment_finder_.params.linear.intercept = 0.0f;
+            return;
+        }
+
+        // Create data points: (segment.min_val -> segment_index)
+        // We're modeling: segment_index = f(value)
+        const double min_val = static_cast<double>(std::invoke(key_extract_, segments_[0].min_val));
+        const double max_val = static_cast<double>(std::invoke(key_extract_, segments_[num_segments_ - 1].max_val));
+        const double value_range = max_val - min_val;
+
+        // Handle constant case (all segment boundaries have same value)
+        if (value_range < detail::ZERO_RANGE_THRESHOLD) {
+            segment_finder_.model_type = detail::ModelType::LINEAR;
+            segment_finder_.max_error = 0;
+            segment_finder_.params.linear.slope = 0.0f;
+            segment_finder_.params.linear.intercept = 0.0f;
+            return;
+        }
+
+        // Fit linear model: segment_index = slope * value + intercept
+        const double slope = static_cast<double>(num_segments_ - 1) / value_range;
+        const double intercept = -slope * min_val;
+
+        // Measure linear prediction error
+        std::size_t max_error = 0;
+        for (std::size_t i = 0; i < num_segments_; ++i) {
+            const double seg_min = static_cast<double>(std::invoke(key_extract_, segments_[i].min_val));
+            const double predicted = std::fma(seg_min, slope, intercept);
+            const double error = std::abs(predicted - static_cast<double>(i));
+            max_error = std::max(max_error, static_cast<std::size_t>(std::ceil(error)));
+        }
+
+        // For now, use linear model (future: could try quadratic/cubic for complex distributions)
+        segment_finder_.model_type = detail::ModelType::LINEAR;
+        segment_finder_.max_error = static_cast<uint32_t>(std::min<std::size_t>(max_error, std::numeric_limits<uint32_t>::max()));
+        segment_finder_.params.linear.slope = static_cast<float>(slope);
+        segment_finder_.params.linear.intercept = static_cast<float>(intercept);
+    }
+
     [[nodiscard]] const detail::Segment<T>* find_segment(const T& value) const noexcept {
         if (num_segments_ == 0) {
             return nullptr;
         }
 
-        // Fast path: O(1) arithmetic lookup for uniform data
-        if (is_uniform_) {
-            const double offset = static_cast<double>(std::invoke(key_extract_, value)) -
-                                 static_cast<double>(std::invoke(key_extract_, min_));
-            std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
-
-            // Clamp to valid range
-            if (seg_idx >= num_segments_) {
-                seg_idx = num_segments_ - 1;
-            }
-
-            // Verify we got the right segment (should always be true for uniform data)
-            const auto& seg = segments_[seg_idx];
-            if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
-                return &seg;
-            }
-
-            // Fallback to binary search if arithmetic failed (rare)
+        // Single segment case
+        if (num_segments_ == 1) {
+            return &segments_[0];
         }
 
-        // Slow path: Binary search through segments for skewed data
-        std::size_t left = 0;
-        std::size_t right = num_segments_;
+        // Use model to predict segment index
+        const double key_val = static_cast<double>(std::invoke(key_extract_, value));
+        std::size_t predicted_seg = segment_finder_.predict(key_val);
 
-        while (left < right) {
-            const std::size_t mid = left + (right - left) / 2;
+        // Clamp to valid range
+        if (predicted_seg >= num_segments_) {
+            predicted_seg = num_segments_ - 1;
+        }
 
-            if (comp_(value, segments_[mid].min_val)) {
-                right = mid;
-            } else if (comp_(segments_[mid].max_val, value)) {
-                left = mid + 1;
-            } else {
-                // value is within this segment
-                return &segments_[mid];
+        // Check predicted segment first
+        const auto& predicted = segments_[predicted_seg];
+        if (!comp_(value, predicted.min_val) && !comp_(predicted.max_val, value)) {
+            return &predicted;
+        }
+
+        // Prediction was off - use exponential search nearby
+        const std::size_t max_radius = std::max<std::size_t>(
+            segment_finder_.max_error + 2,
+            4  // minimum search radius
+        );
+
+        // Determine search direction
+        const bool search_left = comp_(value, predicted.min_val);
+
+        if (search_left) {
+            // Search leftward with exponential expansion
+            std::size_t right_boundary = predicted_seg;
+
+            for (std::size_t radius = 1; radius <= max_radius; radius <<= 1) {
+                if (right_boundary == 0) break;
+
+                const std::size_t left_pos = (predicted_seg >= radius) ? (predicted_seg - radius) : 0;
+                if (left_pos >= right_boundary) break;
+
+                // Check segments in range [left_pos, right_boundary)
+                for (std::size_t i = left_pos; i < right_boundary; ++i) {
+                    const auto& seg = segments_[i];
+                    if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
+                        return &seg;
+                    }
+                }
+
+                right_boundary = left_pos;
+            }
+
+            // Check remaining left segments
+            for (std::size_t i = 0; i < right_boundary; ++i) {
+                const auto& seg = segments_[i];
+                if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
+                    return &seg;
+                }
+            }
+        } else {
+            // Search rightward with exponential expansion
+            std::size_t left_boundary = predicted_seg + 1;
+
+            for (std::size_t radius = 1; radius <= max_radius; radius <<= 1) {
+                const std::size_t right_pos = std::min<std::size_t>(predicted_seg + radius + 1, num_segments_);
+                if (right_pos <= left_boundary) break;
+
+                // Check segments in range [left_boundary, right_pos)
+                for (std::size_t i = left_boundary; i < right_pos; ++i) {
+                    const auto& seg = segments_[i];
+                    if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
+                        return &seg;
+                    }
+                }
+
+                left_boundary = right_pos;
+            }
+
+            // Check remaining right segments
+            for (std::size_t i = left_boundary; i < num_segments_; ++i) {
+                const auto& seg = segments_[i];
+                if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
+                    return &seg;
+                }
             }
         }
 
-        // Edge case: if we're past all segments, return last segment
-        if (left > 0 && left >= num_segments_) {
-            return &segments_[num_segments_ - 1];
-        }
-
-        return left < num_segments_ ? &segments_[left] : nullptr;
+        // Value not found in any segment - shouldn't happen for values within range
+        // Return nullptr to indicate segment not found
+        return nullptr;
     }
 
     [[nodiscard]] bool equal(const T& lhs, const T& rhs) const {
@@ -993,8 +1144,7 @@ private:
     KeyExtractor key_extract_{};
     Compare comp_{};
     std::size_t num_segments_{0};
-    bool is_uniform_{false};
-    double segment_scale_{0.0};
+    detail::SegmentFinderModel segment_finder_{};
     std::array<detail::Segment<T>, NumSegments> segments_{};
 };
 
