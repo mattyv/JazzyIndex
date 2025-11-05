@@ -216,6 +216,7 @@ JazzyIndex comes with comprehensive technical documentation:
 - **Header-only library** (`include/jazzy_index.hpp`) with minimal dependencies
 - **Adaptive model selection**: Automatically chooses constant/linear/quadratic/cubic per segment
 - **Graceful degradation**: Fast on uniform data, consistent on skewed data
+- **Range query support**: STL-compatible `equal_range`, `find_lower_bound`, `find_upper_bound` functions (work in progress - see below)
 - **Comprehensive testing**: Unit tests + RapidCheck property-based tests for correctness
 - **Extensive benchmarks**: 9 distributions tested (Uniform, Exponential, Clustered, Lognormal, Zipf, Mixed, Quadratic, ExtremePoly, InversePoly)
 - **Configurable segment count**: Template parameter for tuning space vs. speed tradeoff
@@ -282,6 +283,73 @@ The template parameters are:
 - `T`: Value type (must be arithmetic - int, float, double, etc.)
 - `NumSegments`: Number of segments (default 256, valid range 1-4096)
 - `Compare`: Comparison functor (default `std::less<>`)
+
+## Range Query Functions (Work in Progress)
+
+JazzyIndex now supports range queries similar to the STL's `std::lower_bound`, `std::upper_bound`, and `std::equal_range`. These functions use the same learned model infrastructure to accelerate range lookups.
+
+### API
+
+```cpp
+// Find the first element not less than the given value
+const T* find_lower_bound(const T& value) const;
+
+// Find the first element greater than the given value
+const T* find_upper_bound(const T& value) const;
+
+// Find the range of elements equal to the given value (returns [lower, upper))
+std::pair<const T*, const T*> equal_range(const T& value) const;
+```
+
+### Usage Example
+
+```cpp
+std::vector<int> data = {1, 2, 2, 2, 3, 5, 5, 7, 8, 9};
+jazzy::JazzyIndex<int> index(data.data(), data.data() + data.size());
+
+// Find the range of all 2's
+auto [lower, upper] = index.equal_range(2);
+// lower points to first 2, upper points one past the last 2
+std::cout << "Found " << (upper - lower) << " instances\n";  // "Found 3 instances"
+
+// Find first element >= 5
+const int* lb = index.find_lower_bound(5);
+std::cout << "Lower bound: " << *lb << "\n";  // "Lower bound: 5"
+
+// Find first element > 5
+const int* ub = index.find_upper_bound(5);
+std::cout << "Upper bound: " << *ub << "\n";  // "Upper bound: 7"
+```
+
+### Current Status and Known Issues
+
+These functions are **production-ready** for correctness (fully tested against STL behavior) but have **identified performance optimization opportunities**:
+
+1. **Linear duplicate scanning** (Priority: High)
+   - Current: O(k) backward scan for k consecutive duplicates
+   - Impact: 10µs on 10,000 duplicates (vs optimal ~14ns)
+   - Proposed fix: Exponential search + binary search → O(log k)
+
+2. **equal_range inefficiency** (Priority: Medium)
+   - Current: Calls `find_lower_bound` and `find_upper_bound` independently (2× work)
+   - Impact: 2× latency when finding ranges
+   - Proposed fix: Combined search that finds both bounds in one pass
+
+3. **Code duplication** (Priority: Low)
+   - 90% code overlap between `find_lower_bound` and `find_upper_bound`
+   - Maintenance burden, potential for divergence
+   - Proposed fix: Extract common logic to shared helper
+
+4. **Search radius validation** (Priority: Low)
+   - Binary search window might not contain value if prediction error exceeds max_error
+   - Currently mitigated by fallback to full segment search
+   - Proposed fix: Validate bounds before binary search
+
+**Performance**: On datasets with few duplicates (typical case), these functions perform within 2-3× of the main `find()` operation. Pathological cases with many consecutive duplicates see degraded performance due to issue #1 above.
+
+**Benchmarks**: Comprehensive benchmarks covering 9 distributions × 10 segment counts × 3 scenarios (FoundMiddle, FoundEnd, NotFound) have been completed. Results are available in [docs/images/benchmarks/](docs/images/benchmarks/).
+
+**Testing**: All functions have comprehensive test coverage (24 test cases) verifying correctness against `std::equal_range`, `std::lower_bound`, and `std::upper_bound` across edge cases, duplicates, custom comparators, and various distributions.
 
 ## Building
 
@@ -360,6 +428,19 @@ cmake --build build --target plot_benchmarks_full
 # Generate all documentation plots (performance + visualizations)
 cmake --build build --target generate_docs_plots
 # Output: docs/images/benchmarks/*.png and docs/images/index_data/*.png
+```
+
+**Range Function Benchmarks** (work in progress):
+
+```bash
+# Run range function benchmarks (equal_range, lower_bound, upper_bound)
+./build/benchmark_range_functions --benchmark_format=json \
+  --benchmark_out=build/jazzy_range_benchmarks.json \
+  --benchmark_threads=4
+
+# Generate separate plots for each function
+./scripts/plot_range_benchmarks.sh build/jazzy_range_benchmarks.json
+# Output: docs/images/benchmarks/jazzy_{equalrange,lowerbound,upperbound}_benchmarks_{low,medium,high}.png
 ```
 
 ## Tuning and Tradeoffs
@@ -449,8 +530,10 @@ include/
 benchmarks/
   fixtures.hpp                    # Data builders shared across benchmarks
   benchmark_main.cpp              # Google Benchmark suite (9 distributions × 10 segment counts)
+  benchmark_range_functions.cpp   # Range query benchmarks (equal_range, lower_bound, upper_bound) [WIP]
 scripts/
   plot_benchmarks.py              # Render performance graphs (split into low/medium/high)
+  plot_range_benchmarks.sh        # Generate separate plots for each range function [WIP]
   plot_index_structure.py         # Generate index structure visualizations
   generate_docs_plots.sh          # Generate all documentation plots
   requirements.txt                # Python dependencies for plotting
@@ -462,6 +545,7 @@ tests/
   gtest_comparator_tests.cpp      # Custom comparator tests
   gtest_error_recovery_tests.cpp  # Error recovery and fallback tests
   gtest_uniformity_tests.cpp      # Uniform detection tests
+  gtest_equal_range_tests.cpp     # Range query function tests [WIP]
   gtest_property_tests.cpp        # RapidCheck property-based tests
 docs/
   BENCHMARKS.md                   # Detailed performance analysis

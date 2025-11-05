@@ -69,9 +69,9 @@ LOWER_BOUND_LINEWIDTH = 2.5
 SCENARIO_ORDER = ["Found", "FoundMiddle", "FoundEnd", "NotFound"]
 SCENARIO_STYLES = {
     "Found": "-",           # Solid line
-    "FoundMiddle": "--",    # Dashed line
+    "FoundMiddle": "-.",    # Dash-dot line (matches main benchmarks)
     "FoundEnd": ":",        # Dotted line
-    "NotFound": "-.",       # Dash-dot line
+    "NotFound": "--",       # Dashed line (matches main benchmarks)
 }
 SCENARIO_LINE_WIDTHS = {
     "Found": 2.5,
@@ -126,15 +126,24 @@ def get_cpu_name() -> str:
 def parse_benchmark_name(name: str) -> BenchmarkKey:
     """
     Parse benchmark names of the form:
-        JazzyIndex/<Distribution>/S<Segments>/N<Size>/<Scenario>
-        LowerBound/<Distribution>/N<Size>/<Scenario>
+        JazzyIndex/<Distribution>/S<Segments>/N<Size>/<Scenario>[/threads:N]
+        LowerBound/<Distribution>/N<Size>/<Scenario>[/threads:N]
+        BM_JazzyIndex_<Function>_<Segments>_<Distribution>/<Scenario>/<Size>[/threads:N]
+        BM_Std_<Function>/<Distribution>/<Scenario>/<Size>[/threads:N]
 
     Returns: (implementation, distribution, scenario, segments, size)
-    where implementation is "JazzyIndex" or "LowerBound", segments is None for LowerBound
+    where implementation is "JazzyIndex" or "LowerBound" or function name, segments is None for std:: baselines
+
+    Note: The optional /threads:N suffix (added by Google Benchmark when using
+    multithreading) is stripped before parsing.
     """
     parts = name.split("/")
 
-    # Parse JazzyIndex format
+    # Strip optional threads:N suffix
+    if parts and parts[-1].startswith("threads:"):
+        parts = parts[:-1]
+
+    # Parse JazzyIndex format (old style)
     if parts[0] == "JazzyIndex":
         if len(parts) != 5:
             raise ValueError(f"Unexpected JazzyIndex benchmark format: {name}")
@@ -145,7 +154,7 @@ def parse_benchmark_name(name: str) -> BenchmarkKey:
         size = int(size_part[1:])
         return "JazzyIndex", distribution, scenario, segments, size
 
-    # Parse LowerBound format
+    # Parse LowerBound format (old style)
     elif parts[0] == "LowerBound":
         if len(parts) != 4:
             raise ValueError(f"Unexpected LowerBound benchmark format: {name}")
@@ -154,6 +163,40 @@ def parse_benchmark_name(name: str) -> BenchmarkKey:
             raise ValueError(f"Unexpected encoding of size in: {name}")
         size = int(size_part[1:])
         return "LowerBound", distribution, scenario, None, size
+
+    # Parse new-style range function benchmarks: BM_JazzyIndex_<Function>_<Segments>_<Distribution>/<Scenario>/<Size>
+    elif parts[0].startswith("BM_JazzyIndex_"):
+        # Extract function, segments, and distribution from benchmark name
+        # Example: BM_JazzyIndex_EqualRange_64_Uniform/FoundMiddle/100
+        benchmark_parts = parts[0].split("_")
+        if len(benchmark_parts) < 5:  # BM, JazzyIndex, Function, Segments, Distribution
+            raise ValueError(f"Unexpected BM_JazzyIndex benchmark format: {name}")
+
+        function = benchmark_parts[2]  # EqualRange, LowerBound, or UpperBound
+        segments = int(benchmark_parts[3])  # 64, 256, 512
+        distribution = benchmark_parts[4]  # Uniform, Clustered, etc.
+
+        if len(parts) < 3:
+            raise ValueError(f"Missing scenario or size in benchmark: {name}")
+
+        scenario = parts[1]  # FoundMiddle, FoundEnd, or NotFound
+        size = int(parts[2])
+
+        return "JazzyIndex", distribution, scenario, segments, size
+
+    # Parse std:: baseline benchmarks: BM_Std_<Function>/<Distribution>/<Scenario>/<Size>
+    elif parts[0].startswith("BM_Std_"):
+        # Example: BM_Std_EqualRange/Uniform/FoundMiddle/100
+        function = parts[0].split("_")[2]  # EqualRange, LowerBound, or UpperBound
+
+        if len(parts) < 4:
+            raise ValueError(f"Missing distribution, scenario, or size in benchmark: {name}")
+
+        distribution = parts[1]
+        scenario = parts[2]  # FoundMiddle, FoundEnd, or NotFound
+        size = int(parts[3])
+
+        return f"Std{function}", distribution, scenario, None, size
 
     else:
         raise ValueError(f"Unknown benchmark type: {parts[0]}")
@@ -188,7 +231,11 @@ def load_benchmark_data(path: Path):
         # Use a key that identifies implementation + segments
         if impl == "LowerBound":
             impl_key = ("LowerBound", "baseline")
+        elif impl.startswith("Std"):
+            # Preserve std:: function names (StdEqualRange, StdLowerBound, StdUpperBound)
+            impl_key = (impl, None)
         else:
+            # JazzyIndex benchmarks
             impl_key = ("JazzyIndex", segments)
 
         grouped[distribution][scenario][impl_key].append((size, time_ns))
@@ -226,22 +273,48 @@ def plot_segment_group(grouped, output: Path, segment_list: List[int], group_nam
             linestyle = SCENARIO_STYLES.get(scenario, "-")
             scenario_label = SCENARIO_LABELS.get(scenario, scenario)
 
-            for impl_key, points in sorted(by_impl.items()):
+            # Sort with custom key to handle None values (baselines)
+            def sort_key(item):
+                impl_key, _ = item
+                impl, seg_or_baseline = impl_key
+                # Put baselines first, then sort by segment count
+                if seg_or_baseline is None:
+                    return (0, 0, impl)  # Baselines first, sorted by name
+                elif isinstance(seg_or_baseline, str):
+                    return (0, 1, impl)  # String baselines (e.g., "baseline") after None
+                else:
+                    return (1, seg_or_baseline, "")  # Then by segment count (numeric)
+
+            for impl_key, points in sorted(by_impl.items(), key=sort_key):
                 if not points:
                     continue
 
                 impl, seg_or_baseline = impl_key
 
-                # Filter: only plot if segment is in our group (or it's LowerBound)
+                # Filter: only plot if segment is in our group (or it's a baseline)
                 if impl == "JazzyIndex" and seg_or_baseline not in segment_list:
+                    continue
+                # Also skip baselines that aren't for this function/scenario
+                if seg_or_baseline is None and not (impl.startswith("Std") or impl == "LowerBound"):
                     continue
 
                 points.sort(key=lambda item: item[0])
                 sizes = [size for size, _ in points]
                 times = [time for _, time in points]
 
-                if impl == "LowerBound":
-                    # Plot std::lower_bound as thick black line
+                if impl == "LowerBound" or impl.startswith("Std"):
+                    # Plot std:: baselines as thick black line
+                    # Map function names to display labels
+                    baseline_label = impl
+                    if impl == "LowerBound":
+                        baseline_label = "std::lower_bound"
+                    elif impl == "StdEqualRange":
+                        baseline_label = "std::equal_range"
+                    elif impl == "StdLowerBound":
+                        baseline_label = "std::lower_bound"
+                    elif impl == "StdUpperBound":
+                        baseline_label = "std::upper_bound"
+
                     ax.plot(
                         sizes,
                         times,
@@ -252,6 +325,7 @@ def plot_segment_group(grouped, output: Path, segment_list: List[int], group_nam
                         linestyle=linestyle,
                         alpha=0.8,
                         zorder=10,  # Draw on top
+                        label=baseline_label if scenario == list(scenarios.keys())[0] else None
                     )
                 else:
                     # Plot JazzyIndex with segment-specific colors
@@ -305,7 +379,35 @@ def plot_segment_group(grouped, output: Path, segment_list: List[int], group_nam
         for seg in segment_list
     ]
 
-    # Add std::lower_bound handle
+    # Detect which std:: function is being benchmarked by checking impl types
+    std_function_name = "std::lower_bound"  # default
+    found_function = False
+    for distribution in grouped:
+        for scenario in grouped[distribution]:
+            for impl_key in grouped[distribution][scenario]:
+                impl, _ = impl_key
+                if impl == "StdEqualRange":
+                    std_function_name = "std::equal_range"
+                    found_function = True
+                    break
+                elif impl == "StdLowerBound":
+                    std_function_name = "std::lower_bound"
+                    found_function = True
+                    break
+                elif impl == "StdUpperBound":
+                    std_function_name = "std::upper_bound"
+                    found_function = True
+                    break
+                elif impl == "LowerBound":
+                    std_function_name = "std::lower_bound"
+                    found_function = True
+                    break
+            if found_function:
+                break
+        if found_function:
+            break
+
+    # Add std:: baseline handle
     lower_bound_handle = Line2D(
         [0],
         [0],
@@ -314,7 +416,7 @@ def plot_segment_group(grouped, output: Path, segment_list: List[int], group_nam
         linestyle="-",
         linewidth=LOWER_BOUND_LINEWIDTH,
         markersize=7,
-        label="std::lower_bound",
+        label=std_function_name,
     )
     segment_handles.append(lower_bound_handle)
 
@@ -332,7 +434,7 @@ def plot_segment_group(grouped, output: Path, segment_list: List[int], group_nam
     ]
 
     cpu_name = get_cpu_name()
-    title = f"JazzyIndex vs std::lower_bound Performance - {group_name.title()} Segments"
+    title = f"JazzyIndex vs {std_function_name} Performance - {group_name.title()} Segments"
     fig.suptitle(title, fontsize=16, fontweight="bold")
     fig.text(0.99, 0.95, cpu_name, ha="right", va="top", fontsize=9, color="gray", transform=fig.transFigure)
     fig.subplots_adjust(bottom=0.18, top=0.90)

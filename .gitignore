@@ -17,3 +17,8 @@ cmake_install.cmake
 
 # Documentation - ignore JSON files, keep PNG plots
 docs/images/index_data/*.json
+
+# Benchmark results (JSON output)
+*_results.json
+threading_results*.json
+benchmark_parallelism_test/

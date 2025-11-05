@@ -22,6 +22,7 @@ option(ENABLE_COVERAGE "Enable coverage instrumentation for tests" OFF)
 
 # Benchmark configuration
 set(BENCHMARK_REPETITIONS "1" CACHE STRING "Number of times to repeat each benchmark (default: 1)")
+set(BENCHMARK_THREADS "0" CACHE STRING "Number of threads per benchmark (0 = single-threaded, default: 0)")
 
 if(BUILD_TESTS OR BUILD_BENCHMARKS)
     include(FetchContent)
@@ -100,6 +101,7 @@ if(BUILD_TESTS)
         tests/gtest_key_value_tests.cpp
         tests/gtest_binary_search_tests.cpp
         tests/gtest_parallel_tests.cpp
+        tests/gtest_equal_range_tests.cpp
     )
     target_link_libraries(jazzy_index_tests PRIVATE
         jazzy_index
@@ -177,6 +179,15 @@ if(BUILD_BENCHMARKS)
         ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
     )
 
+    # Range functions benchmark (equal_range, lower_bound, upper_bound)
+    add_executable(benchmark_range_functions
+        benchmarks/benchmark_range_functions.cpp
+    )
+    target_link_libraries(benchmark_range_functions PRIVATE jazzy_index benchmark::benchmark)
+    target_include_directories(benchmark_range_functions PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
+    )
+
     find_package(Python3 COMPONENTS Interpreter)
     if(Python3_Interpreter_FOUND)
         set(JAZZY_VENV_DIR ${CMAKE_BINARY_DIR}/jazzy_venv)
@@ -201,10 +212,13 @@ if(BUILD_BENCHMARKS)
 
         set(JAZZY_BENCHMARK_JSON ${CMAKE_BINARY_DIR}/jazzy_benchmarks.json)
 
-        # Build benchmark command with optional repetitions
+        # Build benchmark command with optional repetitions and threads
         set(BENCH_CMD $<TARGET_FILE:jazzy_index_benchmarks> --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_JSON})
         if(BENCHMARK_REPETITIONS GREATER 1)
             list(APPEND BENCH_CMD --benchmark_repetitions=${BENCHMARK_REPETITIONS} --benchmark_report_aggregates_only=true)
+        endif()
+        if(BENCHMARK_THREADS GREATER 0)
+            list(APPEND BENCH_CMD --benchmark_threads=${BENCHMARK_THREADS})
         endif()
 
         add_custom_command(
@@ -234,10 +248,13 @@ if(BUILD_BENCHMARKS)
         # Full benchmark suite (up to 1M keys)
         set(JAZZY_BENCHMARK_FULL_JSON ${CMAKE_BINARY_DIR}/jazzy_benchmarks_full.json)
 
-        # Build full benchmark command with optional repetitions
+        # Build full benchmark command with optional repetitions and threads
         set(BENCH_FULL_CMD $<TARGET_FILE:jazzy_index_benchmarks> --full-benchmarks --benchmark_format=json --benchmark_out=${JAZZY_BENCHMARK_FULL_JSON})
         if(BENCHMARK_REPETITIONS GREATER 1)
             list(APPEND BENCH_FULL_CMD --benchmark_repetitions=${BENCHMARK_REPETITIONS} --benchmark_report_aggregates_only=true)
+        endif()
+        if(BENCHMARK_THREADS GREATER 0)
+            list(APPEND BENCH_FULL_CMD --benchmark_threads=${BENCHMARK_THREADS})
         endif()
 
         add_custom_command(
@@ -262,6 +279,41 @@ if(BUILD_BENCHMARKS)
         )
         add_custom_target(plot_benchmarks_full DEPENDS ${JAZZY_BENCHMARK_FULL_PNG})
         add_dependencies(plot_benchmarks_full jazzy_python_env jazzy_benchmark_full_json)
+
+        # Range functions benchmarks (equal_range, lower_bound, upper_bound)
+        set(JAZZY_RANGE_BENCHMARK_JSON ${CMAKE_BINARY_DIR}/jazzy_range_benchmarks.json)
+
+        # Build range benchmark command with optional repetitions and threads
+        set(BENCH_RANGE_CMD $<TARGET_FILE:benchmark_range_functions> --benchmark_format=json --benchmark_out=${JAZZY_RANGE_BENCHMARK_JSON})
+        if(BENCHMARK_REPETITIONS GREATER 1)
+            list(APPEND BENCH_RANGE_CMD --benchmark_repetitions=${BENCHMARK_REPETITIONS} --benchmark_report_aggregates_only=true)
+        endif()
+        if(BENCHMARK_THREADS GREATER 0)
+            list(APPEND BENCH_RANGE_CMD --benchmark_threads=${BENCHMARK_THREADS})
+        endif()
+
+        add_custom_command(
+            OUTPUT ${JAZZY_RANGE_BENCHMARK_JSON}
+            COMMAND ${BENCH_RANGE_CMD}
+            DEPENDS benchmark_range_functions
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMENT "Running JazzyIndex range functions benchmarks (JSON output)"
+            VERBATIM
+        )
+        add_custom_target(jazzy_range_benchmark_json DEPENDS ${JAZZY_RANGE_BENCHMARK_JSON})
+
+        set(JAZZY_RANGE_BENCHMARK_PNG ${JAZZY_DOCS_BENCHMARKS_DIR}/jazzy_range_benchmarks.png)
+        add_custom_command(
+            OUTPUT ${JAZZY_RANGE_BENCHMARK_PNG}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${JAZZY_DOCS_BENCHMARKS_DIR}
+            COMMAND ${JAZZY_VENV_PYTHON} ${JAZZY_PLOT_SCRIPT} --input ${JAZZY_RANGE_BENCHMARK_JSON} --output ${JAZZY_RANGE_BENCHMARK_PNG}
+            DEPENDS ${JAZZY_RANGE_BENCHMARK_JSON} ${JAZZY_PLOT_SCRIPT} ${JAZZY_VENV_PYTHON}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMENT "Generating JazzyIndex range functions benchmark plots in docs/images/benchmarks/"
+            VERBATIM
+        )
+        add_custom_target(plot_range_benchmarks DEPENDS ${JAZZY_RANGE_BENCHMARK_PNG})
+        add_dependencies(plot_range_benchmarks jazzy_python_env jazzy_range_benchmark_json)
 
         # Index visualization target (outputs to committed docs/images/index_data/)
         set(JAZZY_INDEX_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/docs/images/index_data)
