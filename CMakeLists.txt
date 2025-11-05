@@ -39,19 +39,16 @@ if(BUILD_TESTS)
     FetchContent_MakeAvailable(googletest)
 
     # Work around libstdc++-14 incompatibilities with std::format in gtest
-    # Additional workarounds needed for clang-15 with gcc-14's libstdc++
+    # Additional workarounds needed for clang-14/clang-15 with gcc-14's libstdc++
+    # Unconditionally disable all C++20 ranges/format features in GoogleTest
+    # to avoid libstdc++-14 bugs with ranges::subrange and std::format
     set(_GTEST_COMPAT_DEFS
         GTEST_INTERNAL_HAS_STD_FORMAT=0
         GTEST_HAS_STD_WSTRING=0
+        GTEST_INTERNAL_HAS_WSTRING=0
+        GTEST_INTERNAL_HAS_RANGES=0
+        GTEST_INTERNAL_HAS_STRING_VIEW=0
     )
-
-    # Disable problematic features when using older clang with newer libstdc++
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "16.0")
-        list(APPEND _GTEST_COMPAT_DEFS
-            GTEST_INTERNAL_HAS_WSTRING=0
-            GTEST_INTERNAL_HAS_RANGES=0
-        )
-    endif()
 
     foreach(_gtest_target IN ITEMS gtest gtest_main gmock gmock_main)
         if(TARGET ${_gtest_target})
