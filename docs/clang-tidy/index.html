@@ -24,106 +24,14 @@
     <div class="section">
         <h2>Headers (include/*.hpp)</h2>
         <pre>
-[1/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp.
-28531 warnings generated.
-[2/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp.
-58282 warnings generated.
-[3/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp.
-92404 warnings generated.
-[4/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp.
-134512 warnings generated.
-[5/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_utility.hpp.
-145039 warnings generated.
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:13:20: warning: invalid case style for constexpr variable 'kSeed' [readability-identifier-naming]
-   13 | constexpr unsigned kSeed = 42u;
-      |                    ^~~~~
-      |                    K_SEED
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:14:18: warning: invalid case style for constexpr variable 'kExponentialScale' [readability-identifier-naming]
-   14 | constexpr double kExponentialScale = 1.0;
-      |                  ^~~~~~~~~~~~~~~~~
-      |                  K_EXPONENTIAL_SCALE
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:15:23: warning: invalid case style for constexpr variable 'kClusterCount' [readability-identifier-naming]
-   15 | constexpr std::size_t kClusterCount = 5;
-      |                       ^~~~~~~~~~~~~
-      |                       K_CLUSTER_COUNT
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:16:18: warning: invalid case style for constexpr variable 'kClusterSpread' [readability-identifier-naming]
-   16 | constexpr double kClusterSpread = 0.02;
-      |                  ^~~~~~~~~~~~~~
-      |                  K_CLUSTER_SPREAD
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:17:18: warning: invalid case style for constexpr variable 'kLognormalMean' [readability-identifier-naming]
-   17 | constexpr double kLognormalMean = 0.0;
-      |                  ^~~~~~~~~~~~~~
-      |                  K_LOGNORMAL_MEAN
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:18:18: warning: invalid case style for constexpr variable 'kLognormalSigma' [readability-identifier-naming]
-   18 | constexpr double kLognormalSigma = 0.9;
-      |                  ^~~~~~~~~~~~~~~
-      |                  K_LOGNORMAL_SIGMA
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:19:18: warning: invalid case style for constexpr variable 'kZipfA' [readability-identifier-naming]
-   19 | constexpr double kZipfA = 1.2;
-      |                  ^~~~~~
-      |                  K_ZIPF_A
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:20:23: warning: invalid case style for constexpr variable 'kZipfMax' [readability-identifier-naming]
-   20 | constexpr std::size_t kZipfMax = 1'000'000;
-      |                       ^~~~~~~~
-      |                       K_ZIPF_MAX
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:21:18: warning: invalid case style for constexpr variable 'kMixedRatio' [readability-identifier-naming]
-   21 | constexpr double kMixedRatio = 0.5;
-      |                  ^~~~~~~~~~~
-      |                  K_MIXED_RATIO
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:23:74: warning: rvalue reference parameter 'samples' is never moved from inside the function body [cppcoreguidelines-rvalue-reference-param-not-moved]
-   23 | inline std::vector<std::uint64_t> finalize_samples(std::vector<double>&& samples,
-      |                                                                          ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:33:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-   33 |     const double min_d = static_cast<double>(min_value);
-      |           ^~~~~~
-      |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:34:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-   34 |     const double max_d = static_cast<double>(max_value);
-      |           ^~~~~~
-      |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:37:5: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-   37 |     std::uint64_t prev = static_cast<std::uint64_t>(std::llround(clamped));
-      |     ^~~~~~~~~~~~~
-      |     auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:46:9: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-   46 |         std::uint64_t current =
-      |         ^~~~~~~~~~~~~
-      |         auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:83:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-   83 |     const double min_d = static_cast<double>(min_value);
-      |           ^~~~~~
-      |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:84:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-   84 |     const double max_d = static_cast<double>(max_value);
-      |           ^~~~~~
-      |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:107:27: warning: narrowing conversion from 'std::uint64_t' (aka 'unsigned long') to 'value_type' (aka 'double') [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  107 |         samples.push_back(min_value);
-      |                           ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:162:90: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  162 |                                      : std::max<std::size_t>(1, static_cast<std::size_t>(size * exponential_ratio));
-      |                                                                                          ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:219:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  219 |     const double size_d = static_cast<double>(size);
-      |           ^~~~~~
-      |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:227:89: warning: narrowing conversion from 'std::uint64_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  227 |         const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
-      |                                                                                         ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:248:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  248 |     const double size_d = static_cast<double>(size);
-      |           ^~~~~~
-      |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:255:89: warning: narrowing conversion from 'std::uint64_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  255 |         const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
-      |                                                                                         ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:276:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  276 |     const double size_d = static_cast<double>(size);
-      |           ^~~~~~
-      |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/dataset_generators.hpp:283:89: warning: narrowing conversion from 'std::uint64_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  283 |         const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
-      |                                                                                         ^
+[1/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp.
+29751 warnings generated.
+[2/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp.
+63873 warnings generated.
+[3/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp.
+105981 warnings generated.
+[4/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_utility.hpp.
+116508 warnings generated.
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:21:8: warning: invalid case style for struct 'identity' [readability-identifier-naming]
    21 | struct identity {
       |        ^~~~~~~~
@@ -208,8 +116,8 @@
   584 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |                                                  ~~~~~~~~ ^                             ~~~~~~
       |                                                                                _t
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:843:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  843 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:939:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  939 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
       |             ^~~~~~~~~~~
       |             auto
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp:50:16: warning: escaped string literal can be written as a raw string literal [modernize-raw-string-literal]
@@ -220,39 +128,41 @@
    38 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |                                  ^~~~~~~~~~~
       |                                  NUM_SEGMENTS
-Suppressed 144927 warnings (144927 in non-user code).
+Suppressed 116425 warnings (116425 in non-user code).
 Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
         </pre>
     </div>
     <div class="section">
         <h2>Tests (tests/*.cpp)</h2>
         <pre>
-[1/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp.
+[1/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp.
 51362 warnings generated.
-[2/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp.
+[2/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp.
 102679 warnings generated.
-[3/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp.
+[3/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp.
 154174 warnings generated.
-[4/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp.
-205429 warnings generated.
-[5/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp.
-256702 warnings generated.
-[6/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp.
-308071 warnings generated.
-[7/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp.
-364280 warnings generated.
-[8/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp.
-415594 warnings generated.
-[9/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp.
-470293 warnings generated.
-[10/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_property_tests.cpp.
-530671 warnings generated.
-[11/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp.
-582001 warnings generated.
-[12/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_unit_tests.cpp.
-633487 warnings generated.
-[13/13] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/property_tests.cpp.
-689536 warnings generated.
+[4/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_equal_range_tests.cpp.
+205542 warnings generated.
+[5/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp.
+256797 warnings generated.
+[6/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp.
+308070 warnings generated.
+[7/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp.
+359439 warnings generated.
+[8/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp.
+415648 warnings generated.
+[9/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp.
+466962 warnings generated.
+[10/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp.
+521661 warnings generated.
+[11/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_property_tests.cpp.
+582039 warnings generated.
+[12/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp.
+633369 warnings generated.
+[13/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_unit_tests.cpp.
+684855 warnings generated.
+[14/14] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/property_tests.cpp.
+740904 warnings generated.
 /home/runner/work/JazzyIndex/JazzyIndex/build/_deps/rapidcheck-src/include/rapidcheck/Assertions.h:6:9: warning: variadic macro 'RC_INTERNAL_CONDITIONAL_RESULT' used; consider using a 'constexpr' variadic template function [cppcoreguidelines-macro-usage]
     6 | #define RC_INTERNAL_CONDITIONAL_RESULT(                                        \
       |         ^
@@ -5608,12 +5518,12 @@ note: this fix will not be applied because it overlaps with another fix
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:697:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
   697 |                     seg.params.constant.constant_idx = start;
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:843:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  843 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:939:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  939 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
       |             ^~~~~~~~~~~
       |             auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:885:37: warning: 1st argument 'rhs' (passed to 'lhs') looks like it might be swapped with the 2nd, 'lhs' (passed to 'rhs') [readability-suspicious-call-argument]
-  885 |         return !comp_(lhs, rhs) && !comp_(rhs, lhs);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:981:37: warning: 1st argument 'rhs' (passed to 'lhs') looks like it might be swapped with the 2nd, 'lhs' (passed to 'rhs') [readability-suspicious-call-argument]
+  981 |         return !comp_(lhs, rhs) && !comp_(rhs, lhs);
       |                                     ^~~~~ ~~~
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:21:10: note: in the call to 'operator()', declared here
    21 |     bool operator()(const T& lhs, const T& rhs) const {
@@ -6023,7 +5933,7 @@ note: this fix will not be applied because it overlaps with another fix
   227 |     for (int i = 0; i < 100; ++i) {
   228 |         data.push_back(i);
       |         ^
-Suppressed 684926 warnings (684758 in non-user code, 168 NOLINT).
+Suppressed 736126 warnings (735944 in non-user code, 182 NOLINT).
 Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
         </pre>
     </div>
