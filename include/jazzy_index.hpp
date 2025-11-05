@@ -559,6 +559,15 @@ inline constexpr SegmentCount to_segment_count() {
     return static_cast<SegmentCount>(N);
 }
 
+// Forward declarations for parallel build support
+namespace parallel {
+template <typename T, typename Compare, typename KeyExtractor>
+struct BuildTask;
+
+template <typename T, SegmentCount Segments, typename Compare, typename KeyExtractor>
+class ParallelBuilder;
+}  // namespace parallel
+
 template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
 class JazzyIndex {
     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
@@ -798,9 +807,27 @@ public:
     [[nodiscard]] std::size_t num_segments() const noexcept { return num_segments_; }
     [[nodiscard]] bool is_built() const noexcept { return base_ != nullptr; }
 
-    // Friend declaration for export functionality
+    // Parallel build API - requires #include "jazzy_index_parallel.hpp"
+    // Prepare independent build tasks for custom threading model
+    std::vector<parallel::BuildTask<T, Compare, KeyExtractor>>
+    prepare_build_tasks(const T* first, const T* last,
+                       Compare comp = Compare{},
+                       KeyExtractor key_extract = KeyExtractor{});
+
+    // Finalize build after executing tasks
+    void finalize_build(const std::vector<detail::SegmentAnalysis<T>>& results);
+
+    // Parallel build using std::async (convenience method)
+    void build_parallel(const T* first, const T* last,
+                       Compare comp = Compare{},
+                       KeyExtractor key_extract = KeyExtractor{});
+
+    // Friend declarations
     template <typename U, SegmentCount S, typename C, typename K>
     friend std::string export_index_metadata(const JazzyIndex<U, S, C, K>& index);
+
+    template <typename U, SegmentCount S, typename C, typename K>
+    friend class parallel::ParallelBuilder;
 
 private:
 
