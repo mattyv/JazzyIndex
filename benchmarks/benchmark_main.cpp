@@ -23,9 +23,6 @@ namespace {
 // Global dataset cache for parallel pre-generation
 std::unordered_map<std::string, std::shared_ptr<std::vector<std::uint64_t>>> dataset_cache;
 
-// Optional: number of threads for benchmark execution (0 = single-threaded)
-int benchmark_threads = 0;
-
 // Global flag to control benchmark dataset sizes
 static bool use_full_benchmarks = false;
 
@@ -120,15 +117,6 @@ void pre_generate_datasets_parallel(const std::vector<std::size_t>& sizes) {
     }
 
     std::cout << "Dataset generation complete! Generated " << dataset_cache.size() << " datasets." << std::endl;
-}
-
-// Helper to optionally add threading to benchmarks
-template<typename Benchmark>
-Benchmark* maybe_add_threads(Benchmark* bench) {
-    if (benchmark_threads > 0) {
-        return bench->Threads(benchmark_threads);
-    }
-    return bench;
 }
 
 // Baseline: std::lower_bound benchmarks for comparison
@@ -806,19 +794,6 @@ int main(int argc, char** argv) {
             --i;
         } else if (arg == "--full-benchmarks") {
             use_full_benchmarks = true;
-            // Remove this flag so benchmark library doesn't see it
-            for (int j = i; j < argc - 1; ++j) {
-                argv[j] = argv[j + 1];
-            }
-            --argc;
-            --i;
-        } else if (arg.find("--benchmark_threads=") == 0) {
-            try {
-                benchmark_threads = std::stoi(arg.substr(20));  // Length of "--benchmark_threads="
-                std::cout << "Will run benchmarks with " << benchmark_threads << " threads" << std::endl;
-            } catch (...) {
-                std::cerr << "Invalid value for --benchmark_threads" << std::endl;
-            }
             // Remove this flag so benchmark library doesn't see it
             for (int j = i; j < argc - 1; ++j) {
                 argv[j] = argv[j + 1];
