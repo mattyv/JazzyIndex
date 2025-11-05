@@ -377,7 +377,7 @@ The test suite includes deterministic unit tests plus RapidCheck property-based 
 
 ### Code Coverage
 
-**Current Coverage: 84.8%** - [![View Report](https://img.shields.io/badge/view-report-blue)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html)
+[![View Report](https://img.shields.io/badge/view-report-blue)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html)
 
 Coverage is **automatically tracked** by CI and updated on every push to `main`. View the detailed line-by-line [HTML coverage report](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html).
 
