@@ -39,25 +39,37 @@ if(BUILD_TESTS)
     FetchContent_MakeAvailable(googletest)
 
     # Work around libstdc++-14 incompatibilities with std::format in gtest
-    # Additional workarounds needed for clang-14/clang-15 with gcc-14's libstdc++
-    # Unconditionally disable all C++20 ranges/format features in GoogleTest
-    # to avoid libstdc++-14 bugs with ranges::subrange and std::format
-    set(_GTEST_COMPAT_DEFS
-        GTEST_INTERNAL_HAS_STD_FORMAT=0
-        GTEST_HAS_STD_WSTRING=0
-        GTEST_INTERNAL_HAS_WSTRING=0
-        GTEST_INTERNAL_HAS_RANGES=0
-        GTEST_INTERNAL_HAS_STRING_VIEW=0
-    )
+    # These workarounds are only needed on Linux with libstdc++ (gcc's standard library)
+    # Windows uses Microsoft's STL which doesn't have these issues
+    if(UNIX AND NOT APPLE)
+        # On Linux, disable C++20 ranges/format features in GoogleTest
+        # to avoid libstdc++-14 bugs with ranges::subrange and std::format
+        set(_GTEST_COMPAT_DEFS
+            GTEST_INTERNAL_HAS_STD_FORMAT=0
+            GTEST_HAS_STD_WSTRING=0
+            GTEST_INTERNAL_HAS_WSTRING=0
+            GTEST_INTERNAL_HAS_RANGES=0
+            GTEST_INTERNAL_HAS_STRING_VIEW=0
+        )
 
+        foreach(_gtest_target IN ITEMS gtest gtest_main gmock gmock_main)
+            if(TARGET ${_gtest_target})
+                target_compile_definitions(${_gtest_target} PUBLIC ${_GTEST_COMPAT_DEFS})
+            endif()
+        endforeach()
+        # Ensure our tests see the same compatibility defines when including gtest headers
+        set(_APPLY_GTEST_COMPAT_TO_TESTS ON)
+    else()
+        set(_APPLY_GTEST_COMPAT_TO_TESTS OFF)
+    endif()
+
+    # Ensure all gtest targets use C++20
     foreach(_gtest_target IN ITEMS gtest gtest_main gmock gmock_main)
         if(TARGET ${_gtest_target})
-            target_compile_definitions(${_gtest_target} PUBLIC ${_GTEST_COMPAT_DEFS})
             set_property(TARGET ${_gtest_target} PROPERTY CXX_STANDARD 20)
             set_property(TARGET ${_gtest_target} PROPERTY CXX_STANDARD_REQUIRED ON)
         endif()
     endforeach()
-    # Ensure our tests see the same compatibility defines when including gtest headers
 
     # Fetch RapidCheck for property-based testing
     FetchContent_Declare(
@@ -94,7 +106,10 @@ if(BUILD_TESTS)
         GTest::gtest_main
         rapidcheck
     )
-    target_compile_definitions(jazzy_index_tests PRIVATE ${_GTEST_COMPAT_DEFS})
+    # Only apply GoogleTest compatibility defines on Linux where libstdc++ bugs exist
+    if(_APPLY_GTEST_COMPAT_TO_TESTS)
+        target_compile_definitions(jazzy_index_tests PRIVATE ${_GTEST_COMPAT_DEFS})
+    endif()
     set_property(TARGET jazzy_index_tests PROPERTY CXX_STANDARD 20)
     set_property(TARGET jazzy_index_tests PROPERTY CXX_STANDARD_REQUIRED ON)
     target_include_directories(jazzy_index_tests PRIVATE
