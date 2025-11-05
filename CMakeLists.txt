@@ -56,7 +56,7 @@ if(BUILD_TESTS)
     foreach(_gtest_target IN ITEMS gtest gtest_main gmock gmock_main)
         if(TARGET ${_gtest_target})
             target_compile_definitions(${_gtest_target} PUBLIC ${_GTEST_COMPAT_DEFS})
-            set_property(TARGET ${_gtest_target} PROPERTY CXX_STANDARD 17)
+            set_property(TARGET ${_gtest_target} PROPERTY CXX_STANDARD 20)
             set_property(TARGET ${_gtest_target} PROPERTY CXX_STANDARD_REQUIRED ON)
         endif()
     endforeach()
@@ -98,7 +98,7 @@ if(BUILD_TESTS)
         rapidcheck
     )
     target_compile_definitions(jazzy_index_tests PRIVATE ${_GTEST_COMPAT_DEFS})
-    set_property(TARGET jazzy_index_tests PROPERTY CXX_STANDARD 17)
+    set_property(TARGET jazzy_index_tests PROPERTY CXX_STANDARD 20)
     set_property(TARGET jazzy_index_tests PROPERTY CXX_STANDARD_REQUIRED ON)
     target_include_directories(jazzy_index_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/tests

@@ -281,10 +281,14 @@ TEST_F(IntErrorRecoveryTest, LargeErrorRequiringWideSearch) {
 TEST_F(IntErrorRecoveryTest, DuplicateHeavyData) {
     std::vector<int> data;
 
-    // Lots of duplicates
+    // Lots of duplicates (sorted)
     for (int i = 0; i < 100; ++i) {
         data.push_back(1);
+    }
+    for (int i = 0; i < 100; ++i) {
         data.push_back(2);
+    }
+    for (int i = 0; i < 100; ++i) {
         data.push_back(3);
     }
 
