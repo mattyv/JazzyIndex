@@ -75,55 +75,71 @@ inline constexpr double NUMERICAL_TOLERANCE = 1e-10;
 inline constexpr double MIN_DISTRIBUTION_SCALE = 1e-6;
 // Minimum scale parameter for distributions to prevent division by zero
 
-// Model for finding which segment contains a value
-// Treats segment boundaries as data points and fits a model
-struct SegmentFinderModel {
+// Model parameters union shared across all model types
+union ModelParams {
+    struct {
+        float slope;
+        float intercept;
+    } linear;
+    struct {
+        float a;
+        float b;
+        float c;
+    } quadratic;
+    struct {
+        float a;
+        float b;
+        float c;
+        float d;
+    } cubic;
+    struct {
+        std::size_t constant_idx;
+    } constant;
+};
+
+// Common prediction logic used by both Segment and SegmentFinder
+// Returns predicted index from value using the given model
+inline std::size_t predict_with_model(
+    double value,
+    ModelType model_type,
+    const ModelParams& params,
+    std::size_t fallback_idx = 0) noexcept {
+
+    switch (model_type) {
+        case ModelType::LINEAR: {
+            const double pred = std::fma(value, params.linear.slope, params.linear.intercept);
+            return static_cast<std::size_t>(std::max(0.0, pred));
+        }
+        case ModelType::QUADRATIC: {
+            const double pred = std::fma(value,
+                                        std::fma(value, params.quadratic.a, params.quadratic.b),
+                                        params.quadratic.c);
+            return static_cast<std::size_t>(std::max(0.0, pred));
+        }
+        case ModelType::CUBIC: {
+            const double pred = std::fma(value,
+                                        std::fma(value,
+                                                std::fma(value, params.cubic.a, params.cubic.b),
+                                                params.cubic.c),
+                                        params.cubic.d);
+            return static_cast<std::size_t>(std::max(0.0, pred));
+        }
+        case ModelType::CONSTANT:
+            return params.constant.constant_idx;
+        default:
+            return fallback_idx;
+    }
+}
+
+// Learned model structure for segment finding
+// Predicts which segment contains a value
+struct SegmentFinder {
     ModelType model_type{ModelType::LINEAR};
     uint32_t max_error{0};
+    ModelParams params{};
 
-    // Model parameters (same structure as Segment for consistency)
-    union {
-        struct {
-            float slope;
-            float intercept;
-        } linear;
-        struct {
-            float a;
-            float b;
-            float c;
-        } quadratic;
-        struct {
-            float a;
-            float b;
-            float c;
-            float d;
-        } cubic;
-    } params{};
-
-    // Predict segment index from a value
     [[nodiscard]] std::size_t predict(double value) const noexcept {
-        switch (model_type) {
-            case ModelType::LINEAR: {
-                const double pred = std::fma(value, params.linear.slope, params.linear.intercept);
-                return static_cast<std::size_t>(std::max(0.0, pred));
-            }
-            case ModelType::QUADRATIC: {
-                const double pred = std::fma(value,
-                                            std::fma(value, params.quadratic.a, params.quadratic.b),
-                                            params.quadratic.c);
-                return static_cast<std::size_t>(std::max(0.0, pred));
-            }
-            case ModelType::CUBIC: {
-                const double pred = std::fma(value,
-                                            std::fma(value,
-                                                    std::fma(value, params.cubic.a, params.cubic.b),
-                                                    params.cubic.c),
-                                            params.cubic.d);
-                return static_cast<std::size_t>(std::max(0.0, pred));
-            }
-            default:
-                return 0;
-        }
+        return predict_with_model(value, model_type, params, 0);
     }
 };
 
@@ -138,26 +154,7 @@ struct alignas(64) Segment {  // Cache line aligned
 
     // Model parameters (hot path for predict())
     // Using float instead of double to keep struct within 64 bytes
-    alignas(8) union {
-        struct {
-            float slope;
-            float intercept;
-        } linear;
-        struct {
-            float a;
-            float b;
-            float c;
-        } quadratic;
-        struct {
-            float a;
-            float b;
-            float c;
-            float d;
-        } cubic;
-        struct {
-            std::size_t constant_idx;
-        } constant;
-    } params;
+    alignas(8) ModelParams params;
 
     // Warm path: clamping and bounds
     std::size_t start_idx;
@@ -166,39 +163,8 @@ struct alignas(64) Segment {  // Cache line aligned
     template <typename KeyExtractor = jazzy::identity>
     [[nodiscard]] std::size_t predict(const T& value, KeyExtractor key_extract = KeyExtractor{}) const
         noexcept(std::is_nothrow_invocable_v<KeyExtractor, const T&>) {
-        switch (model_type) {
-            case ModelType::LINEAR: {
-                const double key_val = static_cast<double>(std::invoke(key_extract, value));
-                const double pred = std::fma(key_val,
-                                            params.linear.slope,
-                                            params.linear.intercept);
-                // Clamp to non-negative before casting to unsigned type
-                return static_cast<std::size_t>(std::max(0.0, pred));
-            }
-            case ModelType::QUADRATIC: {
-                const double key_val = static_cast<double>(std::invoke(key_extract, value));
-                const double pred = std::fma(key_val,
-                                            std::fma(key_val, params.quadratic.a, params.quadratic.b),
-                                            params.quadratic.c);
-                // Clamp to non-negative before casting to unsigned type
-                return static_cast<std::size_t>(std::max(0.0, pred));
-            }
-            case ModelType::CUBIC: {
-                const double key_val = static_cast<double>(std::invoke(key_extract, value));
-                // Horner's method: ((a*x + b)*x + c)*x + d
-                const double pred = std::fma(key_val,
-                                            std::fma(key_val,
-                                                    std::fma(key_val, params.cubic.a, params.cubic.b),
-                                                    params.cubic.c),
-                                            params.cubic.d);
-                // Clamp to non-negative before casting to unsigned type
-                return static_cast<std::size_t>(std::max(0.0, pred));
-            }
-            case ModelType::CONSTANT:
-                return params.constant.constant_idx;
-            default:
-                return start_idx;  // Fallback
-        }
+        const double key_val = static_cast<double>(std::invoke(key_extract, value));
+        return predict_with_model(key_val, model_type, params, start_idx);
     }
 };
 
@@ -1144,7 +1110,7 @@ private:
     KeyExtractor key_extract_{};
     Compare comp_{};
     std::size_t num_segments_{0};
-    detail::SegmentFinderModel segment_finder_{};
+    detail::SegmentFinder segment_finder_{};
     std::array<detail::Segment<T>, NumSegments> segments_{};
 };
 
