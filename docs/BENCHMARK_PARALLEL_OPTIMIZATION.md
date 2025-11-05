@@ -167,28 +167,6 @@ The cache stores all generated datasets in memory. For `--full-benchmarks`:
 
 This is acceptable for modern systems and provides significant time savings.
 
-## Optional: Multi-Threaded Benchmark Runs
-
-### Command-Line Flag (Experimental)
-
-A `--benchmark_threads=N` flag has been added but is **not recommended for most use cases**:
-
-```bash
-# Run benchmarks with 4 threads (NOT RECOMMENDED)
-./build/jazzy_index_benchmarks --benchmark_threads=4
-```
-
-**Why not recommended:**
-- Adds complexity without clear benefit
-- Benchmark timings may be affected by thread scheduling
-- For speeding up benchmarks, parallel data generation is sufficient
-- Multi-threading is better suited for testing concurrent query performance
-
-**When to use:**
-- Testing thread scalability
-- Stress testing concurrent queries
-- Only if you understand the timing implications
-
 ## Usage Examples
 
 ### Standard Quick Benchmarks
