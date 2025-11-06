@@ -30,10 +30,12 @@ namespace detail {
 
 // Model types for different segment characteristics
 enum class ModelType : uint8_t {
-    LINEAR,      // Most common: y = mx + b (1 FMA)
-    QUADRATIC,   // Curved regions: y = ax^2 + bx + c (2 FMA)
-    CUBIC,       // Highly curved: y = ax^3 + bx^2 + cx + d (3 FMA)
-    CONSTANT     // All values same: y = c (0 computation)
+    LINEAR,       // Most common: y = mx + b (1 FMA)
+    QUADRATIC,    // Curved regions: y = ax^2 + bx + c (2 FMA)
+    CUBIC,        // Highly curved: y = ax^3 + bx^2 + cx + d (3 FMA)
+    EXPONENTIAL,  // Exponential growth: y = a * exp(b * x) + c
+    LOGARITHMIC,  // Logarithmic growth: y = a * log(x + b) + c
+    CONSTANT      // All values same: y = c (0 computation)
 };
 
 // Model selection and search tuning constants
@@ -75,6 +77,32 @@ inline constexpr double NUMERICAL_TOLERANCE = 1e-10;
 inline constexpr double MIN_DISTRIBUTION_SCALE = 1e-6;
 // Minimum scale parameter for distributions to prevent division by zero
 
+// Cost-based model selection constants
+inline constexpr double COMPARISON_TO_FMA_COST_RATIO = 7.5;
+// Binary search comparisons cost ~7.5× more than FMA (memory access + branch prediction)
+// Used to estimate total lookup cost: prediction_fmas + log2(search_range) * this_ratio
+
+// Prediction cost in FMA operations for each model type
+inline constexpr double LINEAR_PREDICTION_COST = 1.0;   // y = mx + b (1 FMA)
+inline constexpr double QUADRATIC_PREDICTION_COST = 2.0; // y = ax² + bx + c (2 FMA)
+
+inline constexpr double LINEAR_ERROR_THRESHOLD = 1.5;
+// Only consider more complex models if LINEAR error exceeds this threshold
+// If LINEAR error ≤ 1.5, search range is ≤ 4 elements (trivial cost)
+// For polynomial data, QUADRATIC can reduce error 3+ down to 0-1, saving many cycles
+
+inline constexpr double COST_IMPROVEMENT_THRESHOLD = 0.95;
+// More complex models must reduce total cost to < 95% of simpler model (5% savings)
+// Prevents choosing complex models for negligible performance gains
+
+inline constexpr double ERROR_RATIO_THRESHOLD = 0.5;
+// More complex models must reduce error to < 50% of simpler model
+// Ensures meaningful accuracy improvement justifies added complexity
+
+inline constexpr double MIN_ERROR_REDUCTION = 3.0;
+// Alternative threshold: absolute error reduction must be ≥ 3 units
+// Used when error ratio threshold doesn't apply (e.g., very small errors)
+
 // Model parameters union shared across all model types
 union ModelParams {
     struct {
@@ -93,6 +121,16 @@ union ModelParams {
         float d;
     } cubic;
     struct {
+        float a;  // scale factor
+        float b;  // exponent coefficient
+        float c;  // offset
+    } exponential;
+    struct {
+        float a;  // scale factor
+        float b;  // log argument offset
+        float c;  // result offset
+    } logarithmic;
+    struct {
         std::size_t constant_idx;
     } constant;
 };
@@ -107,21 +145,33 @@ inline std::size_t predict_with_model(
 
     switch (model_type) {
         case ModelType::LINEAR: {
-            const double pred = std::fma(value, params.linear.slope, params.linear.intercept);
+            const double pred = std::fma(value, static_cast<double>(params.linear.slope), static_cast<double>(params.linear.intercept));
             return static_cast<std::size_t>(std::max(0.0, pred));
         }
         case ModelType::QUADRATIC: {
             const double pred = std::fma(value,
-                                        std::fma(value, params.quadratic.a, params.quadratic.b),
-                                        params.quadratic.c);
+                                        std::fma(value, static_cast<double>(params.quadratic.a), static_cast<double>(params.quadratic.b)),
+                                        static_cast<double>(params.quadratic.c));
             return static_cast<std::size_t>(std::max(0.0, pred));
         }
         case ModelType::CUBIC: {
             const double pred = std::fma(value,
                                         std::fma(value,
-                                                std::fma(value, params.cubic.a, params.cubic.b),
-                                                params.cubic.c),
-                                        params.cubic.d);
+                                                std::fma(value, static_cast<double>(params.cubic.a), static_cast<double>(params.cubic.b)),
+                                                static_cast<double>(params.cubic.c)),
+                                        static_cast<double>(params.cubic.d));
+            return static_cast<std::size_t>(std::max(0.0, pred));
+        }
+        case ModelType::EXPONENTIAL: {
+            const double pred = static_cast<double>(params.exponential.a) * std::exp(static_cast<double>(params.exponential.b) * value) + static_cast<double>(params.exponential.c);
+            return static_cast<std::size_t>(std::max(0.0, pred));
+        }
+        case ModelType::LOGARITHMIC: {
+            const double arg = value + static_cast<double>(params.logarithmic.b);
+            if (arg <= 0.0) {
+                return 0;
+            }
+            const double pred = static_cast<double>(params.logarithmic.a) * std::log(arg) + static_cast<double>(params.logarithmic.c);
             return static_cast<std::size_t>(std::max(0.0, pred));
         }
         case ModelType::CONSTANT:
@@ -183,6 +233,20 @@ struct alignas(64) Segment {  // Cache line aligned
                                                     std::fma(key_val, params.cubic.a, params.cubic.b),
                                                     params.cubic.c),
                                             params.cubic.d);
+                return static_cast<std::size_t>(std::max(0.0, pred));
+            }
+            case ModelType::EXPONENTIAL: {
+                // y = a * exp(b * x) + c
+                const double pred = params.exponential.a * std::exp(params.exponential.b * key_val) + params.exponential.c;
+                return static_cast<std::size_t>(std::max(0.0, pred));
+            }
+            case ModelType::LOGARITHMIC: {
+                // y = a * log(x + b) + c
+                const double arg = key_val + params.logarithmic.b;
+                if (arg <= 0.0) {
+                    return 0;  // Handle domain error
+                }
+                const double pred = params.logarithmic.a * std::log(arg) + params.logarithmic.c;
                 return static_cast<std::size_t>(std::max(0.0, pred));
             }
             case ModelType::CONSTANT:
@@ -1013,7 +1077,7 @@ private:
 
         // First, try linear model
         std::size_t linear_max_error = 0;
-        double linear_slope = static_cast<double>(num_segments_ - 1) / value_range;
+        double linear_slope = static_cast<double>(num_segments_) / value_range;
         double linear_intercept = -linear_slope * min_val;
 
         for (std::size_t i = 0; i < num_segments_; ++i) {
@@ -1048,14 +1112,26 @@ private:
 
         const double n = static_cast<double>(num_segments_);
 
-        // If linear is good enough (max_error <= 3), use it
-        if (linear_max_error <= 3) {
-            segment_finder_.model_type = detail::ModelType::LINEAR;
-            segment_finder_.max_error = static_cast<uint32_t>(linear_max_error);
-            segment_finder_.params.linear.slope = static_cast<float>(linear_slope);
-            segment_finder_.params.linear.intercept = static_cast<float>(linear_intercept);
-            return;
-        }
+        // Cost estimation helper: total_cost = prediction_cost + binary_search_cost
+        // Binary search within ±max_error requires log2(2*max_error+1) comparisons
+        // Each comparison is ~7.5× more expensive than FMA (memory + branches)
+        auto estimate_lookup_cost = [](double prediction_fmas, double max_error) -> double {
+            const double search_range = std::max(1.0, 2.0 * max_error + 1.0);
+            const double search_comparisons = std::log2(search_range);
+            return prediction_fmas + search_comparisons * detail::COMPARISON_TO_FMA_COST_RATIO;
+        };
+
+        // Evaluate all candidate models and choose the one with lowest total cost
+        detail::ModelType best_model = detail::ModelType::LINEAR;
+        double best_error = linear_max_error;
+        double best_cost = estimate_lookup_cost(detail::LINEAR_PREDICTION_COST, linear_max_error);
+
+        // Storage for model parameters (will be copied to segment_finder_ at end)
+        struct {
+            double quad_a, quad_b, quad_c;
+            double exp_a, exp_b, exp_c;
+            double log_a, log_b, log_c;
+        } model_params{};
 
         // Try quadratic model
         // System: [Σx⁴  Σx³  Σx²] [a]   [Σx²y]
@@ -1082,43 +1158,255 @@ private:
             const double c = det_c / det;
 
             // Measure quadratic error
-            std::size_t quad_max_error = 0;
+            double quad_max_error = 0.0;
             for (std::size_t i = 0; i < num_segments_; ++i) {
                 const double seg_min = static_cast<double>(std::invoke(key_extract_, segments_[i].min_val));
                 const double x_normalized = (seg_min - x_min) / x_scale;
                 const double pred = std::fma(x_normalized, std::fma(x_normalized, a, b), c);
                 const double error = std::abs(pred - static_cast<double>(i));
-                quad_max_error = std::max(quad_max_error, static_cast<std::size_t>(std::ceil(error)));
+                quad_max_error = std::max(quad_max_error, error);
             }
 
-            // Use quadratic if it's significantly better (at least 20% improvement)
-            if (quad_max_error < linear_max_error * 0.8) {
-                // Transform coefficients from normalized space to original space
-                const double x_scale_sq = x_scale * x_scale;
-                const double quad_a = a / x_scale_sq;
-                const double quad_b = b / x_scale - 2.0 * a * x_min / x_scale_sq;
-                const double quad_c = a * x_min * x_min / x_scale_sq - b * x_min / x_scale + c;
+            // Transform coefficients from normalized space to original space
+            const double x_scale_sq = x_scale * x_scale;
+            const double quad_a = a / x_scale_sq;
+            const double quad_b = b / x_scale - 2.0 * a * x_min / x_scale_sq;
+            const double quad_c = a * x_min * x_min / x_scale_sq - b * x_min / x_scale + c;
 
-                // Check monotonicity
-                const double deriv_at_min = 2.0 * quad_a * min_val + quad_b;
-                const double deriv_at_max = 2.0 * quad_a * max_val + quad_b;
+            // Check monotonicity: segment finder MUST be monotonic for correctness
+            // (larger values must map to larger/equal segment indices)
+            // For y = ax² + bx + c, derivative is y' = 2ax + b
+            // Must be non-negative across entire value range [min_val, max_val]
+            const double deriv_at_min = 2.0 * quad_a * min_val + quad_b;
+            const double deriv_at_max = 2.0 * quad_a * max_val + quad_b;
 
-                if (deriv_at_min >= 0.0 && deriv_at_max >= 0.0) {
-                    segment_finder_.model_type = detail::ModelType::QUADRATIC;
-                    segment_finder_.max_error = static_cast<uint32_t>(quad_max_error);
-                    segment_finder_.params.quadratic.a = static_cast<float>(quad_a);
-                    segment_finder_.params.quadratic.b = static_cast<float>(quad_b);
-                    segment_finder_.params.quadratic.c = static_cast<float>(quad_c);
-                    return;
+            if (deriv_at_min >= 0.0 && deriv_at_max >= 0.0) {
+                // Quadratic is monotonic - evaluate cost-benefit
+                const double quad_cost = estimate_lookup_cost(detail::QUADRATIC_PREDICTION_COST, quad_max_error);
+
+                // Choose QUADRATIC if total lookup cost is meaningfully lower
+                // AND LINEAR's fit isn't already excellent (error > 1)
+                // When LINEAR error ≤ 1, search range is ≤ 3 elements (trivial)
+                // so prefer simpler model as tie-breaker to avoid degenerate quadratics
+                const bool linear_needs_improvement = best_error > 1.0;
+
+                if (linear_needs_improvement && quad_cost < best_cost * detail::COST_IMPROVEMENT_THRESHOLD) {
+                    best_model = detail::ModelType::QUADRATIC;
+                    best_error = quad_max_error;
+                    best_cost = quad_cost;
+                    model_params.quad_a = quad_a;
+                    model_params.quad_b = quad_b;
+                    model_params.quad_c = quad_c;
                 }
             }
         }
 
-        // Fall back to linear if quadratic didn't help or wasn't monotonic
-        segment_finder_.model_type = detail::ModelType::LINEAR;
-        segment_finder_.max_error = static_cast<uint32_t>(linear_max_error);
-        segment_finder_.params.linear.slope = static_cast<float>(linear_slope);
-        segment_finder_.params.linear.intercept = static_cast<float>(linear_intercept);
+        /* DISABLED: EXPONENTIAL and LOGARITHMIC models are too expensive
+         * std::exp() and std::log() cost ~100 cycles vs LINEAR's ~4 cycles (1 FMA)
+         * The prediction overhead outweighs search space reduction benefits
+         * Keeping code for reference but commented out
+         */
+
+        /*
+        // Try EXPONENTIAL model: y = a * exp(b * x) + c
+        // Good for exponentially distributed data
+        double exp_a = 0.0, exp_b = 0.0, exp_c = 0.0;
+        double exp_max_error = std::numeric_limits<double>::max();
+        bool exp_fit_success = false;
+
+        {
+            // For exponential fitting: segment_idx = a * exp(b * value) + c
+            // Use linearization: if y = a * exp(b * x) + c, then (y - c) = a * exp(b * x)
+            // Taking log: log(y - c) = log(a) + b * x
+            // We need to estimate c first (minimum segment index), then fit log-linear model
+
+            // Estimate c as the minimum segment index (offset)
+            double c_est = 0.0;  // Start with 0 as offset
+
+            // Try to fit log-linear model: log(y - c) = log(a) + b * x
+            // We'll use a simplified approach: assume segment indices grow exponentially
+            std::vector<double> log_y;
+            log_y.reserve(num_segments_);
+
+            bool valid_for_exp = true;
+            for (std::size_t i = 0; i < num_segments_; ++i) {
+                double y_val = static_cast<double>(i) - c_est;
+                if (y_val <= 0.0) {
+                    y_val = 0.1;  // Small positive value to avoid log(0)
+                }
+                log_y.push_back(std::log(y_val));
+            }
+
+            // Fit linear model to (x_i, log(y_i - c))
+            double sum_x_log = 0.0, sum_log = 0.0, sum_x_x_log = 0.0, sum_x_log_x = 0.0;
+            for (std::size_t i = 0; i < num_segments_; ++i) {
+                const double seg_min = static_cast<double>(std::invoke(key_extract_, segments_[i].min_val));
+                const double x_val = seg_min;
+                const double log_val = log_y[i];
+                sum_x_log += x_val;
+                sum_log += log_val;
+                sum_x_x_log += x_val * x_val;
+                sum_x_log_x += x_val * log_val;
+            }
+
+            const double denom_log = n * sum_x_x_log - sum_x_log * sum_x_log;
+            if (std::abs(denom_log) > 1e-10) {
+                // b coefficient (slope in log space)
+                exp_b = (n * sum_x_log_x - sum_x_log * sum_log) / denom_log;
+                // log(a) (intercept in log space)
+                const double log_a = (sum_log - exp_b * sum_x_log) / n;
+                exp_a = std::exp(log_a);
+                exp_c = c_est;
+
+                // Only accept if b is positive (exponential growth) and a is positive
+                if (exp_b > 0.0 && exp_a > 0.0) {
+                    // Compute max error
+                    exp_max_error = 0.0;
+                    for (std::size_t i = 0; i < num_segments_; ++i) {
+                        const double seg_min = static_cast<double>(std::invoke(key_extract_, segments_[i].min_val));
+                        const double x_val = seg_min;
+                        const double predicted = exp_a * std::exp(exp_b * x_val) + exp_c;
+                        const double error = std::abs(predicted - static_cast<double>(i));
+                        exp_max_error = std::max(exp_max_error, error);
+                    }
+
+                    // Check if exponential is significantly better than initial baseline (20% improvement)
+                    if (exp_max_error < linear_max_error * 0.8) {
+                        // Verify monotonicity: derivative = a * b * exp(b * x) should be positive
+                        const double deriv_coeff = exp_a * exp_b;
+                        if (deriv_coeff > 0.0) {
+                            // EXPONENTIAL model is expensive (~25x cost of LINEAR due to std::exp)
+                            // Only use it if accuracy is exceptional or drastically better than LINEAR
+                            // This ensures the prediction cost is justified by search space reduction
+                            if (exp_max_error <= detail::EXPENSIVE_MODEL_MAX_ERROR_THRESHOLD ||
+                                exp_max_error < linear_max_error * detail::EXPENSIVE_MODEL_IMPROVEMENT_THRESHOLD) {
+                                if (exp_max_error < best_error) {
+                                    best_model = detail::ModelType::EXPONENTIAL;
+                                    best_error = exp_max_error;
+                                    model_params.exp_a = exp_a;
+                                    model_params.exp_b = exp_b;
+                                    model_params.exp_c = exp_c;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Try LOGARITHMIC model: y = a * log(x + b) + c
+        // Good for logarithmically distributed data
+        double log_a = 0.0, log_b = 0.0, log_c = 0.0;
+        double log_max_error = std::numeric_limits<double>::max();
+        bool log_fit_success = false;
+
+        {
+            // For logarithmic fitting: segment_idx = a * log(value + b) + c
+            // We need b > -min_val to keep log argument positive
+            // Use a simple approach: set b to shift minimum value to 1
+            double b_est = 1.0 - min_val;
+            if (b_est < 0.0) {
+                b_est = 0.0;  // If min_val >= 1, no shift needed
+            }
+
+            // Now fit linear model: y = a * log(x + b) + c
+            // This is linear in log(x + b), so we can use least squares
+            std::vector<double> log_x;
+            log_x.reserve(num_segments_);
+
+            bool valid_for_log = true;
+            for (std::size_t i = 0; i < num_segments_; ++i) {
+                const double seg_min = static_cast<double>(std::invoke(key_extract_, segments_[i].min_val));
+                const double x_val = seg_min + b_est;
+                if (x_val <= 0.0) {
+                    valid_for_log = false;
+                    break;
+                }
+                log_x.push_back(std::log(x_val));
+            }
+
+            if (valid_for_log) {
+                // Fit linear model to (log(x_i + b), y_i)
+                double sum_logx = 0.0, sum_y_log = 0.0, sum_logx_logx = 0.0, sum_logx_y = 0.0;
+                for (std::size_t i = 0; i < num_segments_; ++i) {
+                    const double logx_val = log_x[i];
+                    const double y_val = static_cast<double>(i);
+                    sum_logx += logx_val;
+                    sum_y_log += y_val;
+                    sum_logx_logx += logx_val * logx_val;
+                    sum_logx_y += logx_val * y_val;
+                }
+
+                const double denom_logfit = n * sum_logx_logx - sum_logx * sum_logx;
+                if (std::abs(denom_logfit) > 1e-10) {
+                    // a coefficient (slope)
+                    log_a = (n * sum_logx_y - sum_logx * sum_y_log) / denom_logfit;
+                    // c (intercept)
+                    log_c = (sum_y_log - log_a * sum_logx) / n;
+                    log_b = b_est;
+
+                    // Only accept if a is positive (logarithmic growth)
+                    if (log_a > 0.0) {
+                        // Compute max error
+                        log_max_error = 0.0;
+                        for (std::size_t i = 0; i < num_segments_; ++i) {
+                            const double seg_min = static_cast<double>(std::invoke(key_extract_, segments_[i].min_val));
+                        const double x_val = seg_min;
+                            const double predicted = log_a * std::log(x_val + log_b) + log_c;
+                            const double error = std::abs(predicted - static_cast<double>(i));
+                            log_max_error = std::max(log_max_error, error);
+                        }
+
+                        // Check if logarithmic is significantly better than initial baseline (20% improvement)
+                        if (log_max_error < linear_max_error * 0.8) {
+                            // Verify monotonicity: derivative = a / (x + b) should be positive
+                            // Since a > 0 and x + b > 0 (checked above), derivative is always positive
+                            // LOGARITHMIC model is expensive (~25x cost of LINEAR due to std::log)
+                            // Only use it if accuracy is exceptional or drastically better than LINEAR
+                            // This ensures the prediction cost is justified by search space reduction
+                            if (log_max_error <= detail::EXPENSIVE_MODEL_MAX_ERROR_THRESHOLD ||
+                                log_max_error < linear_max_error * detail::EXPENSIVE_MODEL_IMPROVEMENT_THRESHOLD) {
+                                if (log_max_error < best_error) {
+                                    best_model = detail::ModelType::LOGARITHMIC;
+                                    best_error = log_max_error;
+                                    model_params.log_a = log_a;
+                                    model_params.log_b = log_b;
+                                    model_params.log_c = log_c;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        */
+
+        // Select the best model among all candidates
+        segment_finder_.max_error = static_cast<uint32_t>(best_error);
+        segment_finder_.model_type = best_model;
+
+        switch (best_model) {
+            case detail::ModelType::QUADRATIC:
+                segment_finder_.params.quadratic.a = static_cast<float>(model_params.quad_a);
+                segment_finder_.params.quadratic.b = static_cast<float>(model_params.quad_b);
+                segment_finder_.params.quadratic.c = static_cast<float>(model_params.quad_c);
+                break;
+            case detail::ModelType::EXPONENTIAL:
+                segment_finder_.params.exponential.a = static_cast<float>(model_params.exp_a);
+                segment_finder_.params.exponential.b = static_cast<float>(model_params.exp_b);
+                segment_finder_.params.exponential.c = static_cast<float>(model_params.exp_c);
+                break;
+            case detail::ModelType::LOGARITHMIC:
+                segment_finder_.params.logarithmic.a = static_cast<float>(model_params.log_a);
+                segment_finder_.params.logarithmic.b = static_cast<float>(model_params.log_b);
+                segment_finder_.params.logarithmic.c = static_cast<float>(model_params.log_c);
+                break;
+            case detail::ModelType::LINEAR:
+            default:
+                segment_finder_.params.linear.slope = static_cast<float>(linear_slope);
+                segment_finder_.params.linear.intercept = static_cast<float>(linear_intercept);
+                break;
+        }
     }
 
     [[nodiscard]] const detail::Segment<T>* find_segment(const T& value) const noexcept {

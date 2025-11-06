@@ -53,7 +53,8 @@ TEST(SegmentFinderTest, UniformDataUsesLinearModel) {
     EXPECT_LE(max_error, 2) << "Uniform data should have very low prediction error";
 }
 
-// Test: Exponential data segment finder should handle curvature
+// Test: Exponentially distributed data uses LINEAR (LOGARITHMIC disabled for performance)
+// (segment_idx grows logarithmically with value, but LOGARITHMIC model too expensive)
 TEST(SegmentFinderTest, ExponentialDataSegmentFinder) {
     std::vector<int> data;
     for (int i = 0; i < 1000; ++i) {
@@ -67,10 +68,32 @@ TEST(SegmentFinderTest, ExponentialDataSegmentFinder) {
     std::string model_type = extract_segment_finder_model(json);
     int max_error = extract_segment_finder_max_error(json);
 
-    // Model type could be LINEAR (current implementation)
-    // Error should be reasonable even if higher than uniform
-    EXPECT_FALSE(model_type.empty()) << "Should have a segment finder model";
-    EXPECT_GE(max_error, 0) << "Max error should be non-negative";
+    // LOGARITHMIC model is disabled due to high std::log() cost (~100 cycles)
+    // LINEAR or QUADRATIC used instead (QUADRATIC may fit better if cost-effective)
+    EXPECT_TRUE(model_type == "LINEAR" || model_type == "QUADRATIC")
+        << "Exponential data uses LINEAR or QUADRATIC (LOGARITHMIC disabled for performance)";
+    EXPECT_GE(max_error, 0) << "Error should be non-negative";
+}
+
+// Test: Logarithmically distributed data uses LINEAR (EXPONENTIAL disabled for performance)
+// (segment_idx grows exponentially with value, but EXPONENTIAL model too expensive)
+TEST(SegmentFinderTest, LogarithmicDataSegmentFinder) {
+    std::vector<double> data;
+    for (int i = 1; i <= 1000; ++i) {
+        data.push_back(std::log(static_cast<double>(i)));
+    }
+
+    jazzy::JazzyIndex<double, jazzy::to_segment_count<256>()> index;
+    index.build(data.data(), data.data() + data.size());
+
+    std::string json = jazzy::export_index_metadata(index);
+    std::string model_type = extract_segment_finder_model(json);
+    int max_error = extract_segment_finder_max_error(json);
+
+    // EXPONENTIAL model is disabled due to high std::exp() cost (~100 cycles)
+    // LINEAR is used instead with higher error but much faster prediction
+    EXPECT_EQ(model_type, "LINEAR") << "Logarithmic data uses LINEAR (EXPONENTIAL disabled for performance)";
+    EXPECT_GE(max_error, 0) << "Error should be non-negative";
 }
 
 // Test: Small segment counts should have low max_error
@@ -120,6 +143,8 @@ TEST(SegmentFinderTest, ConstantDataZeroError) {
 }
 
 // Test: Quadratic growth data
+// Note: For values that grow quadratically (value = i²), segment_idx ≈ √value
+// We don't have a sqrt model, so LINEAR is acceptable with bounded error
 TEST(SegmentFinderTest, QuadraticGrowthData) {
     std::vector<int> data;
     for (int i = 0; i < 1000; ++i) {
@@ -133,10 +158,10 @@ TEST(SegmentFinderTest, QuadraticGrowthData) {
     std::string model_type = extract_segment_finder_model(json);
     int max_error = extract_segment_finder_max_error(json);
 
-    // LINEAR model may have higher error for quadratic data
-    EXPECT_FALSE(model_type.empty());
-    // Error should be bounded but potentially higher than uniform
-    EXPECT_GE(max_error, 0);
+    // Quadratically growing values have sqrt relationship (not modeled), LINEAR is acceptable
+    EXPECT_FALSE(model_type.empty()) << "Should have a segment finder model";
+    // Error should be bounded (LINEAR gives reasonable approximation for sqrt)
+    EXPECT_LE(max_error, 50) << "Model should have bounded error for quadratic growth data";
 }
 
 // Test: Sparse linear data

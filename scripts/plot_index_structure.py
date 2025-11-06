@@ -87,9 +87,12 @@ def plot_segment_model(ax, segment: Dict[str, Any], keys: np.ndarray, alpha: flo
 
 
 def plot_segment_finder_model(ax, segment_finder: Dict[str, Any], keys: np.ndarray, num_segments: int):
-    """Plot the segment finder model as an overlay showing segment_index = f(value)."""
+    """Plot the segment finder model as an overlay showing segment_index = f(value).
+
+    Returns the (min_y, max_y) range covered by the visualization, or None if nothing plotted.
+    """
     if not segment_finder or len(keys) == 0:
-        return
+        return None
 
     model_type = segment_finder['model_type']
     params = segment_finder['params']
@@ -100,7 +103,7 @@ def plot_segment_finder_model(ax, segment_finder: Dict[str, Any], keys: np.ndarr
     max_key = np.max(keys)
 
     if max_key <= min_key:
-        return
+        return None
 
     values = np.linspace(min_key, max_key, 200)
 
@@ -120,30 +123,60 @@ def plot_segment_finder_model(ax, segment_finder: Dict[str, Any], keys: np.ndarr
         c = params['c']
         d = params['d']
         seg_predictions = a * values * values * values + b * values * values + c * values + d
+    elif model_type == 'EXPONENTIAL':
+        a = params['a']
+        b = params['b']
+        c = params['c']
+        seg_predictions = a * np.exp(b * values) + c
+    elif model_type == 'LOGARITHMIC':
+        a = params['a']
+        b = params['b']
+        c = params['c']
+        # Handle domain: log argument must be positive
+        arg = values + b
+        seg_predictions = np.where(arg > 0, a * np.log(arg) + c, 0.0)
     else:
         seg_predictions = np.zeros_like(values)
-
-    # Clamp predictions to valid segment range
-    seg_predictions = np.clip(seg_predictions, 0, num_segments - 1)
 
     # Map segment indices to actual index positions (approximate)
     # For visualization, approximate each segment's midpoint position
     total_size = len(keys)
-    segment_positions = seg_predictions * (total_size / num_segments)
 
-    # Plot the segment finder model as a dashed line on the secondary axis
-    # This shows: "for this key value, which segment should it be in?"
-    ax.plot(segment_positions, values, 'magenta', linewidth=2.5, linestyle='--',
-            alpha=0.7, zorder=5, label=f'Segment Finder ({model_type}, err={max_error})')
+    # Only plot where predictions are within valid range to avoid clamping artifacts
+    valid_mask = (seg_predictions >= 0) & (seg_predictions < num_segments)
 
-    # Plot error band if there's any error
-    if max_error > 0:
-        error_positions_low = (seg_predictions - max_error) * (total_size / num_segments)
-        error_positions_high = (seg_predictions + max_error) * (total_size / num_segments)
-        error_positions_low = np.clip(error_positions_low, 0, total_size)
-        error_positions_high = np.clip(error_positions_high, 0, total_size)
-        ax.fill_betweenx(values, error_positions_low, error_positions_high,
-                        color='magenta', alpha=0.15, zorder=1)
+    if np.any(valid_mask):
+        # Use raw (unclamped) predictions for valid points only
+        segment_positions_valid = seg_predictions[valid_mask] * (total_size / num_segments)
+        values_valid = values[valid_mask]
+
+        ax.plot(segment_positions_valid, values_valid, 'magenta',
+                linewidth=2.5, linestyle='--',
+                alpha=0.7, zorder=5, label=f'Segment Finder ({model_type}, err={max_error})')
+
+        # Plot error band if there's any error (only for valid prediction range)
+        if max_error > 0:
+            error_predictions_low = seg_predictions[valid_mask] - max_error
+            error_predictions_high = seg_predictions[valid_mask] + max_error
+
+            # Clamp the error band predictions to valid segment range
+            error_predictions_low = np.clip(error_predictions_low, 0, num_segments - 1)
+            error_predictions_high = np.clip(error_predictions_high, 0, num_segments - 1)
+
+            error_positions_low = error_predictions_low * (total_size / num_segments)
+            error_positions_high = error_predictions_high * (total_size / num_segments)
+
+            ax.fill_betweenx(values_valid, error_positions_low, error_positions_high,
+                            color='magenta', alpha=0.15, zorder=1)
+
+        # Return the y-range covered by the visualization
+        return (np.min(values_valid), np.max(values_valid))
+    else:
+        # If all predictions are out of range, show a note in the legend
+        # Plot a small dummy line for the legend entry
+        ax.plot([], [], 'magenta', linewidth=2.5, linestyle='--',
+                alpha=0.4, label=f'Segment Finder ({model_type}, err={max_error}, BAD FIT)')
+        return None
 
 
 def plot_error_bands(ax, segment: Dict[str, Any], keys: np.ndarray):
@@ -232,8 +265,9 @@ def plot_index_structure(data: Dict[str, Any], output_file: Path):
         plot_error_bands(ax, segment, keys)
 
     # Plot segment finder model overlay (NEW!)
+    sf_y_range = None
     if segment_finder:
-        plot_segment_finder_model(ax, segment_finder, keys, num_segments)
+        sf_y_range = plot_segment_finder_model(ax, segment_finder, keys, num_segments)
 
     # Plot model prediction curves for each segment
     model_colors = {'L': 'red', 'Q': 'blue', 'Cu': 'orange', 'C': 'green', 'D': 'purple'}
@@ -255,7 +289,16 @@ def plot_index_structure(data: Dict[str, Any], output_file: Path):
 
     # Extract metadata from filename for title
     title_parts = output_file.stem.replace('index_structure_', '').split('_')
-    title = f"JazzyIndex Structure: {' '.join(title_parts)}"
+    base_title = f"JazzyIndex Structure: {' '.join(title_parts)}"
+
+    # Add segment finder model type to title if available
+    if segment_finder:
+        sf_model = segment_finder['model_type']
+        sf_error = segment_finder['max_error']
+        title = f"{base_title} - Segment Finder: {sf_model} (max_error={sf_error})"
+    else:
+        title = base_title
+
     ax.set_title(title, fontsize=14, fontweight='bold', pad=20)
 
     # Create legend
@@ -289,6 +332,13 @@ L: {model_counts['LINEAR']} | Q: {model_counts['QUADRATIC']} | Cu: {model_counts
     ax.text(0.98, 0.02, stats_text, transform=ax.transAxes,
             fontsize=9, verticalalignment='bottom', horizontalalignment='right',
             bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+
+    # Adjust y-axis limits to ensure segment finder overlay and error bands are fully visible
+    if sf_y_range is not None:
+        current_ylim = ax.get_ylim()
+        new_ymin = min(current_ylim[0], sf_y_range[0])
+        new_ymax = max(current_ylim[1], sf_y_range[1])
+        ax.set_ylim(new_ymin, new_ymax)
 
     # Grid
     ax.grid(True, alpha=0.3, linestyle=':', linewidth=0.5)

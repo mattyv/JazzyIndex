@@ -27,6 +27,8 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
         case detail::ModelType::LINEAR: oss << "LINEAR"; break;
         case detail::ModelType::QUADRATIC: oss << "QUADRATIC"; break;
         case detail::ModelType::CUBIC: oss << "CUBIC"; break;
+        case detail::ModelType::EXPONENTIAL: oss << "EXPONENTIAL"; break;
+        case detail::ModelType::LOGARITHMIC: oss << "LOGARITHMIC"; break;
         case detail::ModelType::CONSTANT: oss << "CONSTANT"; break;
     }
     oss << "\",\n";
@@ -47,6 +49,16 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
                 << "\"b\": " << index.segment_finder_.params.cubic.b << ", "
                 << "\"c\": " << index.segment_finder_.params.cubic.c << ", "
                 << "\"d\": " << index.segment_finder_.params.cubic.d;
+            break;
+        case detail::ModelType::EXPONENTIAL:
+            oss << "\"a\": " << index.segment_finder_.params.exponential.a << ", "
+                << "\"b\": " << index.segment_finder_.params.exponential.b << ", "
+                << "\"c\": " << index.segment_finder_.params.exponential.c;
+            break;
+        case detail::ModelType::LOGARITHMIC:
+            oss << "\"a\": " << index.segment_finder_.params.logarithmic.a << ", "
+                << "\"b\": " << index.segment_finder_.params.logarithmic.b << ", "
+                << "\"c\": " << index.segment_finder_.params.logarithmic.c;
             break;
         default:
             break;
@@ -91,6 +103,12 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
             case detail::ModelType::CUBIC:
                 oss << "CUBIC";
                 break;
+            case detail::ModelType::EXPONENTIAL:
+                oss << "EXPONENTIAL";
+                break;
+            case detail::ModelType::LOGARITHMIC:
+                oss << "LOGARITHMIC";
+                break;
             case detail::ModelType::CONSTANT:
                 oss << "CONSTANT";
                 break;
@@ -114,6 +132,16 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
                     << "\"b\": " << seg.params.cubic.b << ", "
                     << "\"c\": " << seg.params.cubic.c << ", "
                     << "\"d\": " << seg.params.cubic.d;
+                break;
+            case detail::ModelType::EXPONENTIAL:
+                oss << "\"a\": " << seg.params.exponential.a << ", "
+                    << "\"b\": " << seg.params.exponential.b << ", "
+                    << "\"c\": " << seg.params.exponential.c;
+                break;
+            case detail::ModelType::LOGARITHMIC:
+                oss << "\"a\": " << seg.params.logarithmic.a << ", "
+                    << "\"b\": " << seg.params.logarithmic.b << ", "
+                    << "\"c\": " << seg.params.logarithmic.c;
                 break;
             case detail::ModelType::CONSTANT:
                 oss << "\"constant_idx\": " << seg.params.constant.constant_idx;
