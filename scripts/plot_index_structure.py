@@ -167,6 +167,23 @@ def plot_index_structure(data: Dict[str, Any], output_file: Path):
         if i == len(segments) - 1:
             ax.axvline(end_idx, color='gray', linestyle='--', linewidth=1, alpha=0.5, zorder=1)
 
+    # Plot sampled boundaries (for segment finder)
+    if 'sampled_boundaries' in data:
+        sampled_data = data['sampled_boundaries']
+        num_samples = sampled_data['num_samples']
+        samples = sampled_data['samples']
+
+        for i, sample in enumerate(samples):
+            seg_idx = sample['segment']
+            if seg_idx < len(segments):
+                # Draw thick purple line at the sampled segment's start (make it stand out!)
+                sample_pos = segments[seg_idx]['start_idx']
+                if i == 0:
+                    ax.axvline(sample_pos, color='purple', linestyle='-', linewidth=3, alpha=0.9,
+                              label=f'Sampled boundaries ({num_samples} samples)', zorder=4)
+                else:
+                    ax.axvline(sample_pos, color='purple', linestyle='-', linewidth=3, alpha=0.9, zorder=4)
+
     # Plot error bands
     for segment in segments:
         plot_error_bands(ax, segment, keys)
@@ -204,6 +221,13 @@ def plot_index_structure(data: Dict[str, Any], output_file: Path):
         mpatches.Patch(color='tan', alpha=0.2, label='Error bands (±max_error)'),
         mpatches.Patch(color='gray', label='Segment boundaries')
     ]
+
+    # Add sampled boundaries to legend if present
+    if 'sampled_boundaries' in data:
+        num_samples = data['sampled_boundaries']['num_samples']
+        legend_elements.append(
+            mpatches.Patch(color='purple', label=f'Sampled boundaries ({num_samples} samples)')
+        )
 
     ax.legend(handles=legend_elements, loc='upper left', fontsize=9)
 

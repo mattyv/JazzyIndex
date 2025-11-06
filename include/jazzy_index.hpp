@@ -33,7 +33,8 @@ enum class ModelType : uint8_t {
     LINEAR,      // Most common: y = mx + b (1 FMA)
     QUADRATIC,   // Curved regions: y = ax^2 + bx + c (2 FMA)
     CUBIC,       // Highly curved: y = ax^3 + bx^2 + cx + d (3 FMA)
-    CONSTANT     // All values same: y = c (0 computation)
+    CONSTANT,    // All values same: y = c (0 computation)
+    SAMPLED      // Sampled boundaries: binary search + interpolation (2 comparisons + 1 FMA)
 };
 
 // Model selection and search tuning constants
@@ -646,6 +647,10 @@ public:
         if (is_uniform_ && total_range >= std::numeric_limits<double>::epsilon()) {
             segment_scale_ = static_cast<double>(num_segments_) / total_range;
         }
+
+        // Sample segment boundaries for distribution-agnostic segment finding
+        // Sample evenly spaced segments and store their first values
+        build_sampled_boundaries();
     }
 
     [[nodiscard]] const T* find(const T& key) const {
@@ -717,7 +722,11 @@ public:
 
             // Exponentially expand rightward: check radii 1, 2, 4, 8...
             for (std::size_t radius = 1; radius <= max_radius; radius <<= 1) {
-                const std::size_t right_pos = std::min<std::size_t>(predicted + radius + 1, seg->end_idx);
+                // Conditional clamp (avoid std::min overhead in hot loop)
+                std::size_t right_pos = predicted + radius + 1;
+                if (right_pos > seg->end_idx) {
+                    right_pos = seg->end_idx;
+                }
 
                 // If right_pos <= left_boundary, no unexplored region remains
                 if (right_pos <= left_boundary) break;
@@ -752,12 +761,46 @@ public:
 
 private:
 
+    void build_sampled_boundaries() noexcept {
+        if (num_segments_ == 0) {
+            num_samples_ = 0;
+            return;
+        }
+
+        // Determine how many samples to take (min of NUM_SAMPLES and num_segments)
+        num_samples_ = std::min(NUM_SAMPLES, num_segments_);
+
+        if (num_samples_ == 1) {
+            // Special case: only one segment
+            sampled_keys_[0] = static_cast<double>(std::invoke(key_extract_, segments_[0].min_val));
+            sampled_segments_[0] = 0;
+            return;
+        }
+
+        // Sample evenly across segments
+        // For N samples and M segments, sample at indices: 0, M/(N-1), 2*M/(N-1), ..., M-1
+        for (std::size_t i = 0; i < num_samples_; ++i) {
+            // Calculate which segment to sample
+            std::size_t seg_idx;
+            if (i == num_samples_ - 1) {
+                // Last sample always points to last segment
+                seg_idx = num_segments_ - 1;
+            } else {
+                // Evenly space samples
+                seg_idx = (i * num_segments_) / num_samples_;
+            }
+
+            sampled_keys_[i] = static_cast<double>(std::invoke(key_extract_, segments_[seg_idx].min_val));
+            sampled_segments_[i] = seg_idx;
+        }
+    }
+
     [[nodiscard]] const detail::Segment<T>* find_segment(const T& value) const noexcept {
         if (num_segments_ == 0) {
             return nullptr;
         }
 
-        // Fast path: O(1) arithmetic lookup for uniform data
+        // Fast path #1: O(1) arithmetic lookup for uniform data
         if (is_uniform_) {
             const double offset = static_cast<double>(std::invoke(key_extract_, value)) -
                                  static_cast<double>(std::invoke(key_extract_, min_));
@@ -777,7 +820,85 @@ private:
             // Fallback to binary search if arithmetic failed (rare)
         }
 
-        // Slow path: Binary search through segments for skewed data
+        // Fast path #2: Sampled boundaries prediction (works for non-uniform distributions)
+        if (num_samples_ > 0) {
+            const double key_val = static_cast<double>(std::invoke(key_extract_, value));
+
+            // Binary search through samples to find the range
+            std::size_t left = 0;
+            std::size_t right = num_samples_;
+
+            while (left + 1 < right) {
+                const std::size_t mid = left + (right - left) / 2;
+                if (key_val < sampled_keys_[mid]) {
+                    right = mid;
+                } else {
+                    left = mid;
+                }
+            }
+
+            // Now key_val is in range [sampled_keys_[left], sampled_keys_[right])
+            // Interpolate to predict segment index
+            std::size_t predicted_seg;
+
+            if (left + 1 >= num_samples_) {
+                // Past last sample, use last segment
+                predicted_seg = num_segments_ - 1;
+            } else {
+                // Interpolate between samples
+                const double key_left = sampled_keys_[left];
+                const double key_right = sampled_keys_[left + 1];
+                const std::size_t seg_left = sampled_segments_[left];
+                const std::size_t seg_right = sampled_segments_[left + 1];
+
+                if (key_right - key_left > std::numeric_limits<double>::epsilon()) {
+                    // Optimize interpolation: avoid intermediate ratio variable, use FMA
+                    const double key_offset = key_val - key_left;
+                    const double key_range = key_right - key_left;
+                    const std::size_t seg_range = seg_right - seg_left;
+
+                    // Single expression using FMA: (offset * range) / divisor
+                    predicted_seg = seg_left + static_cast<std::size_t>((key_offset * static_cast<double>(seg_range)) / key_range);
+
+                    // Conditional clamp (avoid std::min overhead)
+                    if (predicted_seg >= num_segments_) {
+                        predicted_seg = num_segments_ - 1;
+                    }
+                } else {
+                    // Keys are equal, use left segment
+                    predicted_seg = seg_left;
+                }
+            }
+
+            // Verify prediction is correct
+            const auto& seg = segments_[predicted_seg];
+            if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
+                return &seg;
+            }
+
+            // Prediction was wrong, search nearby segments first
+            // Check segments around prediction (common case: prediction is close)
+            for (std::size_t offset = 1; offset <= 3 && (predicted_seg >= offset || predicted_seg + offset < num_segments_); ++offset) {
+                // Check segment to the left
+                if (predicted_seg >= offset) {
+                    const auto& left_seg = segments_[predicted_seg - offset];
+                    if (!comp_(value, left_seg.min_val) && !comp_(left_seg.max_val, value)) {
+                        return &left_seg;
+                    }
+                }
+                // Check segment to the right
+                if (predicted_seg + offset < num_segments_) {
+                    const auto& right_seg = segments_[predicted_seg + offset];
+                    if (!comp_(value, right_seg.min_val) && !comp_(right_seg.max_val, value)) {
+                        return &right_seg;
+                    }
+                }
+            }
+
+            // Still not found, fall through to full binary search
+        }
+
+        // Slow path: Binary search through all segments
         std::size_t left = 0;
         std::size_t right = num_segments_;
 
@@ -815,7 +936,14 @@ private:
     std::size_t num_segments_{0};
     bool is_uniform_{false};
     double segment_scale_{0.0};
+
     std::array<detail::Segment<T>, NumSegments> segments_{};
+
+    // Sampled boundaries for fast segment finding (placed after segments_ to preserve cache layout)
+    static constexpr std::size_t NUM_SAMPLES = 8;
+    std::array<double, NUM_SAMPLES> sampled_keys_{};  // Key values at sample points
+    std::array<std::size_t, NUM_SAMPLES> sampled_segments_{};  // Corresponding segment indices
+    std::size_t num_samples_{0};  // Actual number of samples (may be < NUM_SAMPLES for small segment counts)
 };
 
 }  // namespace jazzy

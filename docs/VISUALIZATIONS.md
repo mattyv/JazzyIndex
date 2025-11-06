@@ -10,10 +10,10 @@ This document explains how to interpret the index structure visualizations gener
 
 ## Overview
 
-JazzyIndex generates visualizations that show exactly how it partitions data into segments and what prediction models (constant, linear, or quadratic) it selects for each segment. These visualizations are invaluable for understanding:
+JazzyIndex generates visualizations that show exactly how it partitions data into segments and what prediction models (constant, linear, quadratic, or cubic) it selects for each segment. These visualizations are invaluable for understanding:
 
 - How well the learned models fit your data distribution
-- Whether quadratic models are being selected for curved regions
+- Whether quadratic or cubic models are being selected for curved regions
 - What the maximum prediction errors are per segment
 - How segment boundaries align with your data
 
@@ -80,7 +80,11 @@ In the bottom-right corner, you'll find:
 - **Uniform**: Whether the index detected uniform spacing (enables O(1) segment lookup)
 - **Avg Error**: Average maximum error across all segments
 - **Max Error**: Worst-case maximum error among all segments
-- **L/Q/C Counts**: Number of LINEAR / QUADRATIC / CONSTANT models selected
+- **Model Counts**:
+  - **L**: Number of LINEAR models selected
+  - **Q**: Number of QUADRATIC models selected
+  - **Cu**: Number of CUBIC models selected
+  - **C**: Number of CONSTANT models selected
 
 ## Example Visualizations
 

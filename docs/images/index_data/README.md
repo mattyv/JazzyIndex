@@ -4,7 +4,7 @@ This directory contains **270+ visualization plots** showing the internal struct
 
 ## What's Here
 
-Each plot visualizes how JazzyIndex segments the data and selects models (CONSTANT, LINEAR, or QUADRATIC) for each segment.
+Each plot visualizes how JazzyIndex segments the data and selects models (CONSTANT, LINEAR, QUADRATIC, or CUBIC) for each segment.
 
 **Coverage:**
 - **9 distributions**: Uniform, Exponential, Clustered, Lognormal, Zipf, Mixed, Quadratic, ExtremePoly, InversePoly
@@ -25,7 +25,8 @@ Examples:
 Each visualization shows:
 - **Black dots**: Actual data points (key-value pairs)
 - **Red lines**: LINEAR models (cost: 1 FMA)
-- **Blue lines**: QUADRATIC models (cost: 3 FMA)
+- **Blue lines**: QUADRATIC models (cost: 2 FMA)
+- **Purple lines**: CUBIC models (cost: 3 FMA)
 - **Green lines**: CONSTANT models (cost: 0)
 - **Tan bands**: Prediction error tolerance zones (±max_error) shown along the entire model line. The band width shows how far off the model's predictions can be from actual index positions. Narrower bands mean more accurate predictions and faster queries.
 - **Gray dashed lines**: Segment boundaries

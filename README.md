@@ -50,12 +50,12 @@ Here's JazzyIndex compared head-to-head with `std::lower_bound` (black X markers
 
 | Distribution | `std::lower_bound` | JazzyIndex (S=256) | **Speedup** |
 |--------------|-------------------:|-------------------:|------------:|
-| Uniform      | 17.4 ns | 3.2 ns | **5.4x** |
-| Lognormal    | 17.4 ns | 3.2 ns | **5.4x** |
-| Exponential  | 17.4 ns | 3.2 ns | **5.4x** |
-| Clustered    | 17.3 ns | 3.5 ns | **4.9x** |
-| Mixed        | 17.3 ns | 3.2 ns | **5.4x** |
-| Zipf         | 18.6 ns | 3.2 ns | **5.8x** |
+| Uniform      | 17.0 ns | 3.8 ns | **4.4x** |
+| Exponential  | 17.0 ns | 5.9 ns | **2.9x** |
+| Quadratic    | 16.9 ns | 6.2 ns | **2.7x** |
+| ExtremePoly  | 17.0 ns | 6.2 ns | **2.7x** |
+| Clustered    | 17.0 ns | 6.2 ns | **2.7x** |
+| Mixed        | 17.0 ns | 6.2 ns | **2.7x** |
 
 *All measurements on 10,000 elements (Apple M2, Release build with -O3 -march=native)*
 
@@ -119,8 +119,9 @@ When you call `build()`, here's what happens:
 The lookup process has three stages:
 
 **Stage 1: Find the segment** (O(log segments) or O(1))
-- Fast path: If data is uniform, compute segment index arithmetically.
-- Slow path: Binary search through segment metadata (min/max values).
+- Fastest path: If data is uniform, compute segment index arithmetically in O(1).
+- Fast path: Use sampled segment boundaries - binary search through 8 samples (log₂(8) = 3 comparisons) + linear interpolation to predict the segment, then verify nearby segments.
+- Fallback: Binary search through all segment metadata if needed (rarely used).
 
 **Stage 2: Predict within segment**
 - Use the segment's model (constant/linear/quadratic) to predict the index.
@@ -274,14 +275,40 @@ if (result != data.data() + data.size()) {
 }
 
 // Customize segment count for your workload
-jazzy::JazzyIndex<int, 512> fine_grained(data.data(), data.data() + data.size());
-jazzy::JazzyIndex<int, 64> coarse_grained(data.data(), data.data() + data.size());
+jazzy::JazzyIndex<int, jazzy::SegmentCount::XLARGE> fine_grained(data.data(), data.data() + data.size());  // 512 segments
+jazzy::JazzyIndex<int, jazzy::SegmentCount::SMALL> coarse_grained(data.data(), data.data() + data.size());   // 64 segments
+```
+
+### Working with Key-Value Pairs
+
+JazzyIndex supports indexing key-value structures using the `KeyExtractor` template parameter:
+
+```cpp
+struct Record {
+    uint64_t id;
+    std::string data;
+};
+
+std::vector<Record> records = /* sorted by id */;
+
+// Define key extraction
+auto key_extract = [](const Record& r) { return r.id; };
+
+// Build index on the id field
+jazzy::JazzyIndex<Record, jazzy::SegmentCount::LARGE, std::less<>, decltype(key_extract)>
+    index(records.data(), records.data() + records.size(), std::less<>{}, key_extract);
+
+// Query by id
+Record query{12345, ""};
+const Record* result = index.find(query);
 ```
 
 The template parameters are:
-- `T`: Value type (must be arithmetic - int, float, double, etc.)
-- `NumSegments`: Number of segments (default 256, valid range 1-4096)
+- `T`: Value type (can be any type supporting comparisons)
+- `Segments`: Segment count preset from `SegmentCount` enum (default: `SegmentCount::LARGE` = 256 segments)
+  - Available: SINGLE(1), MINIMAL(2), PICO(4), NANO(8), MICRO(16), TINY(32), SMALL(64), MEDIUM(128), LARGE(256), XLARGE(512), XXLARGE(1024), MAX(2048)
 - `Compare`: Comparison functor (default `std::less<>`)
+- `KeyExtractor`: Key extraction functor for extracting comparable keys from complex types (default `jazzy::identity` for arithmetic types)
 
 ## Building
 

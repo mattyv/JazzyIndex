@@ -1,6 +1,6 @@
 # Model Selection and Fitting Algorithms
 
-Technical deep-dive into how JazzyIndex fits and selects prediction models (constant, linear, quadratic).
+Technical deep-dive into how JazzyIndex fits and selects prediction models (constant, linear, quadratic, cubic).
 
 ## Table of Contents
 - [Overview](#overview)
@@ -114,9 +114,10 @@ If either check fails, the quadratic is non-monotonic and rejected (falls back t
 - Trade-off: Some segments use linear (higher error) but maintain correctness
 
 **Why 30% improvement?**
-- Quadratic costs 3× more than linear (3 FMA vs. 1 FMA)
-- But can reduce exponential search from ~10 iterations to ~3 iterations
-- 30% error reduction typically saves 20-50 CPU cycles, worth the extra 2 FMA
+- Quadratic costs 2× more than linear (2 FMA vs. 1 FMA)
+- Cubic costs 3× more than linear (3 FMA vs. 1 FMA)
+- But they can reduce exponential search from ~10 iterations to ~3 iterations
+- 30% error reduction typically saves 20-50 CPU cycles, worth the extra FMA operations
 
 ---
 
@@ -130,6 +131,15 @@ static constexpr double MAX_ACCEPTABLE_LINEAR_ERROR = 2.0;
 
 // Quadratic must reduce error to ≤70% of linear error
 static constexpr double QUADRATIC_IMPROVEMENT_THRESHOLD = 0.7;
+
+// If quadratic error > 6, consider cubic
+static constexpr std::size_t MAX_ACCEPTABLE_QUADRATIC_ERROR = 6;
+
+// Only try cubic if quadratic error < 50 (above 50, data is too noisy)
+static constexpr std::size_t MAX_CUBIC_WORTHWHILE_ERROR = 50;
+
+// Cubic must reduce error to ≤70% of quadratic error
+static constexpr double CUBIC_IMPROVEMENT_THRESHOLD = 0.7;
 
 // Add margin to search radius
 static constexpr std::uint64_t SEARCH_RADIUS_MARGIN = 2;
@@ -393,10 +403,11 @@ while (true) {
 
 JazzyIndex's model selection is driven by empirical cost-benefit analysis:
 - **Constant models:** Free prediction, perfect for duplicates
-- **Linear models:** 1 FMA, good for ~90% of segments
-- **Quadratic models:** 3 FMA, essential for curved regions
+- **Linear models:** 1 FMA, good for most segments
+- **Quadratic models:** 2 FMA, essential for curved regions
+- **Cubic models:** 3 FMA, for highly curved data where quadratic isn't enough
 
-The key insight: **Don't use quadratic unless it saves more than it costs.**
+The key insight: **Don't use a more complex model unless it saves more than it costs.**
 
 The recent fix made quadratic models actually work, transforming JazzyIndex from "fast on uniform data" to "fast on all real-world distributions."
 

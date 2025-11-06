@@ -32,6 +32,18 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
     }
     oss << "],\n";
 
+    // Export sampled boundaries (for segment finding)
+    oss << "  \"sampled_boundaries\": {\n";
+    oss << "    \"num_samples\": " << index.num_samples_ << ",\n";
+    oss << "    \"samples\": [\n";
+    for (std::size_t i = 0; i < index.num_samples_; ++i) {
+        if (i > 0) oss << ",\n";
+        oss << "      {\"key\": " << index.sampled_keys_[i]
+            << ", \"segment\": " << index.sampled_segments_[i] << "}";
+    }
+    oss << "\n    ]\n";
+    oss << "  },\n";
+
     // Export segments
     oss << "  \"segments\": [\n";
     for (std::size_t i = 0; i < num_segments; ++i) {
@@ -61,6 +73,9 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
             case detail::ModelType::CONSTANT:
                 oss << "CONSTANT";
                 break;
+            case detail::ModelType::SAMPLED:
+                oss << "SAMPLED";  // Note: segments don't use SAMPLED (only segment finder uses it)
+                break;
         }
         oss << "\",\n";
 
@@ -84,6 +99,9 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
                 break;
             case detail::ModelType::CONSTANT:
                 oss << "\"constant_idx\": " << seg.params.constant.constant_idx;
+                break;
+            case detail::ModelType::SAMPLED:
+                // SAMPLED is not used for segment models, only for segment finder
                 break;
         }
         oss << "}\n";
