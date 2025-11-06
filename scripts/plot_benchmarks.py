@@ -202,12 +202,48 @@ def parse_benchmark_name(name: str) -> BenchmarkKey:
         raise ValueError(f"Unknown benchmark type: {parts[0]}")
 
 
-def load_benchmark_data(path: Path):
+def load_segment_finder_models(index_data_dir: Path) -> Dict[Tuple[str, int, int], str]:
+    """
+    Load segment finder model types from index data JSON files.
+    Returns: dict mapping (distribution, N, S) -> model_type
+    """
+    models = {}
+    if not index_data_dir.exists():
+        return models
+
+    for json_file in index_data_dir.glob("index_*_N*_S*.json"):
+        try:
+            with json_file.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            # Parse filename: index_<Distribution>_N<size>_S<segments>.json
+            filename = json_file.stem  # Remove .json
+            parts = filename.split("_")
+            if len(parts) >= 4:
+                distribution = parts[1]
+                n_str = parts[2]  # N10000
+                s_str = parts[3]  # S256
+
+                if n_str.startswith("N") and s_str.startswith("S"):
+                    n = int(n_str[1:])
+                    s = int(s_str[1:])
+                    model_type = data.get("segment_finder", {}).get("model_type", "UNKNOWN")
+                    models[(distribution, n, s)] = model_type
+        except Exception:
+            # Skip files that can't be parsed
+            continue
+
+    return models
+
+
+def load_benchmark_data(path: Path, index_data_dir: Path = None):
     """
     Load the JSON file and aggregate results as:
       data[distribution][scenario][(implementation, segments)] -> list[(size, time_ns)]
     where implementation is "JazzyIndex" or "LowerBound"
     and segments is the segment count for JazzyIndex or "baseline" for LowerBound
+
+    Also returns segment finder model information if index_data_dir is provided.
     """
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
@@ -240,7 +276,12 @@ def load_benchmark_data(path: Path):
 
         grouped[distribution][scenario][impl_key].append((size, time_ns))
 
-    return grouped
+    # Load segment finder models if directory provided
+    models = {}
+    if index_data_dir:
+        models = load_segment_finder_models(index_data_dir)
+
+    return grouped, models
 
 
 def scenario_sort_key(scenario: str) -> Tuple[int, str]:
@@ -250,8 +291,10 @@ def scenario_sort_key(scenario: str) -> Tuple[int, str]:
         return (len(SCENARIO_ORDER), scenario)
 
 
-def plot_segment_group(grouped, output: Path, segment_list: List[int], group_name: str) -> None:
+def plot_segment_group(grouped, output: Path, segment_list: List[int], group_name: str, models: Dict[Tuple[str, int, int], str] = None) -> None:
     """Plot benchmarks for a specific group of segment counts."""
+    if models is None:
+        models = {}
     distributions = sorted(grouped)
     if not distributions:
         raise ValueError("No benchmark results were found in the input file.")
@@ -346,7 +389,18 @@ def plot_segment_group(grouped, output: Path, segment_list: List[int], group_nam
                         alpha=0.9,
                     )
 
-        ax.set_title(distribution, fontsize=12, fontweight="bold")
+        # Find model type for this distribution (use largest segment/size if available)
+        model_info = ""
+        for seg in reversed(segment_list):  # Check largest segment first
+            for size in [10000, 1000, 100]:  # Check common sizes
+                model_type = models.get((distribution, size, seg))
+                if model_type:
+                    model_info = f" ({model_type})"
+                    break
+            if model_info:
+                break
+
+        ax.set_title(f"{distribution}{model_info}", fontsize=12, fontweight="bold")
         ax.set_xscale("log")
         ax.set_yscale("log")
         ax.yaxis.set_major_locator(LogLocator(base=10.0, subs=(1.0, 2.0, 5.0), numticks=15))
@@ -466,7 +520,7 @@ def plot_segment_group(grouped, output: Path, segment_list: List[int], group_nam
     plt.close(fig)
 
 
-def plot(grouped, output: Path) -> None:
+def plot(grouped, output: Path, models: Dict[Tuple[str, int, int], str] = None) -> None:
     """Generate plots split by segment count groups."""
     # Generate output paths for each segment group
     output_stem = output.stem
@@ -475,7 +529,7 @@ def plot(grouped, output: Path) -> None:
 
     for group_name, segment_list in SEGMENT_GROUPS.items():
         group_output = output_dir / f"{output_stem}_{group_name}{output_suffix}"
-        plot_segment_group(grouped, group_output, segment_list, group_name)
+        plot_segment_group(grouped, group_output, segment_list, group_name, models)
 
 
 def main() -> None:
@@ -492,10 +546,16 @@ def main() -> None:
         default=Path("benchmarks/jazzy_benchmarks.png"),
         help="Destination PNG (will be overwritten). Default: benchmarks/jazzy_benchmarks.png",
     )
+    parser.add_argument(
+        "--index-data-dir",
+        type=Path,
+        default=Path("docs/images/index_data"),
+        help="Directory containing index data JSON files with model information. Default: docs/images/index_data",
+    )
     args = parser.parse_args()
 
-    grouped = load_benchmark_data(args.input)
-    plot(grouped, args.output)
+    grouped, models = load_benchmark_data(args.input, args.index_data_dir)
+    plot(grouped, args.output, models)
 
 
 if __name__ == "__main__":

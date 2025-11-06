@@ -97,6 +97,7 @@ if(BUILD_TESTS)
         tests/gtest_comparator_tests.cpp
         tests/gtest_error_recovery_tests.cpp
         tests/gtest_uniformity_tests.cpp
+        tests/gtest_segment_finder_tests.cpp
         tests/gtest_property_tests.cpp
         tests/gtest_key_value_tests.cpp
         tests/gtest_binary_search_tests.cpp

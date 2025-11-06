@@ -19,8 +19,53 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
     oss << "{\n";
     oss << "  \"size\": " << size << ",\n";
     oss << "  \"num_segments\": " << num_segments << ",\n";
-    oss << "  \"is_uniform\": " << (index.is_uniform_ ? "true" : "false") << ",\n";
-    oss << "  \"segment_scale\": " << index.segment_scale_ << ",\n";
+
+    // Segment finder model info
+    oss << "  \"segment_finder\": {\n";
+    oss << "    \"model_type\": \"";
+    switch (index.segment_finder_.model_type) {
+        case detail::ModelType::LINEAR: oss << "LINEAR"; break;
+        case detail::ModelType::QUADRATIC: oss << "QUADRATIC"; break;
+        case detail::ModelType::CUBIC: oss << "CUBIC"; break;
+        case detail::ModelType::EXPONENTIAL: oss << "EXPONENTIAL"; break;
+        case detail::ModelType::LOGARITHMIC: oss << "LOGARITHMIC"; break;
+        case detail::ModelType::CONSTANT: oss << "CONSTANT"; break;
+    }
+    oss << "\",\n";
+    oss << "    \"max_error\": " << index.segment_finder_.max_error << ",\n";
+    oss << "    \"params\": {";
+    switch (index.segment_finder_.model_type) {
+        case detail::ModelType::LINEAR:
+            oss << "\"slope\": " << index.segment_finder_.params.linear.slope << ", "
+                << "\"intercept\": " << index.segment_finder_.params.linear.intercept;
+            break;
+        case detail::ModelType::QUADRATIC:
+            oss << "\"a\": " << index.segment_finder_.params.quadratic.a << ", "
+                << "\"b\": " << index.segment_finder_.params.quadratic.b << ", "
+                << "\"c\": " << index.segment_finder_.params.quadratic.c;
+            break;
+        case detail::ModelType::CUBIC:
+            oss << "\"a\": " << index.segment_finder_.params.cubic.a << ", "
+                << "\"b\": " << index.segment_finder_.params.cubic.b << ", "
+                << "\"c\": " << index.segment_finder_.params.cubic.c << ", "
+                << "\"d\": " << index.segment_finder_.params.cubic.d;
+            break;
+        case detail::ModelType::EXPONENTIAL:
+            oss << "\"a\": " << index.segment_finder_.params.exponential.a << ", "
+                << "\"b\": " << index.segment_finder_.params.exponential.b << ", "
+                << "\"c\": " << index.segment_finder_.params.exponential.c;
+            break;
+        case detail::ModelType::LOGARITHMIC:
+            oss << "\"a\": " << index.segment_finder_.params.logarithmic.a << ", "
+                << "\"b\": " << index.segment_finder_.params.logarithmic.b << ", "
+                << "\"c\": " << index.segment_finder_.params.logarithmic.c;
+            break;
+        default:
+            break;
+    }
+    oss << "}\n";
+    oss << "  },\n";
+
     oss << "  \"min\": " << static_cast<double>(index.min_) << ",\n";
     oss << "  \"max\": " << static_cast<double>(index.max_) << ",\n";
 
@@ -58,6 +103,12 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
             case detail::ModelType::CUBIC:
                 oss << "CUBIC";
                 break;
+            case detail::ModelType::EXPONENTIAL:
+                oss << "EXPONENTIAL";
+                break;
+            case detail::ModelType::LOGARITHMIC:
+                oss << "LOGARITHMIC";
+                break;
             case detail::ModelType::CONSTANT:
                 oss << "CONSTANT";
                 break;
@@ -81,6 +132,16 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
                     << "\"b\": " << seg.params.cubic.b << ", "
                     << "\"c\": " << seg.params.cubic.c << ", "
                     << "\"d\": " << seg.params.cubic.d;
+                break;
+            case detail::ModelType::EXPONENTIAL:
+                oss << "\"a\": " << seg.params.exponential.a << ", "
+                    << "\"b\": " << seg.params.exponential.b << ", "
+                    << "\"c\": " << seg.params.exponential.c;
+                break;
+            case detail::ModelType::LOGARITHMIC:
+                oss << "\"a\": " << seg.params.logarithmic.a << ", "
+                    << "\"b\": " << seg.params.logarithmic.b << ", "
+                    << "\"c\": " << seg.params.logarithmic.c;
                 break;
             case detail::ModelType::CONSTANT:
                 oss << "\"constant_idx\": " << seg.params.constant.constant_idx;
