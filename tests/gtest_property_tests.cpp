@@ -16,12 +16,23 @@ using qi_index = jazzy::JazzyIndex<value_type, jazzy::to_segment_count<256>()>;
 
 // Property: All inserted values can be found
 TEST(PropertyTests, FindsAllInsertedIntegers) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     const bool result = rc::check("Finds all inserted integers", [](std::vector<value_type> values) {
         RC_PRE(!values.empty());
         std::sort(values.begin(), values.end());
 
         qi_index index;
         index.build(values.data(), values.data() + values.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+        std::string build_log = jazzy::get_debug_log();
+        if (!build_log.empty()) {
+            RC_ASSERT(build_log.find("JazzyIndex::build") != std::string::npos);
+        }
+#endif
 
         for (value_type value : values) {
             const value_type* result = index.find(value);
@@ -34,12 +45,23 @@ TEST(PropertyTests, FindsAllInsertedIntegers) {
 
 // Property: Values outside range are rejected
 TEST(PropertyTests, RejectsValuesOutsideRange) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     const bool result = rc::check("Rejects values outside range", [](std::vector<value_type> values) {
         RC_PRE(!values.empty());
         std::sort(values.begin(), values.end());
 
         qi_index index;
         index.build(values.data(), values.data() + values.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+        std::string build_log = jazzy::get_debug_log();
+        if (!build_log.empty()) {
+            RC_ASSERT(build_log.find("JazzyIndex::build") != std::string::npos);
+        }
+#endif
 
         const value_type* end = values.data() + values.size();
 
@@ -55,12 +77,23 @@ TEST(PropertyTests, RejectsValuesOutsideRange) {
 
 // Property: find() returns pointer within data range or end
 TEST(PropertyTests, FindReturnsValidPointer) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     const bool result = rc::check("Find returns valid pointer", [](std::vector<value_type> values, value_type query) {
         RC_PRE(!values.empty());
         std::sort(values.begin(), values.end());
 
         qi_index index;
         index.build(values.data(), values.data() + values.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+        std::string build_log = jazzy::get_debug_log();
+        if (!build_log.empty()) {
+            RC_ASSERT(build_log.find("JazzyIndex::build") != std::string::npos);
+        }
+#endif
 
         const value_type* result = index.find(query);
         const value_type* begin = values.data();
@@ -73,12 +106,23 @@ TEST(PropertyTests, FindReturnsValidPointer) {
 
 // Property: Monotonicity - queries in sorted order return monotonic pointers
 TEST(PropertyTests, MonotonicPointers) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     const bool result = rc::check("Monotonic pointers", [](std::vector<value_type> values) {
         RC_PRE(values.size() >= 2);
         std::sort(values.begin(), values.end());
 
         qi_index index;
         index.build(values.data(), values.data() + values.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+        std::string build_log = jazzy::get_debug_log();
+        if (!build_log.empty()) {
+            RC_ASSERT(build_log.find("JazzyIndex::build") != std::string::npos);
+        }
+#endif
 
         const value_type* prev = nullptr;
         for (value_type v : values) {
@@ -94,12 +138,23 @@ TEST(PropertyTests, MonotonicPointers) {
 
 // Property: Duplicate values are found
 TEST(PropertyTests, FindsDuplicates) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     const bool result = rc::check("Finds duplicates", [](std::vector<value_type> values) {
         RC_PRE(!values.empty());
         std::sort(values.begin(), values.end());
 
         qi_index index;
         index.build(values.data(), values.data() + values.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+        std::string build_log = jazzy::get_debug_log();
+        if (!build_log.empty()) {
+            RC_ASSERT(build_log.find("JazzyIndex::build") != std::string::npos);
+        }
+#endif
 
         auto unique_vals = values;
         unique_vals.erase(std::unique(unique_vals.begin(), unique_vals.end()), unique_vals.end());
@@ -115,10 +170,22 @@ TEST(PropertyTests, FindsDuplicates) {
 
 // Property: Size is preserved
 TEST(PropertyTests, SizePreserved) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     const bool result = rc::check("Size preserved", [](std::vector<value_type> values) {
         std::sort(values.begin(), values.end());  // Sort data before building index
         qi_index index;
         index.build(values.data(), values.data() + values.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+        std::string build_log = jazzy::get_debug_log();
+        if (!build_log.empty()) {
+            RC_ASSERT(build_log.find("JazzyIndex::build") != std::string::npos);
+        }
+#endif
+
         RC_ASSERT(index.size() == values.size());
     });
     EXPECT_TRUE(result);
@@ -126,10 +193,21 @@ TEST(PropertyTests, SizePreserved) {
 
 // Property: Empty index always returns end
 TEST(PropertyTests, EmptyIndexReturnsEnd) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     const bool result = rc::check("Empty index returns end", [](value_type query) {
         std::vector<value_type> empty;
         qi_index index;
         index.build(empty.data(), empty.data());
+
+#ifdef JAZZY_DEBUG_LOGGING
+        std::string build_log = jazzy::get_debug_log();
+        if (!build_log.empty()) {
+            RC_ASSERT(build_log.find("JazzyIndex::build") != std::string::npos);
+        }
+#endif
 
         RC_ASSERT(index.find(query) == empty.data());
     });
@@ -138,10 +216,21 @@ TEST(PropertyTests, EmptyIndexReturnsEnd) {
 
 // Property: Single element behavior
 TEST(PropertyTests, SingleElementBehavior) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     const bool result = rc::check("Single element behavior", [](value_type val, value_type query) {
         std::vector<value_type> data{val};
         qi_index index;
         index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+        std::string build_log = jazzy::get_debug_log();
+        if (!build_log.empty()) {
+            RC_ASSERT(build_log.find("JazzyIndex::build") != std::string::npos);
+        }
+#endif
 
         const value_type* result = index.find(query);
         if (query == val) {
@@ -156,12 +245,23 @@ TEST(PropertyTests, SingleElementBehavior) {
 
 // Property: Min/max values are always findable
 TEST(PropertyTests, MinMaxAlwaysFindable) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     const bool result = rc::check("Min/max always findable", [](std::vector<value_type> values) {
         RC_PRE(!values.empty());
         std::sort(values.begin(), values.end());
 
         qi_index index;
         index.build(values.data(), values.data() + values.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+        std::string build_log = jazzy::get_debug_log();
+        if (!build_log.empty()) {
+            RC_ASSERT(build_log.find("JazzyIndex::build") != std::string::npos);
+        }
+#endif
 
         const value_type* min_result = index.find(values.front());
         RC_ASSERT(min_result != values.data() + values.size());

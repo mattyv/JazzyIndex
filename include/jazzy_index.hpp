@@ -15,6 +15,7 @@
 #include <utility>
 
 #include "jazzy_index_utility.hpp"  // detail::clamp_value and arithmetic trait
+#include "jazzy_index_debug.hpp"    // DEBUG_LOG macro (conditional compilation)
 
 namespace jazzy {
 
@@ -116,37 +117,47 @@ struct alignas(64) Segment {  // Cache line aligned
     template <typename KeyExtractor = jazzy::identity>
     [[nodiscard]] std::size_t predict(const T& value, KeyExtractor key_extract = KeyExtractor{}) const
         noexcept(std::is_nothrow_invocable_v<KeyExtractor, const T&>) {
+        const double key_val = (model_type != ModelType::CONSTANT) ?
+                               static_cast<double>(std::invoke(key_extract, value)) : 0.0;
+
         switch (model_type) {
             case ModelType::LINEAR: {
-                const double key_val = static_cast<double>(std::invoke(key_extract, value));
                 const double pred = std::fma(key_val,
                                             params.linear.slope,
                                             params.linear.intercept);
-                // Clamp to non-negative before casting to unsigned type
-                return static_cast<std::size_t>(std::max(0.0, pred));
+                const std::size_t result = static_cast<std::size_t>(std::max(0.0, pred));
+                DEBUG_LOG("predict[%zu-%zu]: LINEAR - key=%.4f, pred=%.2f, result=%zu (slope=%.4f, intercept=%.4f)",
+                          start_idx, end_idx, key_val, pred, result, params.linear.slope, params.linear.intercept);
+                return result;
             }
             case ModelType::QUADRATIC: {
-                const double key_val = static_cast<double>(std::invoke(key_extract, value));
                 const double pred = std::fma(key_val,
                                             std::fma(key_val, params.quadratic.a, params.quadratic.b),
                                             params.quadratic.c);
-                // Clamp to non-negative before casting to unsigned type
-                return static_cast<std::size_t>(std::max(0.0, pred));
+                const std::size_t result = static_cast<std::size_t>(std::max(0.0, pred));
+                DEBUG_LOG("predict[%zu-%zu]: QUADRATIC - key=%.4f, pred=%.2f, result=%zu",
+                          start_idx, end_idx, key_val, pred, result);
+                return result;
             }
             case ModelType::CUBIC: {
-                const double key_val = static_cast<double>(std::invoke(key_extract, value));
                 // Horner's method: ((a*x + b)*x + c)*x + d
                 const double pred = std::fma(key_val,
                                             std::fma(key_val,
                                                     std::fma(key_val, params.cubic.a, params.cubic.b),
                                                     params.cubic.c),
                                             params.cubic.d);
-                // Clamp to non-negative before casting to unsigned type
-                return static_cast<std::size_t>(std::max(0.0, pred));
+                const std::size_t result = static_cast<std::size_t>(std::max(0.0, pred));
+                DEBUG_LOG("predict[%zu-%zu]: CUBIC - key=%.4f, pred=%.2f, result=%zu",
+                          start_idx, end_idx, key_val, pred, result);
+                return result;
             }
             case ModelType::CONSTANT:
+                DEBUG_LOG("predict[%zu-%zu]: CONSTANT - returning %zu",
+                          start_idx, end_idx, params.constant.constant_idx);
                 return params.constant.constant_idx;
             default:
+                DEBUG_LOG("predict[%zu-%zu]: UNKNOWN model type, returning start_idx=%zu",
+                          start_idx, end_idx, start_idx);
                 return start_idx;  // Fallback
         }
     }
@@ -174,10 +185,12 @@ template <typename T, typename Compare = std::less<>, typename KeyExtractor = ja
              std::is_nothrow_invocable_v<Compare, const T&, const T&>) {
     SegmentAnalysis<T> result{};
 
-    auto make_constant = [&result, start]() {
+    auto make_constant = [&result, start, end]() {
         result.best_model = ModelType::CONSTANT;
         result.linear_b = static_cast<double>(start);
         result.max_error = 0;
+        DEBUG_LOG("analyze_segment[%zu-%zu]: Selected CONSTANT model (empty or single element)",
+                  start, end);
         return result;
     };
 
@@ -264,13 +277,21 @@ template <typename T, typename Compare = std::less<>, typename KeyExtractor = ja
 
     const double linear_mean_error = linear_total_error / static_cast<double>(n);
 
+    DEBUG_LOG("analyze_segment[%zu-%zu]: n=%zu, linear_max_error=%zu, linear_mean_error=%.2f, slope=%.4f, intercept=%.4f",
+              start, end, n, linear_max_error, linear_mean_error, slope, intercept);
+
     // If linear is good enough, use it
     if (linear_max_error <= MAX_ACCEPTABLE_LINEAR_ERROR) {
         result.best_model = ModelType::LINEAR;
         result.max_error = linear_max_error;
         result.mean_error = linear_mean_error;
+        DEBUG_LOG("analyze_segment[%zu-%zu]: Selected LINEAR model (max_error=%zu <= threshold=%zu)",
+                  start, end, linear_max_error, MAX_ACCEPTABLE_LINEAR_ERROR);
         return result;
     }
+
+    DEBUG_LOG("analyze_segment[%zu-%zu]: Linear error too high (%zu > %zu), trying QUADRATIC",
+              start, end, linear_max_error, MAX_ACCEPTABLE_LINEAR_ERROR);
 
     // Try quadratic model: we already have the sums from the single pass above
 
@@ -319,6 +340,9 @@ template <typename T, typename Compare = std::less<>, typename KeyExtractor = ja
 
         const double quad_mean_error = quad_total_error / n_double;
 
+        DEBUG_LOG("analyze_segment[%zu-%zu]: QUADRATIC: max_error=%zu, mean_error=%.2f, improvement_threshold=%.0f",
+                  start, end, quad_max_error, quad_mean_error, linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD);
+
         // Choose quadratic if it's significantly better
         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
             // Transform coefficients from normalized space back to original space
@@ -336,6 +360,9 @@ template <typename T, typename Compare = std::less<>, typename KeyExtractor = ja
             const double derivative_at_max = 2.0 * quad_a_transformed * max_val + quad_b_transformed;
             const bool is_monotonic = (derivative_at_min >= 0.0) && (derivative_at_max >= 0.0);
 
+            DEBUG_LOG("analyze_segment[%zu-%zu]: QUADRATIC monotonicity: deriv_at_min=%.4f, deriv_at_max=%.4f, is_monotonic=%d",
+                      start, end, derivative_at_min, derivative_at_max, is_monotonic);
+
             // Only accept quadratic if it's monotonic
             if (is_monotonic) {
                 // Check if we should try cubic for even better fit
@@ -343,6 +370,8 @@ template <typename T, typename Compare = std::less<>, typename KeyExtractor = ja
                 // High error (>50) likely indicates discontinuity where cubic won't help
                 if (quad_max_error > MAX_ACCEPTABLE_QUADRATIC_ERROR &&
                     quad_max_error < MAX_CUBIC_WORTHWHILE_ERROR) {
+                    DEBUG_LOG("analyze_segment[%zu-%zu]: Quad error in sweet spot (%zu), trying CUBIC",
+                              start, end, quad_max_error);
                     // Try cubic model using same normalized sums
                     // System: [Σx⁶  Σx⁵  Σx⁴  Σx³] [a]   [Σx³y]
                     //         [Σx⁵  Σx⁴  Σx³  Σx²] [b] = [Σx²y]
@@ -454,6 +483,9 @@ template <typename T, typename Compare = std::less<>, typename KeyExtractor = ja
                             cubic_total_error += error;
                         }
 
+                        DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC: max_error=%zu, improvement_threshold=%.0f",
+                                  start, end, cubic_max_error, quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD);
+
                         // Choose cubic if it's significantly better than quadratic
                         if (cubic_max_error < quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD) {
                             // Transform coefficients from normalized space to original space
@@ -486,19 +518,31 @@ template <typename T, typename Compare = std::less<>, typename KeyExtractor = ja
                             };
 
                             bool cubic_is_monotonic = true;
+                            const double cubic_deriv_at_min = cubic_derivative(min_val);
+                            const double cubic_deriv_at_max = cubic_derivative(max_val);
+
+                            DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC monotonicity check: deriv_at_min=%.4f, deriv_at_max=%.4f",
+                                      start, end, cubic_deriv_at_min, cubic_deriv_at_max);
 
                             // Check endpoints
-                            if (cubic_derivative(min_val) < 0.0 || cubic_derivative(max_val) < 0.0) {
+                            if (cubic_deriv_at_min < 0.0 || cubic_deriv_at_max < 0.0) {
                                 cubic_is_monotonic = false;
+                                DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC failed endpoint monotonicity check", start, end);
                             }
 
                             // Check critical points (where f''(x) = 0)
                             // f''(x) = 6*a*x + 2*b = 0 => x = -b/(3*a)
                             if (cubic_is_monotonic && std::abs(cubic_a_orig) > NUMERICAL_TOLERANCE) {
                                 const double critical_x = -cubic_b_orig / (3.0 * cubic_a_orig);
+                                DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC critical point at x=%.4f (range: [%.4f, %.4f])",
+                                          start, end, critical_x, min_val, max_val);
                                 if (critical_x >= min_val && critical_x <= max_val) {
-                                    if (cubic_derivative(critical_x) < 0.0) {
+                                    const double deriv_at_critical = cubic_derivative(critical_x);
+                                    DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC deriv at critical point: %.4f",
+                                              start, end, deriv_at_critical);
+                                    if (deriv_at_critical < 0.0) {
                                         cubic_is_monotonic = false;
+                                        DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC failed critical point monotonicity", start, end);
                                     }
                                 }
                             }
@@ -511,6 +555,8 @@ template <typename T, typename Compare = std::less<>, typename KeyExtractor = ja
                                 result.cubic_d = cubic_d_orig;
                                 result.max_error = cubic_max_error;
                                 result.mean_error = cubic_total_error / n_double;
+                                DEBUG_LOG("analyze_segment[%zu-%zu]: Selected CUBIC model (max_error=%zu, improved from quad_error=%zu)",
+                                          start, end, cubic_max_error, quad_max_error);
                                 return result;
                             }
                         }
@@ -524,16 +570,27 @@ template <typename T, typename Compare = std::less<>, typename KeyExtractor = ja
                 result.quad_c = quad_c_transformed;
                 result.max_error = quad_max_error;
                 result.mean_error = quad_mean_error;
+                DEBUG_LOG("analyze_segment[%zu-%zu]: Selected QUADRATIC model (max_error=%zu, improved from linear_error=%zu, cubic failed/not worthwhile)",
+                          start, end, quad_max_error, linear_max_error);
                 return result;
+            } else {
+                DEBUG_LOG("analyze_segment[%zu-%zu]: QUADRATIC not monotonic, falling back to LINEAR", start, end);
             }
             // If non-monotonic, fall through to use linear model instead
+        } else {
+            DEBUG_LOG("analyze_segment[%zu-%zu]: QUADRATIC not good enough (error=%zu >= threshold=%.0f), using LINEAR",
+                      start, end, quad_max_error, linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD);
         }
+    } else {
+        DEBUG_LOG("analyze_segment[%zu-%zu]: Quadratic matrix singular (det=%.6f), using LINEAR", start, end, det);
     }
 
     // Default to linear
     result.best_model = ModelType::LINEAR;
     result.max_error = linear_max_error;
     result.mean_error = linear_mean_error;
+    DEBUG_LOG("analyze_segment[%zu-%zu]: Defaulted to LINEAR model (max_error=%zu)",
+              start, end, linear_max_error);
     return result;
 }
 
@@ -624,6 +681,8 @@ public:
         size_ = static_cast<std::size_t>(last - first);
         key_extract_ = key_extract;
         comp_ = comp;
+
+        DEBUG_LOG("JazzyIndex::build: Building index for %zu elements with %zu segments", size_, NumSegments);
 
         if (size_ == 0) {
             return;
@@ -727,7 +786,12 @@ public:
         // Compute scale factor for O(1) segment lookup if data is uniform
         if (is_uniform_ && total_range >= detail::ZERO_RANGE_THRESHOLD) {
             segment_scale_ = static_cast<double>(num_segments_) / total_range;
+            DEBUG_LOG("JazzyIndex::build: Data is UNIFORM, segment_scale=%.6f", segment_scale_);
+        } else {
+            DEBUG_LOG("JazzyIndex::build: Data is NON-UNIFORM (is_uniform=%d, total_range=%.4f)",
+                      is_uniform_, total_range);
         }
+        DEBUG_LOG("JazzyIndex::build: Build complete with %zu segments", num_segments_);
     }
 
     // Iterator-based build method
@@ -742,8 +806,11 @@ public:
     }
 
     [[nodiscard]] const_iterator find(const T& key) const {
+        DEBUG_LOG("JazzyIndex::find: Called (size=%zu, is_built=%d)", size_, is_built());
+
         // Return end iterator if index not built or empty
         if (!is_built() || size_ == 0) {
+            DEBUG_LOG("JazzyIndex::find: Index not built or empty, returning end()");
             return base_ + size_;
         }
 
@@ -751,12 +818,14 @@ public:
         const T& first_value = base_[0];
         const T& last_value = base_[size_ - 1];
         if (comp_(key, first_value) || comp_(last_value, key)) {
+            DEBUG_LOG("JazzyIndex::find: Key out of bounds, returning end()");
             return base_ + size_;
         }
 
         // Find segment using binary search
         const auto seg = find_segment(key);
         if (seg == nullptr) {
+            DEBUG_LOG("JazzyIndex::find: find_segment returned nullptr, returning end()");
             return base_ + size_;
         }
 
@@ -765,16 +834,23 @@ public:
         predicted = detail::clamp_value<std::size_t>(predicted, seg->start_idx,
                                                       seg->end_idx > 0 ? seg->end_idx - 1 : 0);
 
+        DEBUG_LOG("JazzyIndex::find: Predicted index %zu for key in segment [%zu-%zu]",
+                  predicted, seg->start_idx, seg->end_idx);
+
         const T* begin = base_;
 
         // Check predicted position first
         if (equal(begin[predicted], key)) {
+            DEBUG_LOG("JazzyIndex::find: Found exact match at predicted index %zu", predicted);
             return begin + predicted;
         }
 
         // Determine search direction using one comparison
         const bool search_left = comp_(key, begin[predicted]);
         const std::size_t max_radius = std::max<std::size_t>(seg->max_error + detail::SEARCH_RADIUS_MARGIN, detail::MIN_SEARCH_RADIUS);
+
+        DEBUG_LOG("JazzyIndex::find: Search direction: %s, max_radius: %zu",
+                  search_left ? "LEFT" : "RIGHT", max_radius);
 
         if (search_left) {
             // Key is less than predicted value, search leftward
@@ -791,6 +867,8 @@ public:
                 // Search the new range [left_pos, right_boundary)
                 const T* found = std::lower_bound(begin + left_pos, begin + right_boundary, key, comp_);
                 if (found != begin + right_boundary && equal(*found, key)) {
+                    DEBUG_LOG("JazzyIndex::find: Found match at index %zu (left search, radius=%zu)",
+                              static_cast<std::size_t>(found - begin), radius);
                     return found;
                 }
 
@@ -799,8 +877,11 @@ public:
 
             // Fallback: search any remaining unsearched left region
             if (right_boundary > seg->start_idx) {
+                DEBUG_LOG("JazzyIndex::find: Left fallback search [%zu-%zu)", seg->start_idx, right_boundary);
                 const T* found = std::lower_bound(begin + seg->start_idx, begin + right_boundary, key, comp_);
                 if (found != begin + right_boundary && equal(*found, key)) {
+                    DEBUG_LOG("JazzyIndex::find: Found match at index %zu (left fallback)",
+                              static_cast<std::size_t>(found - begin));
                     return found;
                 }
             }
@@ -819,6 +900,8 @@ public:
                 // Search the new range [left_boundary, right_pos)
                 const T* found = std::lower_bound(begin + left_boundary, begin + right_pos, key, comp_);
                 if (found != begin + right_pos && equal(*found, key)) {
+                    DEBUG_LOG("JazzyIndex::find: Found match at index %zu (right search, radius=%zu)",
+                              static_cast<std::size_t>(found - begin), radius);
                     return found;
                 }
 
@@ -827,13 +910,17 @@ public:
 
             // Fallback: search any remaining unsearched right region
             if (left_boundary < seg->end_idx) {
+                DEBUG_LOG("JazzyIndex::find: Right fallback search [%zu-%zu)", left_boundary, seg->end_idx);
                 const T* found = std::lower_bound(begin + left_boundary, begin + seg->end_idx, key, comp_);
                 if (found != begin + seg->end_idx && equal(*found, key)) {
+                    DEBUG_LOG("JazzyIndex::find: Found match at index %zu (right fallback)",
+                              static_cast<std::size_t>(found - begin));
                     return found;
                 }
             }
         }
 
+        DEBUG_LOG("JazzyIndex::find: Not found after exhaustive search, returning end()");
         return base_ + size_;
     }
 
@@ -841,10 +928,12 @@ public:
     // Returns a pair of iterators [lower, upper) where all elements in the range are equivalent to value
     // For missing values, returns [position, position) where position is where the value would be inserted
     [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const T& value) const {
+        DEBUG_LOG("JazzyIndex::equal_range: Called for value");
         const_iterator end = base_ + size_;
 
         // Handle empty index
         if (size_ == 0) {
+            DEBUG_LOG("JazzyIndex::equal_range: Empty index, returning [end, end)");
             return std::make_pair(end, end);
         }
 
@@ -855,19 +944,24 @@ public:
         // If value is not found, both lower and upper point to insertion position
         // This matches std::equal_range behavior
         if (lower == end || !are_equivalent(*lower, value)) {
+            DEBUG_LOG("JazzyIndex::equal_range: Value not found, returning empty range");
             return std::make_pair(lower, lower);
         }
 
+        DEBUG_LOG("JazzyIndex::equal_range: Found range [%zu, %zu)",
+                  static_cast<std::size_t>(lower - base_), static_cast<std::size_t>(upper - base_));
         return std::make_pair(lower, upper);
     }
 
     // Find the first occurrence of a value (lower bound)
     [[nodiscard]] const_iterator find_lower_bound(const T& value) const {
+        DEBUG_LOG("JazzyIndex::find_lower_bound: Called");
         const_iterator end = base_ + size_;
 
         // Use the existing prediction mechanism to get close
         const auto* seg = find_segment(value);
         if (seg == nullptr) {
+            DEBUG_LOG("JazzyIndex::find_lower_bound: Segment not found, returning end()");
             return end;
         }
 
@@ -876,6 +970,9 @@ public:
         // Clamp to segment bounds
         predicted_index = detail::clamp_value<std::size_t>(predicted_index, seg->start_idx,
                                                            seg->end_idx > 0 ? seg->end_idx - 1 : 0);
+
+        DEBUG_LOG("JazzyIndex::find_lower_bound: Predicted index %zu in segment [%zu-%zu]",
+                  predicted_index, seg->start_idx, seg->end_idx);
 
         // Now perform a local search to find the exact lower bound
         const T* ptr = base_ + predicted_index;
@@ -886,6 +983,8 @@ public:
             while (ptr > base_ && are_equivalent(*(ptr - 1), value)) {
                 --ptr;
             }
+            std::size_t result_idx = static_cast<std::size_t>(ptr - base_);
+            DEBUG_LOG("JazzyIndex::find_lower_bound: Found lower bound at index %zu (scanned backward)", result_idx);
             return ptr;
         }
 
@@ -894,16 +993,21 @@ public:
         const T* search_begin = (ptr >= base_ + search_radius) ? (ptr - search_radius) : base_;
         const T* search_end = std::min(end, ptr + search_radius + 1);
 
-        return std::lower_bound(search_begin, search_end, value, comp_);
+        const T* result = std::lower_bound(search_begin, search_end, value, comp_);
+        DEBUG_LOG("JazzyIndex::find_lower_bound: Binary search result at index %zu",
+                  static_cast<std::size_t>(result - base_));
+        return result;
     }
 
     // Find one past the last occurrence of a value (upper bound)
     [[nodiscard]] const_iterator find_upper_bound(const T& value) const {
+        DEBUG_LOG("JazzyIndex::find_upper_bound: Called");
         const_iterator end = base_ + size_;
 
         // Similar to lower_bound, but finds one past the last occurrence
         const auto* seg = find_segment(value);
         if (seg == nullptr) {
+            DEBUG_LOG("JazzyIndex::find_upper_bound: Segment not found, returning end()");
             return end;
         }
 
@@ -912,6 +1016,9 @@ public:
         // Clamp to segment bounds
         predicted_index = detail::clamp_value<std::size_t>(predicted_index, seg->start_idx,
                                                            seg->end_idx > 0 ? seg->end_idx - 1 : 0);
+
+        DEBUG_LOG("JazzyIndex::find_upper_bound: Predicted index %zu in segment [%zu-%zu]",
+                  predicted_index, seg->start_idx, seg->end_idx);
 
         // Perform local search for upper bound
         const_iterator ptr = base_ + predicted_index;
@@ -922,6 +1029,8 @@ public:
             while (ptr < end && are_equivalent(*ptr, value)) {
                 ++ptr;
             }
+            std::size_t result_idx = static_cast<std::size_t>(ptr - base_);
+            DEBUG_LOG("JazzyIndex::find_upper_bound: Found upper bound at index %zu (scanned forward)", result_idx);
             return ptr;
         }
 
@@ -930,7 +1039,10 @@ public:
         const T* search_begin = (ptr >= base_ + search_radius) ? (ptr - search_radius) : base_;
         const T* search_end = std::min(end, ptr + search_radius + 1);
 
-        return std::upper_bound(search_begin, search_end, value, comp_);
+        const T* result = std::upper_bound(search_begin, search_end, value, comp_);
+        DEBUG_LOG("JazzyIndex::find_upper_bound: Binary search result at index %zu",
+                  static_cast<std::size_t>(result - base_));
+        return result;
     }
 
     [[nodiscard]] std::size_t size() const noexcept { return size_; }
@@ -973,52 +1085,74 @@ public:
 private:
 
     [[nodiscard]] const detail::Segment<T>* find_segment(const T& value) const noexcept {
+        DEBUG_LOG("find_segment: Called with is_uniform=%d, num_segments=%zu", is_uniform_, num_segments_);
+
         if (num_segments_ == 0) {
+            DEBUG_LOG("find_segment: No segments, returning nullptr");
             return nullptr;
         }
 
         // Fast path: O(1) arithmetic lookup for uniform data
         if (is_uniform_) {
-            const double offset = static_cast<double>(std::invoke(key_extract_, value)) -
-                                 static_cast<double>(std::invoke(key_extract_, min_));
+            const double key_val = static_cast<double>(std::invoke(key_extract_, value));
+            const double min_key = static_cast<double>(std::invoke(key_extract_, min_));
+            const double offset = key_val - min_key;
             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
+
+            DEBUG_LOG("find_segment: UNIFORM path - key_val=%.4f, offset=%.4f, segment_scale=%.6f, seg_idx=%zu",
+                      key_val, offset, segment_scale_, seg_idx);
 
             // Clamp to valid range
             if (seg_idx >= num_segments_) {
                 seg_idx = num_segments_ - 1;
+                DEBUG_LOG("find_segment: Clamped seg_idx to %zu", seg_idx);
             }
 
             // Verify we got the right segment (should always be true for uniform data)
             const auto& seg = segments_[seg_idx];
             if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
+                DEBUG_LOG("find_segment: UNIFORM succeeded, returning segment %zu [%zu-%zu]",
+                          seg_idx, seg.start_idx, seg.end_idx);
                 return &seg;
             }
 
+            DEBUG_LOG("find_segment: UNIFORM verification failed, falling back to binary search");
             // Fallback to binary search if arithmetic failed (rare)
         }
 
         // Slow path: Binary search through segments for skewed data
+        DEBUG_LOG("find_segment: Using binary search (non-uniform or fallback)");
         std::size_t left = 0;
         std::size_t right = num_segments_;
+        int iterations = 0;
 
         while (left < right) {
             const std::size_t mid = left + (right - left) / 2;
+            ++iterations;
+
+            DEBUG_LOG("find_segment: Binary search iter %d - left=%zu, mid=%zu, right=%zu",
+                      iterations, left, mid, right);
 
             if (comp_(value, segments_[mid].min_val)) {
+                DEBUG_LOG("find_segment: Value < seg[%zu].min, searching left", mid);
                 right = mid;
             } else if (comp_(segments_[mid].max_val, value)) {
+                DEBUG_LOG("find_segment: Value > seg[%zu].max, searching right", mid);
                 left = mid + 1;
             } else {
                 // value is within this segment
+                DEBUG_LOG("find_segment: Found segment %zu [%zu-%zu]", mid, segments_[mid].start_idx, segments_[mid].end_idx);
                 return &segments_[mid];
             }
         }
 
         // Edge case: if we're past all segments, return last segment
         if (left > 0 && left >= num_segments_) {
+            DEBUG_LOG("find_segment: Past all segments, returning last segment %zu", num_segments_ - 1);
             return &segments_[num_segments_ - 1];
         }
 
+        DEBUG_LOG("find_segment: Returning segment %zu or nullptr (left=%zu)", left, left);
         return left < num_segments_ ? &segments_[left] : nullptr;
     }
 

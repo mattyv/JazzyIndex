@@ -19,6 +19,7 @@ target_include_directories(jazzy_index INTERFACE
 option(BUILD_TESTS "Build JazzyIndex unit and property tests" ON)
 option(BUILD_BENCHMARKS "Build JazzyIndex benchmark suite" ON)
 option(ENABLE_COVERAGE "Enable coverage instrumentation for tests" OFF)
+option(ENABLE_DEBUG_LOGGING "Enable debug logging for tests" OFF)
 
 # Benchmark configuration
 set(BENCHMARK_REPETITIONS "1" CACHE STRING "Number of times to repeat each benchmark (default: 1)")
@@ -103,6 +104,7 @@ if(BUILD_TESTS)
         tests/gtest_parallel_tests.cpp
         tests/gtest_equal_range_tests.cpp
         tests/gtest_iterator_tests.cpp
+        tests/gtest_debug_logging_tests.cpp
     )
     target_link_libraries(jazzy_index_tests PRIVATE
         jazzy_index
@@ -119,6 +121,47 @@ if(BUILD_TESTS)
     target_include_directories(jazzy_index_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/tests
     )
+
+    # Enable debug logging if requested
+    if(ENABLE_DEBUG_LOGGING)
+        target_compile_definitions(jazzy_index_tests PRIVATE JAZZY_DEBUG_LOGGING)
+    endif()
+
+    # Create a separate target for tests with debug logging always enabled
+    # Usage: cmake --build build --target jazzy_index_tests_debug && ./build/jazzy_index_tests_debug
+    # This target validates internal logging and provides visibility into JazzyIndex operations
+    add_executable(jazzy_index_tests_debug EXCLUDE_FROM_ALL
+        tests/gtest_unit_tests.cpp
+        tests/gtest_model_tests.cpp
+        tests/gtest_boundary_tests.cpp
+        tests/gtest_floating_point_tests.cpp
+        tests/gtest_comparator_tests.cpp
+        tests/gtest_error_recovery_tests.cpp
+        tests/gtest_uniformity_tests.cpp
+        tests/gtest_property_tests.cpp
+        tests/gtest_key_value_tests.cpp
+        tests/gtest_binary_search_tests.cpp
+        tests/gtest_parallel_tests.cpp
+        tests/gtest_equal_range_tests.cpp
+        tests/gtest_iterator_tests.cpp
+        tests/gtest_debug_logging_tests.cpp
+    )
+    target_link_libraries(jazzy_index_tests_debug PRIVATE
+        jazzy_index
+        GTest::gtest
+        GTest::gtest_main
+        rapidcheck
+    )
+    if(DEFINED _GTEST_COMPAT_DEFS)
+        target_compile_definitions(jazzy_index_tests_debug PRIVATE ${_GTEST_COMPAT_DEFS})
+    endif()
+    set_property(TARGET jazzy_index_tests_debug PROPERTY CXX_STANDARD 20)
+    set_property(TARGET jazzy_index_tests_debug PROPERTY CXX_STANDARD_REQUIRED ON)
+    target_include_directories(jazzy_index_tests_debug PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests
+    )
+    # Always enable debug logging for this target
+    target_compile_definitions(jazzy_index_tests_debug PRIVATE JAZZY_DEBUG_LOGGING)
 
     enable_testing()
     add_test(NAME jazzy_index_tests COMMAND jazzy_index_tests)

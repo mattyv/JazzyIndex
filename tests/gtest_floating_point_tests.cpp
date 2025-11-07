@@ -48,8 +48,19 @@ using DoubleTest = FloatingPointTest<double, 256>;
 
 // Test: Basic double values
 TEST_F(DoubleTest, BasicDoubleValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data{0.0, 0.5, 1.0, 10.5, 100.0};
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(0.0), data, 0.0));
     EXPECT_TRUE(is_found(index.find(0.5), data, 0.5));
@@ -64,8 +75,19 @@ TEST_F(DoubleTest, BasicDoubleValues) {
 
 // Test: Basic float values
 TEST_F(FloatTest, BasicFloatValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<float> data{0.0f, 1.5f, 3.14f, 10.0f, 99.99f};
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(0.0f), data, 0.0f));
     EXPECT_TRUE(is_found(index.find(3.14f), data, 3.14f));
@@ -76,11 +98,22 @@ TEST_F(FloatTest, BasicFloatValues) {
 
 // Test: Double precision values
 TEST_F(DoubleTest, DoublePrecisionValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data;
     for (int i = 0; i < 1000; ++i) {
         data.push_back(i * 0.001);  // 0.000, 0.001, 0.002, ..., 0.999
     }
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test various precision values
     EXPECT_TRUE(is_found(index.find(0.000), data, 0.000));
@@ -94,8 +127,19 @@ TEST_F(DoubleTest, DoublePrecisionValues) {
 
 // Test: Negative floating-point values
 TEST_F(DoubleTest, NegativeFloatingPointValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data{-100.5, -50.25, -10.0, 0.0, 10.0, 50.25, 100.5};
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(-100.5), data, -100.5));
     EXPECT_TRUE(is_found(index.find(-50.25), data, -50.25));
@@ -108,8 +152,19 @@ TEST_F(DoubleTest, NegativeFloatingPointValues) {
 
 // Test: Very small positive values
 TEST_F(DoubleTest, VerySmallPositiveValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data{1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1.0};
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(1e-10), data, 1e-10));
     EXPECT_TRUE(is_found(index.find(1e-6), data, 1e-6));
@@ -120,8 +175,19 @@ TEST_F(DoubleTest, VerySmallPositiveValues) {
 
 // Test: Very large values
 TEST_F(DoubleTest, VeryLargeValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data{1e6, 1e9, 1e12, 1e15, 1e18};
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(1e6), data, 1e6));
     EXPECT_TRUE(is_found(index.find(1e12), data, 1e12));
@@ -132,12 +198,23 @@ TEST_F(DoubleTest, VeryLargeValues) {
 
 // Test: Mixed magnitude values
 TEST_F(DoubleTest, MixedMagnitudeValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data{
         -1e10, -1000.0, -1.0, -0.001,
         0.0,
         0.001, 1.0, 1000.0, 1e10
     };
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     for (auto val : data) {
         EXPECT_TRUE(is_found(index.find(val), data, val))
@@ -147,11 +224,22 @@ TEST_F(DoubleTest, MixedMagnitudeValues) {
 
 // Test: Fractional sequence
 TEST_F(DoubleTest, FractionalSequence) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data;
     for (int i = 0; i < 100; ++i) {
         data.push_back(i + 0.5);  // 0.5, 1.5, 2.5, ..., 99.5
     }
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(0.5), data, 0.5));
     EXPECT_TRUE(is_found(index.find(50.5), data, 50.5));
@@ -164,10 +252,21 @@ TEST_F(DoubleTest, FractionalSequence) {
 
 // Test: Scientific notation values
 TEST_F(DoubleTest, ScientificNotationValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data{
         1.23e-5, 4.56e-3, 7.89e0, 1.11e2, 2.22e5
     };
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(1.23e-5), data, 1.23e-5));
     EXPECT_TRUE(is_found(index.find(7.89e0), data, 7.89e0));
@@ -176,11 +275,22 @@ TEST_F(DoubleTest, ScientificNotationValues) {
 
 // Test: Uniform floating-point distribution
 TEST_F(DoubleTest, UniformFloatingPointDistribution) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data;
     for (int i = 0; i < 1000; ++i) {
         data.push_back(static_cast<double>(i) / 10.0);  // 0.0, 0.1, 0.2, ..., 99.9
     }
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test regular intervals
     for (int i = 0; i < 1000; i += 100) {
@@ -192,11 +302,22 @@ TEST_F(DoubleTest, UniformFloatingPointDistribution) {
 
 // Test: Logarithmically spaced values
 TEST_F(DoubleTest, LogarithmicallySpacedValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data;
     for (int i = -10; i <= 10; ++i) {
         data.push_back(std::pow(10.0, static_cast<double>(i)));
     }
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(1e-10), data, 1e-10));
     EXPECT_TRUE(is_found(index.find(1e0), data, 1e0));
@@ -205,6 +326,10 @@ TEST_F(DoubleTest, LogarithmicallySpacedValues) {
 
 // Test: Denormalized/subnormal numbers (very small)
 TEST_F(DoubleTest, SubnormalNumbers) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data{
         std::numeric_limits<double>::denorm_min(),
         std::numeric_limits<double>::denorm_min() * 2,
@@ -215,6 +340,13 @@ TEST_F(DoubleTest, SubnormalNumbers) {
     std::sort(data.begin(), data.end());
     auto index = build_index(data);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     // Denormalized numbers should still be findable
     EXPECT_TRUE(is_found(index.find(std::numeric_limits<double>::denorm_min()),
                          data, std::numeric_limits<double>::denorm_min()));
@@ -224,11 +356,22 @@ TEST_F(DoubleTest, SubnormalNumbers) {
 
 // Test: Float type with similar operations
 TEST_F(FloatTest, FloatPrecisionSequence) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<float> data;
     for (int i = 0; i < 100; ++i) {
         data.push_back(static_cast<float>(i) * 0.1f);
     }
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test various points - use actual values from the array to avoid precision issues
     EXPECT_TRUE(is_found(index.find(data[0]), data, data[0]));   // 0.0
@@ -238,12 +381,23 @@ TEST_F(FloatTest, FloatPrecisionSequence) {
 
 // Test: Quadratic floating-point growth
 TEST_F(DoubleTest, QuadraticFloatingPointGrowth) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data;
     for (int i = 0; i < 100; ++i) {
         double x = static_cast<double>(i) * 0.1;
         data.push_back(x * x);
     }
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test some specific values - use actual values from the array
     EXPECT_TRUE(is_found(index.find(data[0]), data, data[0]));   // 0^2 = 0.0
@@ -253,6 +407,10 @@ TEST_F(DoubleTest, QuadraticFloatingPointGrowth) {
 
 // Test: Fractional duplicates
 TEST_F(DoubleTest, FractionalDuplicates) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data;
     for (int i = 0; i < 50; ++i) {
         data.push_back(1.5);
@@ -261,6 +419,13 @@ TEST_F(DoubleTest, FractionalDuplicates) {
     }
     std::sort(data.begin(), data.end());
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(1.5), data, 1.5));
     EXPECT_TRUE(is_found(index.find(2.5), data, 2.5));
@@ -272,8 +437,19 @@ TEST_F(DoubleTest, FractionalDuplicates) {
 
 // Test: Zero and negative zero
 TEST_F(DoubleTest, ZeroAndNegativeZero) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data{-1.0, 0.0, 1.0};
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(0.0), data, 0.0));
     EXPECT_TRUE(is_found(index.find(-0.0), data, -0.0));  // -0.0 == 0.0
@@ -281,11 +457,22 @@ TEST_F(DoubleTest, ZeroAndNegativeZero) {
 
 // Test: Large dataset with floating-point values
 TEST_F(DoubleTest, LargeFloatingPointDataset) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data(10000);
     for (size_t i = 0; i < data.size(); ++i) {
         data[i] = static_cast<double>(i) * 0.01;
     }
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Sample various points
     for (size_t i = 0; i < data.size(); i += 1000) {
@@ -296,11 +483,22 @@ TEST_F(DoubleTest, LargeFloatingPointDataset) {
 
 // Test: Exponential growth
 TEST_F(DoubleTest, ExponentialGrowth) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data;
     for (int i = 0; i < 20; ++i) {
         data.push_back(std::exp(static_cast<double>(i) * 0.5));
     }
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test first, middle, and last
     EXPECT_TRUE(is_found(index.find(data[0]), data, data[0]));
@@ -310,11 +508,22 @@ TEST_F(DoubleTest, ExponentialGrowth) {
 
 // Test: Interleaved positive and negative
 TEST_F(DoubleTest, InterleavedPositiveNegative) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data;
     for (int i = -50; i <= 50; ++i) {
         data.push_back(static_cast<double>(i) * 0.5);
     }
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(is_found(index.find(-25.0), data, -25.0));
     EXPECT_TRUE(is_found(index.find(0.0), data, 0.0));
