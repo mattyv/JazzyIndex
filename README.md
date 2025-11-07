@@ -1,6 +1,6 @@
 # Jazzy Index - Proof of Concept
 
-![Jazzy Logo](docs/images/Jazzy.JPG)
+<img src="docs/images/Jazzy.JPG" width="230">
 
 [![CI Tests](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/mattyv/JazzyIndex/actions/workflows/tests.yml)
 [![Code Coverage](https://img.shields.io/badge/coverage-94.9%25-brightgreen)](https://htmlpreview.github.io/?https://github.com/mattyv/JazzyIndex/blob/main/docs/coverage/index.html)
