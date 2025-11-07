@@ -69,10 +69,21 @@ using LargeIntParallel = ParallelBuildTest<int, 512>;
 
 // Test: Empty dataset
 TEST_F(IntParallel, EmptyDataset) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
 
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 
     EXPECT_EQ(idx_single.size(), 0);
     EXPECT_EQ(idx_parallel.size(), 0);
@@ -81,10 +92,21 @@ TEST_F(IntParallel, EmptyDataset) {
 
 // Test: Single element
 TEST_F(IntParallel, SingleElement) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{42};
 
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 
@@ -95,28 +117,54 @@ TEST_F(IntParallel, SingleElement) {
 
 // Test: Uniform sequence (linear distribution)
 TEST_F(IntParallel, UniformSequence) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(10000);
     std::iota(data.begin(), data.end(), 0);
 
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 }
 
 // Test: Large uniform sequence
 TEST_F(LargeIntParallel, LargeUniformSequence) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(100000);
     std::iota(data.begin(), data.end(), 0);
 
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 }
 
 // Test: Skewed distribution
 TEST_F(IntParallel, SkewedDistribution) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
 
     // Dense region
@@ -132,11 +180,22 @@ TEST_F(IntParallel, SkewedDistribution) {
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 }
 
 // Test: Quadratic distribution (requires quadratic models)
 TEST_F(IntParallel, QuadraticDistribution) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
     for (int i = 0; i < 1000; ++i) {
         data.push_back(i * i);
@@ -145,11 +204,22 @@ TEST_F(IntParallel, QuadraticDistribution) {
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 }
 
 // Test: Cubic distribution (requires cubic models)
 TEST_F(IntParallel, CubicDistribution) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
     for (int i = 0; i < 500; ++i) {
         data.push_back(i * i * i);
@@ -158,11 +228,22 @@ TEST_F(IntParallel, CubicDistribution) {
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 }
 
 // Test: Duplicates
 TEST_F(IntParallel, WithDuplicates) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
     for (int i = 0; i < 100; ++i) {
         data.push_back(i);
@@ -174,11 +255,22 @@ TEST_F(IntParallel, WithDuplicates) {
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 }
 
 // Test: Custom threading model using prepare_build_tasks
 TEST_F(IntParallel, CustomThreadingModel) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(10000);
     std::iota(data.begin(), data.end(), 0);
 
@@ -199,11 +291,22 @@ TEST_F(IntParallel, CustomThreadingModel) {
 
     idx_custom.finalize_build(results);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_custom, data));
 }
 
 // Test: Unsorted data throws exception
 TEST_F(IntParallel, UnsortedDataThrows) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{5, 3, 1, 2, 4};  // Not sorted
 
     IndexType index;
@@ -211,10 +314,21 @@ TEST_F(IntParallel, UnsortedDataThrows) {
         index.build_parallel(data.data(), data.data() + data.size()),
         std::runtime_error
     );
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 }
 
 // Test: Various segment counts
 TEST(ParallelBuildVariousSegments, TinySegments) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(1000);
     std::iota(data.begin(), data.end(), 0);
 
@@ -224,10 +338,21 @@ TEST(ParallelBuildVariousSegments, TinySegments) {
     idx_single.build(data.data(), data.data() + data.size());
     idx_parallel.build_parallel(data.data(), data.data() + data.size());
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 }
 
 TEST(ParallelBuildVariousSegments, XXLargeSegments) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(50000);
     std::iota(data.begin(), data.end(), 0);
 
@@ -237,11 +362,22 @@ TEST(ParallelBuildVariousSegments, XXLargeSegments) {
     idx_single.build(data.data(), data.data() + data.size());
     idx_parallel.build_parallel(data.data(), data.data() + data.size());
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 }
 
 // Test: Floating point data
 TEST(ParallelBuildFloatingPoint, DoubleData) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data;
     for (int i = 0; i < 5000; ++i) {
         data.push_back(std::sqrt(static_cast<double>(i)));
@@ -253,11 +389,22 @@ TEST(ParallelBuildFloatingPoint, DoubleData) {
     idx_single.build(data.data(), data.data() + data.size());
     idx_parallel.build_parallel(data.data(), data.data() + data.size());
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 }
 
 // Test: Task execution with std::async (simulating parallel execution)
 TEST_F(IntParallel, TaskExecutionWithAsync) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(10000);
     std::iota(data.begin(), data.end(), 0);
 
@@ -283,11 +430,22 @@ TEST_F(IntParallel, TaskExecutionWithAsync) {
 
     idx_async.finalize_build(results);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(indexes_equal(idx_single, idx_async, data));
 }
 
 // Test: Mismatched result count throws
 TEST_F(IntParallel, MismatchedResultCountThrows) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(1000);
     std::iota(data.begin(), data.end(), 0);
 
@@ -298,14 +456,32 @@ TEST_F(IntParallel, MismatchedResultCountThrows) {
     std::vector<jazzy::detail::SegmentAnalysis<int>> results(tasks.size() - 1);
 
     EXPECT_THROW(index.finalize_build(results), std::runtime_error);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 }
 
 // Test: Dataset smaller than segment count
 TEST_F(IntParallel, DatasetSmallerThanSegments) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{1, 2, 3, 4, 5};  // 5 elements with 256 segments configured
 
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
     EXPECT_EQ(idx_parallel.num_segments(), data.size());  // Should use actual size
@@ -313,10 +489,21 @@ TEST_F(IntParallel, DatasetSmallerThanSegments) {
 
 // Test: All identical values (constant segment)
 TEST_F(IntParallel, AllIdenticalValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(1000, 42);  // All values are 42
 
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 
@@ -328,6 +515,10 @@ TEST_F(IntParallel, AllIdenticalValues) {
 
 // Test: Custom comparator (descending order)
 TEST(ParallelBuildCustomComparator, DescendingOrder) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(10000);
     std::iota(data.begin(), data.end(), 0);
     std::reverse(data.begin(), data.end());  // Descending: 9999, 9998, ..., 0
@@ -339,6 +530,13 @@ TEST(ParallelBuildCustomComparator, DescendingOrder) {
 
     idx_single.build(data.data(), data.data() + data.size(), std::greater<>{});
     idx_parallel.build_parallel(data.data(), data.data() + data.size(), std::greater<>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 
     // Test searches
     const int* result1 = idx_parallel.find(5000);
@@ -352,6 +550,10 @@ TEST(ParallelBuildCustomComparator, DescendingOrder) {
 
 // Test: Custom key extractor (key-value pairs)
 TEST(ParallelBuildCustomKeyExtractor, KeyValuePairs) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     struct KeyValue {
         int key;
         std::string value;
@@ -375,6 +577,13 @@ TEST(ParallelBuildCustomKeyExtractor, KeyValuePairs) {
     idx_single.build(data.data(), data.data() + data.size(), std::less<>{}, key_extractor);
     idx_parallel.build_parallel(data.data(), data.data() + data.size(), std::less<>{}, key_extractor);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     // Test searches
     KeyValue search_key{1000, ""};
     const KeyValue* result = idx_parallel.find(search_key);
@@ -385,6 +594,10 @@ TEST(ParallelBuildCustomKeyExtractor, KeyValuePairs) {
 
 // Test: Multiple sequential builds on same index
 TEST_F(IntParallel, MultipleSequentialBuilds) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     IndexType index;
 
     // First build
@@ -401,6 +614,13 @@ TEST_F(IntParallel, MultipleSequentialBuilds) {
     std::iota(data2.begin(), data2.end(), 1000);
     index.build_parallel(data2.data(), data2.data() + data2.size());
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
+
     const int* result2 = index.find(1500);
     ASSERT_NE(result2, data2.data() + data2.size());
     EXPECT_EQ(*result2, 1500);
@@ -412,6 +632,10 @@ TEST_F(IntParallel, MultipleSequentialBuilds) {
 
 // Test: Very small datasets (edge cases)
 TEST_F(IntParallel, VerySmallDatasets) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     // Two elements
     {
         std::vector<int> data{1, 2};
@@ -427,15 +651,33 @@ TEST_F(IntParallel, VerySmallDatasets) {
         auto idx_parallel = build_parallel(data);
         EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
     }
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 }
 
 // Test: Segment metadata preservation
 TEST_F(IntParallel, SegmentMetadataPreserved) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(10000);
     std::iota(data.begin(), data.end(), 0);
 
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 
     // Both should have same number of segments
     EXPECT_EQ(idx_single.num_segments(), idx_parallel.num_segments());
@@ -446,6 +688,10 @@ TEST_F(IntParallel, SegmentMetadataPreserved) {
 
 // Test: Empty result after prepare (edge case)
 TEST_F(IntParallel, EmptyTaskList) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;  // Empty
     IndexType index;
 
@@ -456,15 +702,33 @@ TEST_F(IntParallel, EmptyTaskList) {
     std::vector<jazzy::detail::SegmentAnalysis<int>> results;
     // This should not throw, just do nothing
     EXPECT_NO_THROW(index.finalize_build(results));
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 }
 
 // Test: Negative integers
 TEST_F(IntParallel, NegativeIntegers) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(5000);
     std::iota(data.begin(), data.end(), -2500);  // -2500 to 2499
 
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 
@@ -475,6 +739,10 @@ TEST_F(IntParallel, NegativeIntegers) {
 
 // Test: Large sparse dataset
 TEST_F(IntParallel, LargeSparseDataset) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
     for (int i = 0; i < 10000; i += 100) {  // Very sparse
         data.push_back(i);
@@ -482,6 +750,13 @@ TEST_F(IntParallel, LargeSparseDataset) {
 
     auto idx_single = build_single_threaded(data);
     auto idx_parallel = build_parallel(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
 }

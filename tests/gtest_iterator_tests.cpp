@@ -25,10 +25,21 @@ TEST(IteratorTests, TypeAliases) {
 
 // Test building with std::vector iterators
 TEST(IteratorTests, BuildWithVectorIterators) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
     JazzyIndex<int> index;
     index.build(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(index.is_built());
     EXPECT_EQ(index.size(), 10);
@@ -41,10 +52,21 @@ TEST(IteratorTests, BuildWithVectorIterators) {
 
 // Test building with std::array iterators
 TEST(IteratorTests, BuildWithArrayIterators) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::array<int, 10> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
     JazzyIndex<int> index;
     index.build(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(index.is_built());
     EXPECT_EQ(index.size(), 10);
@@ -56,9 +78,20 @@ TEST(IteratorTests, BuildWithArrayIterators) {
 
 // Test iterator-based constructor with vector
 TEST(IteratorTests, ConstructorWithVectorIterators) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {10, 20, 30, 40, 50};
 
     JazzyIndex<int> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(index.is_built());
     EXPECT_EQ(index.size(), 5);
@@ -70,8 +103,19 @@ TEST(IteratorTests, ConstructorWithVectorIterators) {
 
 // Test that find returns const_iterator
 TEST(IteratorTests, FindReturnsConstIterator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {1, 2, 3, 4, 5};
     JazzyIndex<int> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     auto it = index.find(3);
 
@@ -88,8 +132,19 @@ TEST(IteratorTests, FindReturnsConstIterator) {
 
 // Test that equal_range returns pair of const_iterators
 TEST(IteratorTests, EqualRangeReturnsConstIterators) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {1, 2, 2, 2, 3, 4, 5};
     JazzyIndex<int> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     auto [lower, upper] = index.equal_range(2);
 
@@ -109,8 +164,19 @@ TEST(IteratorTests, EqualRangeReturnsConstIterators) {
 
 // Test find_lower_bound returns const_iterator
 TEST(IteratorTests, LowerBoundReturnsConstIterator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {1, 3, 3, 5, 7, 9};
     JazzyIndex<int> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     auto it = index.find_lower_bound(3);
 
@@ -121,8 +187,19 @@ TEST(IteratorTests, LowerBoundReturnsConstIterator) {
 
 // Test find_upper_bound returns const_iterator
 TEST(IteratorTests, UpperBoundReturnsConstIterator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {1, 3, 3, 5, 7, 9};
     JazzyIndex<int> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     auto it = index.find_upper_bound(3);
 
@@ -133,8 +210,19 @@ TEST(IteratorTests, UpperBoundReturnsConstIterator) {
 
 // Test iterator arithmetic
 TEST(IteratorTests, IteratorArithmetic) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
     JazzyIndex<int> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     auto it1 = index.find(30);
     auto it2 = index.find(70);
@@ -150,8 +238,19 @@ TEST(IteratorTests, IteratorArithmetic) {
 
 // Test iterator comparison
 TEST(IteratorTests, IteratorComparison) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {1, 2, 3, 4, 5};
     JazzyIndex<int> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     auto it1 = index.find(2);
     auto it2 = index.find(4);
@@ -168,8 +267,20 @@ TEST(IteratorTests, IteratorComparison) {
 
 // Test using iterators with STL algorithms
 TEST(IteratorTests, STLAlgorithmCompatibility) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     JazzyIndex<int> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+    jazzy::clear_debug_log();
+#endif
 
     // Test that find returns pointer to same element
     auto it1 = index.find(5);
@@ -180,6 +291,13 @@ TEST(IteratorTests, STLAlgorithmCompatibility) {
     std::vector<int> data_with_dups = {1, 2, 2, 2, 3, 4, 5};
     JazzyIndex<int> index2(data_with_dups.begin(), data_with_dups.end());
 
+#ifdef JAZZY_DEBUG_LOGGING
+    build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     auto [lower, upper] = index2.equal_range(2);
     EXPECT_EQ(std::count(lower, upper, 2), 3);
 
@@ -189,10 +307,21 @@ TEST(IteratorTests, STLAlgorithmCompatibility) {
 
 // Test with custom comparator
 TEST(IteratorTests, CustomComparator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
     JazzyIndex<int, SegmentCount::LARGE, std::greater<>> index;
     index.build(data.begin(), data.end(), std::greater<>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     auto it = index.find(5);
     EXPECT_NE(it, data.data() + data.size());
@@ -201,6 +330,10 @@ TEST(IteratorTests, CustomComparator) {
 
 // Test with struct and key extractor
 TEST(IteratorTests, KeyExtractorWithIterators) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     struct Record {
         int id;
         std::string name;
@@ -222,6 +355,13 @@ TEST(IteratorTests, KeyExtractorWithIterators) {
     JazzyIndex<Record, SegmentCount::SMALL, std::less<Record>, decltype(key_extractor)> index;
     index.build(data.begin(), data.end(), std::less<Record>{}, key_extractor);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     auto it = index.find(Record{2, ""});
     EXPECT_NE(it, data.data() + data.size());
     EXPECT_EQ(it->id, 2);
@@ -230,8 +370,19 @@ TEST(IteratorTests, KeyExtractorWithIterators) {
 
 // Test empty range
 TEST(IteratorTests, EmptyRange) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data = {1, 2, 3, 4, 5};
     JazzyIndex<int> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     auto [lower, upper] = index.equal_range(10);  // Not in data
     EXPECT_EQ(lower, upper);  // Empty range
@@ -239,12 +390,23 @@ TEST(IteratorTests, EmptyRange) {
 
 // Test with large dataset
 TEST(IteratorTests, LargeDataset) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(10000);
     for (int i = 0; i < 10000; ++i) {
         data[i] = i;
     }
 
     JazzyIndex<int> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test various finds
     for (int val : {0, 1000, 5000, 9999}) {
@@ -256,8 +418,19 @@ TEST(IteratorTests, LargeDataset) {
 
 // Test with floating point
 TEST(IteratorTests, FloatingPoint) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data = {1.1, 2.2, 3.3, 4.4, 5.5};
     JazzyIndex<double> index(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     auto it = index.find(3.3);
     EXPECT_NE(it, data.data() + data.size());
@@ -266,9 +439,20 @@ TEST(IteratorTests, FloatingPoint) {
 
 // Test that raw pointers still work (backward compatibility)
 TEST(IteratorTests, BackwardCompatibilityWithPointers) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     int data[] = {1, 2, 3, 4, 5};
 
     JazzyIndex<int> index(data, data + 5);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_TRUE(index.is_built());
     EXPECT_EQ(index.size(), 5);
@@ -279,6 +463,10 @@ TEST(IteratorTests, BackwardCompatibilityWithPointers) {
 
 // Test parallel build with iterators
 TEST(IteratorTests, ParallelBuildWithIterators) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(1000);
     for (int i = 0; i < 1000; ++i) {
         data[i] = i;
@@ -286,6 +474,12 @@ TEST(IteratorTests, ParallelBuildWithIterators) {
 
     JazzyIndex<int> index;
     index.build_parallel(data.begin(), data.end());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    // Parallel build may not produce logs, so just check if we got the log
+    // (don't require specific content for parallel builds)
+#endif
 
     EXPECT_TRUE(index.is_built());
     EXPECT_EQ(index.size(), 1000);

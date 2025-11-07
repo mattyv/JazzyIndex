@@ -34,6 +34,10 @@ struct AbsoluteValueCompare {
 
 // Test: std::greater for reverse order
 TEST(ComparatorTest, ReverseOrderWithGreater) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(100);
     std::iota(data.begin(), data.end(), 0);
 
@@ -43,6 +47,13 @@ TEST(ComparatorTest, ReverseOrderWithGreater) {
     // Build index with std::greater
     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::greater<int>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test finding elements
     const int* result = index.find(50);
@@ -56,11 +67,22 @@ TEST(ComparatorTest, ReverseOrderWithGreater) {
 
 // Test: Custom reverse comparator
 TEST(ComparatorTest, CustomReverseComparator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{100, 90, 80, 70, 60, 50, 40, 30, 20, 10};
 
     // Build index with custom reverse comparator
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), ReverseCompare<int>> index;
     index.build(data.data(), data.data() + data.size(), ReverseCompare<int>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test lookups
     for (int val : data) {
@@ -77,6 +99,10 @@ TEST(ComparatorTest, CustomReverseComparator) {
 
 // Test: Absolute value comparator
 TEST(ComparatorTest, AbsoluteValueComparator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{-100, -50, -10, -5, 0, 5, 10, 50, 100};
 
     // Sort by absolute value
@@ -85,6 +111,13 @@ TEST(ComparatorTest, AbsoluteValueComparator) {
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), AbsoluteValueCompare> index;
     index.build(data.data(), data.data() + data.size(), AbsoluteValueCompare{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test finding elements - check equivalence under absolute value, not exact match
     // With custom comparators, lower_bound can return any equivalent element
@@ -100,11 +133,22 @@ TEST(ComparatorTest, AbsoluteValueComparator) {
 
 // Test: std::less (default) explicitly specified
 TEST(ComparatorTest, ExplicitStdLess) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(100);
     std::iota(data.begin(), data.end(), 0);
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::less<int>> index;
     index.build(data.data(), data.data() + data.size(), std::less<int>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_NE(index.find(0), data.data() + data.size());
     EXPECT_NE(index.find(50), data.data() + data.size());
@@ -113,6 +157,10 @@ TEST(ComparatorTest, ExplicitStdLess) {
 
 // Test: Lambda comparator (if supported)
 TEST(ComparatorTest, LambdaComparatorViaFunctionObject) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{10, 20, 30, 40, 50};
 
     // Using std::function to wrap lambda
@@ -121,15 +169,33 @@ TEST(ComparatorTest, LambdaComparatorViaFunctionObject) {
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), decltype(comp)> index;
     index.build(data.data(), data.data() + data.size(), comp);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     EXPECT_NE(index.find(30), data.data() + data.size());
 }
 
 // Test: Reverse order with duplicates
 TEST(ComparatorTest, ReverseOrderWithDuplicates) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{50, 50, 50, 40, 40, 30, 30, 20, 10, 10};
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_NE(index.find(50), data.data() + data.size());
     EXPECT_NE(index.find(40), data.data() + data.size());
@@ -142,10 +208,21 @@ TEST(ComparatorTest, ReverseOrderWithDuplicates) {
 
 // Test: Floating-point with reverse order
 TEST(ComparatorTest, FloatingPointReverseOrder) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<double> data{100.0, 75.5, 50.0, 25.5, 10.0, 5.0, 1.0};
 
     jazzy::JazzyIndex<double, jazzy::to_segment_count<64>(), std::greater<double>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<double>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_NE(index.find(100.0), data.data() + data.size());
     EXPECT_NE(index.find(50.0), data.data() + data.size());
@@ -156,6 +233,10 @@ TEST(ComparatorTest, FloatingPointReverseOrder) {
 
 // Test: Case-insensitive string comparison (conceptual with int encoding)
 TEST(ComparatorTest, ModuloComparator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     // Custom comparator that compares values modulo 10
     struct ModuloCompare {
         bool operator()(int lhs, int rhs) const {
@@ -170,6 +251,13 @@ TEST(ComparatorTest, ModuloComparator) {
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), ModuloCompare> index;
     index.build(data.data(), data.data() + data.size(), ModuloCompare{});
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     // Search for values - check equivalence under modulo 10, not exact match
     for (int val : data) {
         const int* result = index.find(val);
@@ -183,12 +271,23 @@ TEST(ComparatorTest, ModuloComparator) {
 
 // Test: Large dataset with reverse order
 TEST(ComparatorTest, LargeDatasetReverseOrder) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(1000);
     std::iota(data.begin(), data.end(), 0);
     std::reverse(data.begin(), data.end());
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::greater<int>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Sample various points
     for (int i = 0; i < 1000; i += 100) {
@@ -201,10 +300,21 @@ TEST(ComparatorTest, LargeDatasetReverseOrder) {
 
 // Test: std::greater<> (transparent comparator)
 TEST(ComparatorTest, TransparentComparator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{100, 90, 80, 70, 60, 50, 40, 30, 20, 10};
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_NE(index.find(100), data.data() + data.size());
     EXPECT_NE(index.find(50), data.data() + data.size());
@@ -213,6 +323,10 @@ TEST(ComparatorTest, TransparentComparator) {
 
 // Test: Rebuild with different comparator
 TEST(ComparatorTest, RebuildWithDifferentComparator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data1{10, 20, 30, 40, 50};
     std::vector<int> data2{50, 40, 30, 20, 10};
 
@@ -220,21 +334,49 @@ TEST(ComparatorTest, RebuildWithDifferentComparator) {
 
     // Build with ascending order
     index.build(data1.data(), data1.data() + data1.size(), std::less<int>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+    jazzy::clear_debug_log();
+#endif
+
     EXPECT_NE(index.find(30), data1.data() + data1.size());
 
     // Rebuild with different comparator (note: this requires the index to support it)
     // In practice, you'd create a new index with different comparator template parameter
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index2;
     index2.build(data2.data(), data2.data() + data2.size(), std::greater<int>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log2 = jazzy::get_debug_log();
+    if (!build_log2.empty()) {
+        EXPECT_NE(build_log2.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     EXPECT_NE(index2.find(30), data2.data() + data2.size());
 }
 
 // Test: Negative numbers with reverse order
 TEST(ComparatorTest, NegativeNumbersReverseOrder) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{0, -10, -20, -30, -40, -50};
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_NE(index.find(0), data.data() + data.size());
     EXPECT_EQ(index.find(-25), data.data() + data.size()) << "Value -25 not in dataset";
@@ -243,10 +385,21 @@ TEST(ComparatorTest, NegativeNumbersReverseOrder) {
 
 // Test: Edge case with single element and custom comparator
 TEST(ComparatorTest, SingleElementCustomComparator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{42};
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_NE(index.find(42), data.data() + data.size());
     EXPECT_EQ(index.find(43), data.data() + data.size());
@@ -254,10 +407,21 @@ TEST(ComparatorTest, SingleElementCustomComparator) {
 
 // Test: Empty dataset with custom comparator
 TEST(ComparatorTest, EmptyDatasetCustomComparator) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
     index.build(data.data(), data.data(), std::greater<int>{});
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_EQ(index.find(42), data.data());
     EXPECT_EQ(index.size(), 0);

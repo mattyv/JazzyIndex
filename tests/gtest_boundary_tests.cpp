@@ -43,9 +43,20 @@ using UInt64BoundaryTest = BoundaryTest<std::uint64_t, 256>;
 
 // Test: Min and max values in dataset
 TEST_F(IntBoundaryTest, MinMaxValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(1000);
     std::iota(data.begin(), data.end(), 0);
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test minimum value
     EXPECT_TRUE(is_found(index.find(0), data, 0));
@@ -62,12 +73,23 @@ TEST_F(IntBoundaryTest, MinMaxValues) {
 
 // Test: Segment boundaries with known segment count
 TEST_F(IntBoundaryTest, SegmentBoundariesExplicit) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(1000);
     std::iota(data.begin(), data.end(), 0);
 
     // Use 10 segments for easy calculation
     jazzy::JazzyIndex<int, jazzy::to_segment_count<10>()> index;
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Each segment should cover 100 elements
     // Test at each segment boundary (0, 100, 200, ..., 900)
@@ -89,12 +111,23 @@ TEST_F(IntBoundaryTest, SegmentBoundariesExplicit) {
 
 // Test: Segment boundaries with exact quantile splits
 TEST_F(IntBoundaryTest, ExactQuantileSplits) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(256);
     std::iota(data.begin(), data.end(), 0);
 
     // 256 elements with 256 segments = 1 element per segment
     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>()> index;
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Every single element should be findable
     for (int i = 0; i < 256; ++i) {
@@ -105,11 +138,22 @@ TEST_F(IntBoundaryTest, ExactQuantileSplits) {
 
 // Test: More segments than data points
 TEST_F(IntBoundaryTest, MoreSegmentsThanDataPoints) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{1, 2, 3, 4, 5};
 
     // 256 segments but only 5 data points
     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>()> index;
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Should still work correctly
     for (int val : data) {
@@ -122,6 +166,10 @@ TEST_F(IntBoundaryTest, MoreSegmentsThanDataPoints) {
 
 // Test: Type limits - minimum values
 TEST_F(IntBoundaryTest, TypeMinimumValue) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{
         std::numeric_limits<int>::min(),
         std::numeric_limits<int>::min() + 1,
@@ -131,6 +179,13 @@ TEST_F(IntBoundaryTest, TypeMinimumValue) {
     };
     auto index = build_index(data);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(is_found(index.find(std::numeric_limits<int>::min()), data,
                          std::numeric_limits<int>::min()));
     EXPECT_TRUE(is_found(index.find(std::numeric_limits<int>::max()), data,
@@ -139,6 +194,10 @@ TEST_F(IntBoundaryTest, TypeMinimumValue) {
 
 // Test: Type limits - unsigned 64-bit
 TEST_F(UInt64BoundaryTest, UInt64TypeLimits) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<std::uint64_t> data{
         0ull,
         1ull,
@@ -147,6 +206,13 @@ TEST_F(UInt64BoundaryTest, UInt64TypeLimits) {
     };
     auto index = build_index(data);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(is_found(index.find(0ull), data, 0ull));
     EXPECT_TRUE(is_found(index.find(std::numeric_limits<std::uint64_t>::max()),
                          data, std::numeric_limits<std::uint64_t>::max()));
@@ -154,11 +220,22 @@ TEST_F(UInt64BoundaryTest, UInt64TypeLimits) {
 
 // Test: First and last elements in each segment
 TEST_F(IntBoundaryTest, FirstLastElementsPerSegment) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(1000);
     std::iota(data.begin(), data.end(), 100);  // Start from 100
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<20>()> index;  // 20 segments, 50 elements each
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test first and last element of each theoretical segment
     for (int seg = 0; seg < 20; ++seg) {
@@ -177,6 +254,10 @@ TEST_F(IntBoundaryTest, FirstLastElementsPerSegment) {
 
 // Test: Adjacent values at segment boundaries
 TEST_F(IntBoundaryTest, AdjacentValuesAtBoundaries) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
     // Create data with clear segment structure
     for (int i = 0; i < 100; ++i) {
@@ -185,6 +266,13 @@ TEST_F(IntBoundaryTest, AdjacentValuesAtBoundaries) {
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<10>()> index;  // 10 segments, 10 elements each
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test around each boundary
     for (size_t i = 0; i < data.size(); ++i) {
@@ -195,6 +283,10 @@ TEST_F(IntBoundaryTest, AdjacentValuesAtBoundaries) {
 
 // Test: Boundary with duplicate values
 TEST_F(IntBoundaryTest, BoundariesWithDuplicates) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
 
     // Segment 1: many 10s
@@ -215,6 +307,13 @@ TEST_F(IntBoundaryTest, BoundariesWithDuplicates) {
     jazzy::JazzyIndex<int, jazzy::to_segment_count<16>()> index;
     index.build(data.data(), data.data() + data.size());
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     EXPECT_TRUE(is_found(index.find(10), data, 10));
     EXPECT_TRUE(is_found(index.find(20), data, 20));
     EXPECT_TRUE(is_found(index.find(30), data, 30));
@@ -226,10 +325,21 @@ TEST_F(IntBoundaryTest, BoundariesWithDuplicates) {
 
 // Test: Single-element segments
 TEST_F(IntBoundaryTest, SingleElementSegments) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{10, 20, 30, 40, 50};
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<5>()> index;  // Same number of segments as elements
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     for (int val : data) {
         EXPECT_TRUE(is_found(index.find(val), data, val));
@@ -238,6 +348,10 @@ TEST_F(IntBoundaryTest, SingleElementSegments) {
 
 // Test: Very large gaps between values
 TEST_F(UInt64BoundaryTest, LargeGapsBetweenValues) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<std::uint64_t> data{
         1ull,
         1000ull,
@@ -246,6 +360,13 @@ TEST_F(UInt64BoundaryTest, LargeGapsBetweenValues) {
         1'000'000'000'000ull
     };
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     for (auto val : data) {
         EXPECT_TRUE(is_found(index.find(val), data, val))
@@ -259,11 +380,22 @@ TEST_F(UInt64BoundaryTest, LargeGapsBetweenValues) {
 
 // Test: Segment with exact range boundaries
 TEST_F(IntBoundaryTest, SegmentRangeBoundaries) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(100);
     std::iota(data.begin(), data.end(), 0);
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<4>()> index;  // 4 segments: [0-24], [25-49], [50-74], [75-99]
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test boundaries of each segment
     EXPECT_TRUE(is_found(index.find(0), data, 0));    // Start of segment 0
@@ -278,8 +410,19 @@ TEST_F(IntBoundaryTest, SegmentRangeBoundaries) {
 
 // Test: Out of bounds queries at extremes
 TEST_F(IntBoundaryTest, OutOfBoundsExtremes) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{10, 20, 30, 40, 50};
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Way below minimum
     EXPECT_FALSE(is_found(index.find(-1000), data, -1000));
@@ -294,6 +437,10 @@ TEST_F(IntBoundaryTest, OutOfBoundsExtremes) {
 
 // Test: Boundary at zero crossing
 TEST_F(IntBoundaryTest, ZeroCrossingBoundary) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
     for (int i = -50; i <= 50; ++i) {
         data.push_back(i);
@@ -301,6 +448,13 @@ TEST_F(IntBoundaryTest, ZeroCrossingBoundary) {
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<10>()> index;
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test around zero
     EXPECT_TRUE(is_found(index.find(-1), data, -1));

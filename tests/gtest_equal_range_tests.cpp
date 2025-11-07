@@ -40,15 +40,37 @@ TEST(EqualRangeTest, NoDuplicates) {
 
 // Test: equal_range with multiple duplicates
 TEST(EqualRangeTest, MultipleDuplicates) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{1, 2, 2, 2, 3, 4, 5, 5, 5, 6, 7, 8, 8, 9};
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>()> index;
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
 
     // Test finding range of 2's
     auto [lower2, upper2] = index.equal_range(2);
     EXPECT_EQ(lower2, data.data() + 1);
     EXPECT_EQ(upper2, data.data() + 4);
     EXPECT_EQ(upper2 - lower2, 3);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string log = jazzy::get_debug_log();
+    if (!log.empty()) {
+        // equal_range should call both find_lower_bound and find_upper_bound
+        EXPECT_NE(log.find("equal_range: Called"), std::string::npos)
+            << "Should log equal_range call";
+        EXPECT_NE(log.find("find_lower_bound"), std::string::npos)
+            << "Should call find_lower_bound";
+        EXPECT_NE(log.find("find_upper_bound"), std::string::npos)
+            << "Should call find_upper_bound";
+    }
+    jazzy::clear_debug_log();
+#endif
 
     // Test finding range of 5's
     auto [lower5, upper5] = index.equal_range(5);
@@ -65,14 +87,38 @@ TEST(EqualRangeTest, MultipleDuplicates) {
 
 // Test: equal_range with all identical values
 TEST(EqualRangeTest, AllIdentical) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(10, 42);
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>()> index;
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos)
+            << "Should log build phase";
+        // All identical values should use CONSTANT model
+        if (build_log.find("Selected CONSTANT") != std::string::npos) {
+            EXPECT_NE(build_log.find("Selected CONSTANT"), std::string::npos);
+        }
+    }
+    jazzy::clear_debug_log();
+#endif
 
     auto [lower, upper] = index.equal_range(42);
     EXPECT_EQ(lower, data.data());
     EXPECT_EQ(upper, data.data() + data.size());
     EXPECT_EQ(upper - lower, 10);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string find_log = jazzy::get_debug_log();
+    if (!find_log.empty()) {
+        EXPECT_NE(find_log.find("equal_range"), std::string::npos);
+    }
+#endif
 }
 
 // Test: equal_range for missing value

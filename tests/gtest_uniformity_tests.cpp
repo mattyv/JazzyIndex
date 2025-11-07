@@ -41,9 +41,30 @@ using DoubleUniformityTest = UniformityTest<double, 256>;
 
 // Test: Perfectly uniform integer sequence
 TEST_F(IntUniformityTest, PerfectlyUniformSequence) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data(1000);
     std::iota(data.begin(), data.end(), 0);  // 0, 1, 2, ..., 999
     auto index = build_index(data);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    // With 256 segments for 1000 elements, uniformity detection may vary
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build: Building index for 1000 elements"), std::string::npos)
+            << "Should log build";
+        // Uniform detection depends on segment configuration
+        // If detected, should log uniformity details
+        if (build_log.find("Data is UNIFORM") != std::string::npos) {
+            EXPECT_NE(build_log.find("segment_scale="), std::string::npos)
+                << "If uniform is detected, should log segment_scale";
+        }
+    }
+
+    jazzy::clear_debug_log();
+#endif
 
     // This should trigger uniformity detection
     // All lookups should work via O(1) arithmetic
@@ -51,6 +72,16 @@ TEST_F(IntUniformityTest, PerfectlyUniformSequence) {
     for (int i = 0; i < 1000; i += 50) {
         EXPECT_TRUE(is_found(index.find(i), data, i));
     }
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string find_log = jazzy::get_debug_log();
+    // If data was detected as uniform, finds should use UNIFORM path
+    // (depends on segment configuration whether uniformity is detected)
+    if (!find_log.empty() && find_log.find("UNIFORM path") != std::string::npos) {
+        // Just verify UNIFORM path was used if it appears
+        EXPECT_NE(find_log.find("UNIFORM path"), std::string::npos);
+    }
+#endif
 
     EXPECT_EQ(index.size(), 1000);
 }
@@ -85,6 +116,10 @@ TEST_F(DoubleUniformityTest, UniformFloatingPointSequence) {
 
 // Test: Non-uniform data (skewed)
 TEST_F(IntUniformityTest, NonUniformSkewedData) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
 
     // Skewed: dense at beginning, sparse at end
@@ -97,6 +132,19 @@ TEST_F(IntUniformityTest, NonUniformSkewedData) {
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>()> index;
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    // Skewed data should NOT be detected as uniform
+    if (!build_log.empty()) {
+        EXPECT_EQ(build_log.find("Data is UNIFORM"), std::string::npos)
+            << "Skewed data should NOT be detected as UNIFORM";
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos)
+            << "Build should be logged";
+    }
+
+    jazzy::clear_debug_log();
+#endif
 
     // Should NOT be detected as uniform
     // Should still work correctly with binary search

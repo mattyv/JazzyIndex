@@ -44,6 +44,10 @@ using DoubleBinarySearchTest = BinarySearchSegmentTest<double, 64>;
 
 // Test: Highly skewed data forces binary search path
 TEST_F(IntBinarySearchTest, HighlySkewedDataForcesBinarySearch) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
 
     // First quarter: very dense (0-49)
@@ -59,6 +63,18 @@ TEST_F(IntBinarySearchTest, HighlySkewedDataForcesBinarySearch) {
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>()> index;
     index.build(data.data(), data.data() + data.size());
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos)
+            << "Should log build phase";
+        // Skewed data should NOT be detected as uniform
+        EXPECT_EQ(build_log.find("Data is UNIFORM"), std::string::npos)
+            << "Skewed data should NOT be detected as UNIFORM";
+    }
+    jazzy::clear_debug_log();
+#endif
+
     // This data should NOT be uniform, forcing binary search
 
     // Test finds in dense region
@@ -71,6 +87,16 @@ TEST_F(IntBinarySearchTest, HighlySkewedDataForcesBinarySearch) {
     EXPECT_TRUE(is_found(index, data, 3000));
     EXPECT_TRUE(is_found(index, data, 5900));
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string find_log = jazzy::get_debug_log();
+    if (!find_log.empty()) {
+        // Non-uniform data should NOT use UNIFORM path
+        EXPECT_EQ(find_log.find("UNIFORM path"), std::string::npos)
+            << "Non-uniform data should use binary search, not UNIFORM path";
+    }
+    jazzy::clear_debug_log();
+#endif
+
     // Test missing values
     EXPECT_TRUE(is_missing(index, data, 50));
     EXPECT_TRUE(is_missing(index, data, 500));
@@ -79,6 +105,10 @@ TEST_F(IntBinarySearchTest, HighlySkewedDataForcesBinarySearch) {
 
 // Test: Exponential distribution (definitely non-uniform)
 TEST_F(IntBinarySearchTest, ExponentialDistributionBinarySearch) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
     for (int i = 0; i < 100; ++i) {
         data.push_back(static_cast<int>(std::pow(2.0, i * 0.2)));
@@ -86,6 +116,18 @@ TEST_F(IntBinarySearchTest, ExponentialDistributionBinarySearch) {
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<128>()> index;
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build: Building index for 100 elements"),
+                 std::string::npos) << "Should log build with correct element count";
+        // Exponential distribution should NOT be uniform
+        EXPECT_EQ(build_log.find("Data is UNIFORM"), std::string::npos)
+            << "Exponential data should NOT be uniform";
+    }
+    jazzy::clear_debug_log();
+#endif
 
     // Exponential growth ensures non-uniformity
     EXPECT_TRUE(is_found(index, data, data[0]));

@@ -29,6 +29,10 @@ struct KeyValue {
 
 // Test with key-value struct
 TEST(KeyValueTests, KeyValueStruct) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<KeyValue> data{
         {1, "apple"},
         {2, "banana"},
@@ -43,6 +47,13 @@ TEST(KeyValueTests, KeyValueStruct) {
     // Build index with key extractor
     jazzy::JazzyIndex<KeyValue, jazzy::SegmentCount::SMALL, std::less<>, decltype(&KeyValue::key)> index;
     index.build(data.data(), data.data() + data.size(), std::less<>{}, &KeyValue::key);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_EQ(index.size(), data.size());
     EXPECT_GT(index.num_segments(), 0u);
@@ -83,6 +94,10 @@ struct Person {
 };
 
 TEST(KeyValueTests, CustomStruct) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<Person> people{
         {101, "Alice", 30},
         {102, "Bob", 25},
@@ -94,6 +109,13 @@ TEST(KeyValueTests, CustomStruct) {
     // Build index with member pointer to extract id
     jazzy::JazzyIndex<Person, jazzy::SegmentCount::TINY, std::less<>, decltype(&Person::id)> index;
     index.build(people.data(), people.data() + people.size(), std::less<>{}, &Person::id);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_EQ(index.size(), people.size());
 
@@ -130,6 +152,10 @@ struct Record {
 };
 
 TEST(KeyValueTests, MemberFunctionPointer) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<Record> records{
         {10, 1.5},
         {20, 2.5},
@@ -142,6 +168,13 @@ TEST(KeyValueTests, MemberFunctionPointer) {
     jazzy::JazzyIndex<Record, jazzy::SegmentCount::TINY, std::less<>, decltype(&Record::key)> index;
     index.build(records.data(), records.data() + records.size(), std::less<>{}, &Record::key);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     auto* result = index.find(Record{30, 0.0});
     ASSERT_NE(result, records.data() + records.size());
     EXPECT_EQ(result->key, 30);
@@ -150,11 +183,22 @@ TEST(KeyValueTests, MemberFunctionPointer) {
 
 // Test backward compatibility - plain types should still work
 TEST(KeyValueTests, BackwardCompatibilityPlainTypes) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data{1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
 
     // Old API - no key extractor needed
     jazzy::JazzyIndex<int, jazzy::SegmentCount::SMALL> index;
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_EQ(index.size(), data.size());
 
@@ -165,6 +209,10 @@ TEST(KeyValueTests, BackwardCompatibilityPlainTypes) {
 
 // Test with large dataset
 TEST(KeyValueTests, LargeDatasetKeyValue) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<KeyValue> data;
     for (int i = 0; i < 10000; ++i) {
         data.push_back({i, "value_" + std::to_string(i)});
@@ -172,6 +220,13 @@ TEST(KeyValueTests, LargeDatasetKeyValue) {
 
     jazzy::JazzyIndex<KeyValue, jazzy::SegmentCount::LARGE, std::less<>, decltype(&KeyValue::key)> index;
     index.build(data.data(), data.data() + data.size(), std::less<>{}, &KeyValue::key);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     EXPECT_EQ(index.size(), data.size());
 
@@ -186,6 +241,10 @@ TEST(KeyValueTests, LargeDatasetKeyValue) {
 
 // Test with reverse order (std::greater)
 TEST(KeyValueTests, ReverseOrderKeyValue) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<KeyValue> data{
         {50, "fifty"},
         {40, "forty"},
@@ -197,6 +256,13 @@ TEST(KeyValueTests, ReverseOrderKeyValue) {
     jazzy::JazzyIndex<KeyValue, jazzy::SegmentCount::TINY, std::greater<>, decltype(&KeyValue::key)> index;
     index.build(data.data(), data.data() + data.size(), std::greater<>{}, &KeyValue::key);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     auto* result = index.find({30, ""});
     ASSERT_NE(result, data.data() + data.size());
     EXPECT_EQ(result->key, 30);
@@ -205,10 +271,21 @@ TEST(KeyValueTests, ReverseOrderKeyValue) {
 
 // Test edge cases
 TEST(KeyValueTests, EdgeCasesSingleElement) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<KeyValue> data{{42, "answer"}};
 
     jazzy::JazzyIndex<KeyValue, jazzy::SegmentCount::TINY, std::less<>, decltype(&KeyValue::key)> index;
     index.build(data.data(), data.data() + data.size(), std::less<>{}, &KeyValue::key);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     auto* result = index.find({42, ""});
     ASSERT_NE(result, data.data() + data.size());
@@ -221,6 +298,10 @@ TEST(KeyValueTests, EdgeCasesSingleElement) {
 
 // Test with duplicate keys (should find first occurrence)
 TEST(KeyValueTests, DuplicateKeys) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<KeyValue> data{
         {1, "first_1"},
         {2, "first_2"},
@@ -233,6 +314,13 @@ TEST(KeyValueTests, DuplicateKeys) {
     jazzy::JazzyIndex<KeyValue, jazzy::SegmentCount::TINY, std::less<>, decltype(&KeyValue::key)> index;
     index.build(data.data(), data.data() + data.size(), std::less<>{}, &KeyValue::key);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
+
     auto* result = index.find({2, ""});
     ASSERT_NE(result, data.data() + data.size());
     EXPECT_EQ(result->key, 2);
@@ -242,6 +330,10 @@ TEST(KeyValueTests, DuplicateKeys) {
 
 // Test correctness against std::lower_bound
 TEST(KeyValueTests, CorrectnessAgainstStdLowerBound) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<KeyValue> data;
     for (int i = 0; i < 1000; ++i) {
         data.push_back({i * 3, "value_" + std::to_string(i * 3)});  // 0, 3, 6, 9, ...
@@ -249,6 +341,13 @@ TEST(KeyValueTests, CorrectnessAgainstStdLowerBound) {
 
     jazzy::JazzyIndex<KeyValue, jazzy::SegmentCount::MEDIUM, std::less<>, decltype(&KeyValue::key)> index;
     index.build(data.data(), data.data() + data.size(), std::less<>{}, &KeyValue::key);
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos);
+    }
+#endif
 
     // Test lookups and compare with std::lower_bound
     for (int test_key : {0, 3, 6, 99, 150, 300, 999, 2997}) {

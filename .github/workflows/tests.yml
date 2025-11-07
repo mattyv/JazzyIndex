@@ -570,3 +570,82 @@ jobs:
       env:
         ASAN_OPTIONS: detect_leaks=0:windows_hook_rtl_allocators=true
       run: ctest --output-on-failure --verbose
+
+  test-debug-logging:
+    name: Debug Logging Validation - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            compiler: gcc-12
+          - os: macos-latest
+            compiler: clang
+          - os: windows-latest
+            compiler: msvc
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build g++-12
+        echo "CC=gcc-12" >> $GITHUB_ENV
+        echo "CXX=g++-12" >> $GITHUB_ENV
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install cmake ninja
+
+    - name: Set up MSVC (Windows)
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Configure CMake (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        cmake -B build \
+          -G Ninja \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DBUILD_TESTS=ON \
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Configure CMake (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cmake -B build `
+          -G Ninja `
+          -DCMAKE_BUILD_TYPE=Debug `
+          -DBUILD_TESTS=ON `
+          -DBUILD_BENCHMARKS=OFF
+
+    - name: Build debug logging test target (Unix)
+      if: runner.os != 'Windows'
+      run: cmake --build build --target jazzy_index_tests_debug --parallel
+
+    - name: Build debug logging test target (Windows)
+      if: runner.os == 'Windows'
+      run: cmake --build build --target jazzy_index_tests_debug --parallel
+
+    - name: Run tests with debug logging validation (Unix)
+      if: runner.os != 'Windows'
+      working-directory: build
+      run: ./jazzy_index_tests_debug --gtest_output=xml:test_results_debug.xml
+
+    - name: Run tests with debug logging validation (Windows)
+      if: runner.os == 'Windows'
+      working-directory: build
+      run: .\jazzy_index_tests_debug.exe --gtest_output=xml:test_results_debug.xml
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: debug-logging-test-results-${{ matrix.os }}
+        path: build/test_results_debug.xml

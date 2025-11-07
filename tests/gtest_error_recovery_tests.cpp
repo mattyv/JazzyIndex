@@ -42,6 +42,10 @@ using IntErrorRecoveryTest = ErrorRecoveryTest<int, 256>;
 
 // Test: Data with high prediction error (non-linear distribution)
 TEST_F(IntErrorRecoveryTest, HighPredictionErrorData) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     // Create data that will have poor linear predictions
     std::vector<int> data;
     for (int i = 0; i < 100; ++i) {
@@ -50,15 +54,45 @@ TEST_F(IntErrorRecoveryTest, HighPredictionErrorData) {
     }
     auto index = build_index(data);
 
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build"), std::string::npos)
+            << "Should log build phase";
+        // Exponential data should have segments with error metrics
+        if (build_log.find("analyze_segment") != std::string::npos) {
+            // Should log error metrics for non-linear data
+            EXPECT_TRUE(build_log.find("max_error") != std::string::npos ||
+                       build_log.find("Selected") != std::string::npos)
+                << "Should log error metrics or model selection";
+        }
+    }
+    jazzy::clear_debug_log();
+#endif
+
     // Despite poor predictions, all values should still be found
     for (size_t i = 0; i < data.size(); ++i) {
         EXPECT_TRUE(is_found(index.find(data[i]), data, data[i]))
             << "Failed at index " << i << " with value " << data[i];
     }
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string find_log = jazzy::get_debug_log();
+    if (!find_log.empty()) {
+        // With high prediction errors, exponential search may be used
+        // Just verify that find operations are logged
+        EXPECT_NE(find_log.find("find:"), std::string::npos)
+            << "Should log find operations";
+    }
+#endif
 }
 
 // Test: Stepped data (sudden jumps)
 TEST_F(IntErrorRecoveryTest, SteppedDataWithJumps) {
+#ifdef JAZZY_DEBUG_LOGGING
+    jazzy::clear_debug_log();
+#endif
+
     std::vector<int> data;
 
     // Region 1: dense (0-99)
@@ -78,6 +112,18 @@ TEST_F(IntErrorRecoveryTest, SteppedDataWithJumps) {
 
     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>()> index;
     index.build(data.data(), data.data() + data.size());
+
+#ifdef JAZZY_DEBUG_LOGGING
+    std::string build_log = jazzy::get_debug_log();
+    if (!build_log.empty()) {
+        EXPECT_NE(build_log.find("JazzyIndex::build: Building index for 300 elements"),
+                 std::string::npos) << "Should log build with 300 elements";
+        // Stepped data with jumps should NOT be uniform
+        EXPECT_EQ(build_log.find("Data is UNIFORM"), std::string::npos)
+            << "Stepped data with large jumps should NOT be uniform";
+    }
+    jazzy::clear_debug_log();
+#endif
 
     // Test values from each region
     EXPECT_TRUE(is_found(index.find(50), data, 50));
