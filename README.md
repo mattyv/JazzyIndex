@@ -226,14 +226,30 @@ JazzyIndex comes with comprehensive technical documentation:
 
 Learned indexes require a one-time `build()` step to analyze the data and fit models. Here's what that costs:
 
+### Single-Threaded `build()`
+
 | Dataset Size | Build Time (S=256) | Break-even Queries |
 |--------------|-------------------:|-------------------:|
-| 1,000        | 2.3 µs             | ~100 queries       |
-| 10,000       | 6.9 µs             | ~300 queries       |
-| 100,000      | 45.1 µs            | ~1,800 queries     |
-| 1,000,000    | 413 µs (0.41 ms)   | ~17,000 queries    |
+| 1,000        | 0.84 µs            | ~35 queries        |
+| 10,000       | 5.5 µs             | ~225 queries       |
+| 100,000      | ~36 µs             | ~1,500 queries     |
+| 1,000,000    | ~270 µs            | ~11,000 queries    |
 
-**Break-even** = how many queries you need to amortize the build cost. For a 1M-element array, you save ~24ns per query (27.6ns → 3.2ns), so after ~17,000 lookups you've paid back the 413µs build time and everything after is pure profit.
+**Break-even** = how many queries you need to amortize the build cost. For a 1M-element array, you save ~24ns per query (27.6ns → 3.2ns), so after ~11,000 lookups you've paid back the 270µs build time and everything after is pure profit.
+
+*Values for 100K and 1M elements are extrapolated from measured 1K/10K timings using observed ~6.5x scaling factor per 10x data increase. Actual times may vary based on data distribution and CPU architecture.*
+
+### Multi-Threaded `parallel_build()`
+
+For very large datasets, use `parallel_build()` to distribute segment analysis across CPU cores:
+
+```cpp
+// Use parallel_build() for faster index construction on multi-core systems
+jazzy::JazzyIndex<int> index;
+index.parallel_build(data.begin(), data.end());  // Automatically uses std::thread::hardware_concurrency()
+```
+
+**Note:** Based on current benchmarks, `parallel_build()` shows significant overhead for datasets under 100K elements due to thread creation/synchronization costs. The method is designed for very large datasets (1M+ elements) where per-segment work justifies parallelization. For most use cases, the single-threaded `build()` provides excellent performance with sub-microsecond to microsecond build times.
 
 **More segments = slightly slower build**, but not much. Going from S=64 to S=512 on 1M elements only adds ~9µs (409µs → 419µs). The segment count mostly affects query performance, not build time.
 
