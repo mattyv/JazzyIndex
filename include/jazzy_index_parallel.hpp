@@ -163,29 +163,13 @@ public:
             }
         }
 
-        // Compute uniformity and segment scale for O(1) lookups
+        // Always compute scale factor for O(1) segment lookup hint
         const double total_range = static_cast<double>(std::invoke(index.key_extract_, index.max_)) -
                                    static_cast<double>(std::invoke(index.key_extract_, index.min_));
-        const double expected_spacing = (index.num_segments_ > 1 && total_range >= detail::ZERO_RANGE_THRESHOLD)
-            ? total_range / static_cast<double>(index.num_segments_)
-            : 0.0;
-        const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
 
-        index.is_uniform_ = true;
-        if (index.num_segments_ > 1 && total_range >= detail::ZERO_RANGE_THRESHOLD) {
-            for (std::size_t i = 0; i < index.num_segments_; ++i) {
-                const auto& seg = index.segments_[i];
-                const double segment_range = static_cast<double>(std::invoke(index.key_extract_, seg.max_val)) -
-                                            static_cast<double>(std::invoke(index.key_extract_, seg.min_val));
-                if (std::abs(segment_range - expected_spacing) > tolerance) {
-                    index.is_uniform_ = false;
-                    break;
-                }
-            }
-        }
-
-        // Compute scale factor for O(1) segment lookup if data is uniform
-        if (index.is_uniform_ && total_range >= detail::ZERO_RANGE_THRESHOLD) {
+        // Always compute segment scale (no uniformity detection)
+        // Even for non-uniform data, this gives us a good starting point
+        if (total_range >= detail::ZERO_RANGE_THRESHOLD) {
             index.segment_scale_ = static_cast<double>(index.num_segments_) / total_range;
         }
     }

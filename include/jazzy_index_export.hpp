@@ -19,7 +19,6 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
     oss << "{\n";
     oss << "  \"size\": " << size << ",\n";
     oss << "  \"num_segments\": " << num_segments << ",\n";
-    oss << "  \"is_uniform\": " << (index.is_uniform_ ? "true" : "false") << ",\n";
     oss << "  \"segment_scale\": " << index.segment_scale_ << ",\n";
     oss << "  \"min\": " << static_cast<double>(index.min_) << ",\n";
     oss << "  \"max\": " << static_cast<double>(index.max_) << ",\n";

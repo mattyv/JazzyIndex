@@ -100,6 +100,7 @@ if(BUILD_TESTS)
         tests/gtest_property_tests.cpp
         tests/gtest_key_value_tests.cpp
         tests/gtest_binary_search_tests.cpp
+        tests/gtest_fallback_tests.cpp
         tests/gtest_parallel_tests.cpp
         tests/gtest_equal_range_tests.cpp
     )

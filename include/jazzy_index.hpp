@@ -629,11 +629,6 @@ public:
         // Precompute uniformity parameters before loop
         const double total_range = static_cast<double>(std::invoke(key_extract_, max_)) -
                                    static_cast<double>(std::invoke(key_extract_, min_));
-        const double expected_spacing = (num_segments_ > 1 && total_range >= detail::ZERO_RANGE_THRESHOLD)
-            ? total_range / static_cast<double>(num_segments_)
-            : 0.0;
-        const double tolerance = expected_spacing * detail::UNIFORMITY_TOLERANCE;
-        is_uniform_ = true;  // Assume uniform until proven otherwise
 
         for (std::size_t i = 0; i < actual_segments; ++i) {
             const std::size_t start = (i * size_) / actual_segments;
@@ -651,15 +646,6 @@ public:
                     "Input data is not sorted. JazzyIndex requires sorted data. "
                     "Please sort your data before building the index."
                 );
-            }
-
-            // Check uniformity inline (while min/max values are hot in cache)
-            if (is_uniform_ && num_segments_ > 1 && total_range >= detail::ZERO_RANGE_THRESHOLD) {
-                const double segment_range = static_cast<double>(std::invoke(key_extract_, seg.max_val)) -
-                                            static_cast<double>(std::invoke(key_extract_, seg.min_val));
-                if (std::abs(segment_range - expected_spacing) > tolerance) {
-                    is_uniform_ = false;
-                }
             }
 
             // Analyze segment and choose best model
@@ -701,8 +687,9 @@ public:
             }
         }
 
-        // Compute scale factor for O(1) segment lookup if data is uniform
-        if (is_uniform_ && total_range >= detail::ZERO_RANGE_THRESHOLD) {
+        // Always compute scale factor for O(1) segment lookup hint
+        // Even for non-uniform data, this gives us a good starting point
+        if (total_range >= detail::ZERO_RANGE_THRESHOLD) {
             segment_scale_ = static_cast<double>(num_segments_) / total_range;
         }
     }
@@ -932,8 +919,14 @@ private:
             return nullptr;
         }
 
-        // Fast path: O(1) arithmetic lookup for uniform data
-        if (is_uniform_) {
+        // Initialize binary search bounds (may be narrowed by arithmetic hint)
+        std::size_t left = 0;
+        std::size_t right = num_segments_;
+
+        // Always try O(1) arithmetic lookup first as a hint
+        // Even for non-uniform data, this often gets us close to the right segment
+        // Cost: ~5 cycles (1 sub, 1 mul, 1 cast, 2 comparisons) - cheaper than one binary search iteration
+        if (segment_scale_ > 0.0) {
             const double offset = static_cast<double>(std::invoke(key_extract_, value)) -
                                  static_cast<double>(std::invoke(key_extract_, min_));
             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
@@ -943,19 +936,25 @@ private:
                 seg_idx = num_segments_ - 1;
             }
 
-            // Verify we got the right segment (should always be true for uniform data)
+            // Verify we got the right segment
             const auto& seg = segments_[seg_idx];
             if (!comp_(value, seg.min_val) && !comp_(seg.max_val, value)) {
-                return &seg;
+                return &seg;  // Success! O(1) lookup
             }
 
-            // Fallback to binary search if arithmetic failed (rare)
+            // Optimization: Use failed prediction to narrow binary search space
+            // We know which direction the actual segment is relative to the hint
+            if (comp_(value, seg.min_val)) {
+                // value < seg.min_val → search LEFT [0, seg_idx)
+                right = seg_idx;
+            } else {
+                // value > seg.max_val → search RIGHT (seg_idx, num_segments_]
+                left = seg_idx + 1;
+            }
         }
 
-        // Slow path: Binary search through segments for skewed data
-        std::size_t left = 0;
-        std::size_t right = num_segments_;
-
+        // Binary search through segments
+        // Uses narrowed range [left, right) based on arithmetic hint if available
         while (left < right) {
             const std::size_t mid = left + (right - left) / 2;
 
@@ -993,8 +992,7 @@ private:
     KeyExtractor key_extract_{};
     Compare comp_{};
     std::size_t num_segments_{0};
-    bool is_uniform_{false};
-    double segment_scale_{0.0};
+    double segment_scale_{0.0};  // Scale factor for O(1) segment lookup hint
     std::array<detail::Segment<T>, NumSegments> segments_{};
 };
 
