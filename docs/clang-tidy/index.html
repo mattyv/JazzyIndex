@@ -24,100 +24,106 @@
     <div class="section">
         <h2>Headers (include/*.hpp)</h2>
         <pre>
-[1/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp.
-31357 warnings generated.
-[2/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp.
-65655 warnings generated.
-[3/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp.
-107917 warnings generated.
-[4/4] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_utility.hpp.
-118444 warnings generated.
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:23:8: warning: invalid case style for struct 'identity' [readability-identifier-naming]
-   23 | struct identity {
+[1/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp.
+31359 warnings generated.
+[2/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp.
+46936 warnings generated.
+[3/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp.
+81236 warnings generated.
+[4/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp.
+123500 warnings generated.
+[5/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_utility.hpp.
+134027 warnings generated.
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:24:8: warning: invalid case style for struct 'identity' [readability-identifier-naming]
+   24 | struct identity {
       |        ^~~~~~~~
       |        Identity
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:121:23: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  121 |                 const double key_val = static_cast<double>(std::invoke(key_extract, value));
-      |                       ^~~~~~
-      |                       auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:129:23: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  129 |                 const double key_val = static_cast<double>(std::invoke(key_extract, value));
-      |                       ^~~~~~
-      |                       auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:137:23: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  137 |                 const double key_val = static_cast<double>(std::invoke(key_extract, value));
-      |                       ^~~~~~
-      |                       auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:190:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  190 |     const double min_val = static_cast<double>(std::invoke(key_extract, data[start]));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:203:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  203 |     const double min_val = static_cast<double>(std::invoke(key_extract, data[start]));
       |           ^~~~~~
       |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:191:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  191 |     const double max_val = static_cast<double>(std::invoke(key_extract, data[end - 1]));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:204:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  204 |     const double max_val = static_cast<double>(std::invoke(key_extract, data[end - 1]));
       |           ^~~~~~
       |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:210:5: warning: multiple declarations in a single statement reduces readability [readability-isolate-declaration]
-  210 |     double sum_x = 0.0, sum_x2 = 0.0, sum_x3 = 0.0, sum_x4 = 0.0, sum_x5 = 0.0, sum_x6 = 0.0;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:223:5: warning: multiple declarations in a single statement reduces readability [readability-isolate-declaration]
+  223 |     double sum_x = 0.0, sum_x2 = 0.0, sum_x3 = 0.0, sum_x4 = 0.0, sum_x5 = 0.0, sum_x6 = 0.0;
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:211:5: warning: multiple declarations in a single statement reduces readability [readability-isolate-declaration]
-  211 |     double sum_y = 0.0, sum_xy = 0.0, sum_x2y = 0.0, sum_x3y = 0.0;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:224:5: warning: multiple declarations in a single statement reduces readability [readability-isolate-declaration]
+  224 |     double sum_y = 0.0, sum_xy = 0.0, sum_x2y = 0.0, sum_x3y = 0.0;
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:226:15: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  226 |         const double key_val = static_cast<double>(std::invoke(key_extract, current_val));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:239:15: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  239 |         const double key_val = static_cast<double>(std::invoke(key_extract, current_val));
       |               ^~~~~~
       |               auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:241:15: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  241 |         const double y = static_cast<double>(i);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:254:15: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  254 |         const double y = static_cast<double>(i);
       |               ^~~~~~
       |               auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:277:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  277 |     const double n_double = static_cast<double>(n);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:298:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  298 |     const double n_double = static_cast<double>(n);
       |           ^~~~~~
       |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:312:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  312 |             const double key_val = static_cast<double>(std::invoke(key_extract, data[i]));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:333:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  333 |             const double key_val = static_cast<double>(std::invoke(key_extract, data[i]));
       |                   ^~~~~~
       |                   auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:323:13: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  323 |         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:347:13: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
+  347 |         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
       |             ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:323:30: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  323 |         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:347:30: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
+  347 |         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
       |                              ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:445:35: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  445 |                             const double key_value = static_cast<double>(std::invoke(key_extract, data[i]));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:474:35: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  474 |                             const double key_value = static_cast<double>(std::invoke(key_extract, data[i]));
       |                                   ^~~~~~
       |                                   auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:458:29: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  458 |                         if (cubic_max_error < quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD) {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:490:29: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
+  490 |                         if (cubic_max_error < quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD) {
       |                             ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:458:47: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  458 |                         if (cubic_max_error < quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD) {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:490:47: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
+  490 |                         if (cubic_max_error < quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD) {
       |                                               ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:543:12: warning: enum 'SegmentCount' uses a larger base type ('std::size_t' (aka 'unsigned long'), size: 8 bytes) than necessary for its value set, consider using 'std::uint16_t' (2 bytes) as the base type to reduce its size [performance-enum-size]
-  543 | enum class SegmentCount : std::size_t {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:600:12: warning: enum 'SegmentCount' uses a larger base type ('std::size_t' (aka 'unsigned long'), size: 8 bytes) than necessary for its value set, consider using 'std::uint16_t' (2 bytes) as the base type to reduce its size [performance-enum-size]
+  600 | enum class SegmentCount : std::size_t {
       |            ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:560:1: warning: function 'to_segment_count' has inline specifier but is implicitly inlined [readability-redundant-inline-specifier]
-  560 | inline constexpr SegmentCount to_segment_count() {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:617:1: warning: function 'to_segment_count' has inline specifier but is implicitly inlined [readability-redundant-inline-specifier]
+  617 | inline constexpr SegmentCount to_segment_count() {
       | ^~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:575:34: warning: invalid case style for constexpr variable 'NumSegments' [readability-identifier-naming]
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:632:34: warning: invalid case style for constexpr variable 'NumSegments' [readability-identifier-naming]
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |                                  ^~~~~~~~~~~
       |                                  NUM_SEGMENTS
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |                   ~~~~~~~~~~~        ~~~~~~~~~~~
       |                   NUM_SEGMENTS       NUM_SEGMENTS
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:586:35: warning: use c++14 style type templates [modernize-type-traits]
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:643:35: warning: use c++14 style type templates [modernize-type-traits]
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |                          ~~~~~~~~ ^                                                            ~~~~~~
       |                                                 _t
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:586:59: warning: use c++14 style type templates [modernize-type-traits]
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:643:59: warning: use c++14 style type templates [modernize-type-traits]
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |                                                  ~~~~~~~~ ^                             ~~~~~~
       |                                                                                _t
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:984:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  984 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:986:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  986 |             std::size_t result_idx = static_cast<std::size_t>(ptr - base_);
+      |             ^~~~~~~~~~~
+      |             auto
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1032:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1032 |             std::size_t result_idx = static_cast<std::size_t>(ptr - base_);
+      |             ^~~~~~~~~~~
+      |             auto
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1097:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1097 |             const double key_val = static_cast<double>(std::invoke(key_extract_, value));
+      |                   ^~~~~~
+      |                   auto
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1098:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1098 |             const double min_key = static_cast<double>(std::invoke(key_extract_, min_));
+      |                   ^~~~~~
+      |                   auto
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1100:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1100 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
       |             ^~~~~~~~~~~
       |             auto
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp:50:16: warning: escaped string literal can be written as a raw string literal [modernize-raw-string-literal]
@@ -128,43 +134,73 @@
    38 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |                                  ^~~~~~~~~~~
       |                                  NUM_SEGMENTS
-Suppressed 118361 warnings (118361 in non-user code).
+Suppressed 133941 warnings (133941 in non-user code).
 Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
         </pre>
     </div>
     <div class="section">
         <h2>Tests (tests/*.cpp)</h2>
         <pre>
-[1/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp.
-51310 warnings generated.
-[2/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp.
-102576 warnings generated.
-[3/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp.
-154019 warnings generated.
-[4/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_equal_range_tests.cpp.
-205336 warnings generated.
-[5/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp.
-256539 warnings generated.
-[6/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp.
-307760 warnings generated.
-[7/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp.
-361106 warnings generated.
-[8/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp.
-412479 warnings generated.
-[9/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp.
-468563 warnings generated.
-[10/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp.
-519826 warnings generated.
-[11/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp.
-574389 warnings generated.
-[12/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_property_tests.cpp.
-634714 warnings generated.
-[13/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp.
-685993 warnings generated.
-[14/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_unit_tests.cpp.
-737428 warnings generated.
-[15/15] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/property_tests.cpp.
-793418 warnings generated.
+[1/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp.
+51323 warnings generated.
+[2/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp.
+103140 warnings generated.
+[3/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp.
+154415 warnings generated.
+[4/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp.
+206122 warnings generated.
+[5/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp.
+257580 warnings generated.
+[6/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp.
+309680 warnings generated.
+[7/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp.
+360720 warnings generated.
+[8/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp.
+412156 warnings generated.
+[9/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_equal_range_tests.cpp.
+463492 warnings generated.
+[10/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_equal_range_tests.cpp.
+515289 warnings generated.
+[11/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp.
+566500 warnings generated.
+[12/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp.
+618054 warnings generated.
+[13/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp.
+669274 warnings generated.
+[14/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp.
+720771 warnings generated.
+[15/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp.
+774119 warnings generated.
+[16/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp.
+827792 warnings generated.
+[17/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp.
+879170 warnings generated.
+[18/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp.
+931009 warnings generated.
+[19/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp.
+987106 warnings generated.
+[20/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp.
+1038374 warnings generated.
+[21/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp.
+1090015 warnings generated.
+[22/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp.
+1144584 warnings generated.
+[23/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp.
+1199556 warnings generated.
+[24/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_property_tests.cpp.
+1259881 warnings generated.
+[25/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_property_tests.cpp.
+1320430 warnings generated.
+[26/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp.
+1371718 warnings generated.
+[27/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp.
+1423440 warnings generated.
+[28/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_unit_tests.cpp.
+1474880 warnings generated.
+[29/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_unit_tests.cpp.
+1526692 warnings generated.
+[30/16] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/property_tests.cpp.
+1582682 warnings generated.
 /home/runner/work/JazzyIndex/JazzyIndex/build/_deps/rapidcheck-src/include/rapidcheck/Assertions.h:6:9: warning: variadic macro 'RC_INTERNAL_CONDITIONAL_RESULT' used; consider using a 'constexpr' variadic template function [cppcoreguidelines-macro-usage]
     6 | #define RC_INTERNAL_CONDITIONAL_RESULT(                                        \
       |         ^
@@ -5073,463 +5109,893 @@ note: this fix will not be applied because it overlaps with another fix
 /home/runner/work/JazzyIndex/JazzyIndex/build/_deps/rapidcheck-src/include/rapidcheck/shrinkable/Transform.hpp:146:61: warning: forwarding reference parameter 'shrink' is never forwarded inside the function body [cppcoreguidelines-missing-std-forward]
   146 | Shrinkable<T> postShrink(Shrinkable<T> shrinkable, Shrink &&shrink) {
       |                                                             ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:23:8: warning: invalid case style for struct 'identity' [readability-identifier-naming]
-   23 | struct identity {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:24:8: warning: invalid case style for struct 'identity' [readability-identifier-naming]
+   24 | struct identity {
       |        ^~~~~~~~
       |        Identity
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:121:23: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  121 |                 const double key_val = static_cast<double>(std::invoke(key_extract, value));
-      |                       ^~~~~~
-      |                       auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:123:52: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  123 |                                             params.linear.slope,
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:126:52: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  126 |                                             params.linear.slope,
       |                                                    ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:124:52: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  124 |                                             params.linear.intercept);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:127:52: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  127 |                                             params.linear.intercept);
       |                                                    ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:129:23: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  129 |                 const double key_val = static_cast<double>(std::invoke(key_extract, value));
-      |                       ^~~~~~
-      |                       auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:131:70: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  131 |                                             std::fma(key_val, params.quadratic.a, params.quadratic.b),
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:129:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  129 |                 DEBUG_LOG("predict[%zu-%zu]: LINEAR - key=%.4f, pred=%.2f, result=%zu (slope=%.4f, intercept=%.4f)",
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:130:77: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  130 |                           start_idx, end_idx, key_val, pred, result, params.linear.slope, params.linear.intercept);
+      |                                                                             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:130:98: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  130 |                           start_idx, end_idx, key_val, pred, result, params.linear.slope, params.linear.intercept);
+      |                                                                                                  ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:135:70: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  135 |                                             std::fma(key_val, params.quadratic.a, params.quadratic.b),
       |                                                                      ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:131:90: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  131 |                                             std::fma(key_val, params.quadratic.a, params.quadratic.b),
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:135:90: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  135 |                                             std::fma(key_val, params.quadratic.a, params.quadratic.b),
       |                                                                                          ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:132:52: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  132 |                                             params.quadratic.c);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:136:52: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  136 |                                             params.quadratic.c);
       |                                                    ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:137:23: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  137 |                 const double key_val = static_cast<double>(std::invoke(key_extract, value));
-      |                       ^~~~~~
-      |                       auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:141:78: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  141 |                                                     std::fma(key_val, params.cubic.a, params.cubic.b),
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:138:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  138 |                 DEBUG_LOG("predict[%zu-%zu]: QUADRATIC - key=%.4f, pred=%.2f, result=%zu",
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:146:78: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  146 |                                                     std::fma(key_val, params.cubic.a, params.cubic.b),
       |                                                                              ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:141:94: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  141 |                                                     std::fma(key_val, params.cubic.a, params.cubic.b),
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:146:94: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  146 |                                                     std::fma(key_val, params.cubic.a, params.cubic.b),
       |                                                                                              ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:142:60: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  142 |                                                     params.cubic.c),
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:147:60: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  147 |                                                     params.cubic.c),
       |                                                            ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:143:52: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  143 |                                             params.cubic.d);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:148:52: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  148 |                                             params.cubic.d);
       |                                                    ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:148:31: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  148 |                 return params.constant.constant_idx;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:150:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  150 |                 DEBUG_LOG("predict[%zu-%zu]: CUBIC - key=%.4f, pred=%.2f, result=%zu",
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:155:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  155 |                 DEBUG_LOG("predict[%zu-%zu]: CONSTANT - returning %zu",
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:156:54: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  156 |                           start_idx, end_idx, params.constant.constant_idx);
+      |                                                      ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:157:31: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  157 |                 return params.constant.constant_idx;
       |                               ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:190:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  190 |     const double min_val = static_cast<double>(std::invoke(key_extract, data[start]));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:159:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  159 |                 DEBUG_LOG("predict[%zu-%zu]: UNKNOWN model type, returning start_idx=%zu",
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:192:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  192 |         DEBUG_LOG("analyze_segment[%zu-%zu]: Selected CONSTANT model (empty or single element)",
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:203:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  203 |     const double min_val = static_cast<double>(std::invoke(key_extract, data[start]));
       |           ^~~~~~
       |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:191:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  191 |     const double max_val = static_cast<double>(std::invoke(key_extract, data[end - 1]));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:204:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  204 |     const double max_val = static_cast<double>(std::invoke(key_extract, data[end - 1]));
       |           ^~~~~~
       |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:210:5: warning: multiple declarations in a single statement reduces readability [readability-isolate-declaration]
-  210 |     double sum_x = 0.0, sum_x2 = 0.0, sum_x3 = 0.0, sum_x4 = 0.0, sum_x5 = 0.0, sum_x6 = 0.0;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:223:5: warning: multiple declarations in a single statement reduces readability [readability-isolate-declaration]
+  223 |     double sum_x = 0.0, sum_x2 = 0.0, sum_x3 = 0.0, sum_x4 = 0.0, sum_x5 = 0.0, sum_x6 = 0.0;
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:211:5: warning: multiple declarations in a single statement reduces readability [readability-isolate-declaration]
-  211 |     double sum_y = 0.0, sum_xy = 0.0, sum_x2y = 0.0, sum_x3y = 0.0;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:224:5: warning: multiple declarations in a single statement reduces readability [readability-isolate-declaration]
+  224 |     double sum_y = 0.0, sum_xy = 0.0, sum_x2y = 0.0, sum_x3y = 0.0;
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:226:15: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  226 |         const double key_val = static_cast<double>(std::invoke(key_extract, current_val));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:239:15: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  239 |         const double key_val = static_cast<double>(std::invoke(key_extract, current_val));
       |               ^~~~~~
       |               auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:241:15: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  241 |         const double y = static_cast<double>(i);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:254:15: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  254 |         const double y = static_cast<double>(i);
       |               ^~~~~~
       |               auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:277:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  277 |     const double n_double = static_cast<double>(n);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:280:5: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  280 |     DEBUG_LOG("analyze_segment[%zu-%zu]: n=%zu, linear_max_error=%zu, linear_mean_error=%.2f, slope=%.4f, intercept=%.4f",
+      |     ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:288:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  288 |         DEBUG_LOG("analyze_segment[%zu-%zu]: Selected LINEAR model (max_error=%zu <= threshold=%zu)",
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:293:5: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  293 |     DEBUG_LOG("analyze_segment[%zu-%zu]: Linear error too high (%zu > %zu), trying QUADRATIC",
+      |     ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:298:11: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  298 |     const double n_double = static_cast<double>(n);
       |           ^~~~~~
       |           auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:312:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  312 |             const double key_val = static_cast<double>(std::invoke(key_extract, data[i]));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:333:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  333 |             const double key_val = static_cast<double>(std::invoke(key_extract, data[i]));
       |                   ^~~~~~
       |                   auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:323:13: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  323 |         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:343:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  343 |         DEBUG_LOG("analyze_segment[%zu-%zu]: QUADRATIC: max_error=%zu, mean_error=%.2f, improvement_threshold=%.0f",
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:347:13: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
+  347 |         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
       |             ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:323:30: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  323 |         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:347:30: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
+  347 |         if (quad_max_error < linear_max_error * QUADRATIC_IMPROVEMENT_THRESHOLD) {
       |                              ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:445:35: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  445 |                             const double key_value = static_cast<double>(std::invoke(key_extract, data[i]));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:363:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  363 |             DEBUG_LOG("analyze_segment[%zu-%zu]: QUADRATIC monotonicity: deriv_at_min=%.4f, deriv_at_max=%.4f, is_monotonic=%d",
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:373:21: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  373 |                     DEBUG_LOG("analyze_segment[%zu-%zu]: Quad error in sweet spot (%zu), trying CUBIC",
+      |                     ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:474:35: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  474 |                             const double key_value = static_cast<double>(std::invoke(key_extract, data[i]));
       |                                   ^~~~~~
       |                                   auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:458:29: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  458 |                         if (cubic_max_error < quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD) {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:486:25: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  486 |                         DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC: max_error=%zu, improvement_threshold=%.0f",
+      |                         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:490:29: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
+  490 |                         if (cubic_max_error < quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD) {
       |                             ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:458:47: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
-  458 |                         if (cubic_max_error < quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD) {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:490:47: warning: narrowing conversion from 'std::size_t' (aka 'unsigned long') to 'double' [bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions]
+  490 |                         if (cubic_max_error < quad_max_error * CUBIC_IMPROVEMENT_THRESHOLD) {
       |                                               ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:543:12: warning: enum 'SegmentCount' uses a larger base type ('std::size_t' (aka 'unsigned long'), size: 8 bytes) than necessary for its value set, consider using 'std::uint16_t' (2 bytes) as the base type to reduce its size [performance-enum-size]
-  543 | enum class SegmentCount : std::size_t {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:524:29: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  524 |                             DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC monotonicity check: deriv_at_min=%.4f, deriv_at_max=%.4f",
+      |                             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:530:33: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  530 |                                 DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC failed endpoint monotonicity check", start, end);
+      |                                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:537:33: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  537 |                                 DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC critical point at x=%.4f (range: [%.4f, %.4f])",
+      |                                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:541:37: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  541 |                                     DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC deriv at critical point: %.4f",
+      |                                     ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:545:41: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  545 |                                         DEBUG_LOG("analyze_segment[%zu-%zu]: CUBIC failed critical point monotonicity", start, end);
+      |                                         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:558:33: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  558 |                                 DEBUG_LOG("analyze_segment[%zu-%zu]: Selected CUBIC model (max_error=%zu, improved from quad_error=%zu)",
+      |                                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:573:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  573 |                 DEBUG_LOG("analyze_segment[%zu-%zu]: Selected QUADRATIC model (max_error=%zu, improved from linear_error=%zu, cubic failed/not worthwhile)",
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:577:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  577 |                 DEBUG_LOG("analyze_segment[%zu-%zu]: QUADRATIC not monotonic, falling back to LINEAR", start, end);
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:581:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  581 |             DEBUG_LOG("analyze_segment[%zu-%zu]: QUADRATIC not good enough (error=%zu >= threshold=%.0f), using LINEAR",
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:585:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  585 |         DEBUG_LOG("analyze_segment[%zu-%zu]: Quadratic matrix singular (det=%.6f), using LINEAR", start, end, det);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:592:5: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  592 |     DEBUG_LOG("analyze_segment[%zu-%zu]: Defaulted to LINEAR model (max_error=%zu)",
+      |     ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:600:12: warning: enum 'SegmentCount' uses a larger base type ('std::size_t' (aka 'unsigned long'), size: 8 bytes) than necessary for its value set, consider using 'std::uint16_t' (2 bytes) as the base type to reduce its size [performance-enum-size]
+  600 | enum class SegmentCount : std::size_t {
       |            ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:560:1: warning: function 'to_segment_count' has inline specifier but is implicitly inlined [readability-redundant-inline-specifier]
-  560 | inline constexpr SegmentCount to_segment_count() {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:617:1: warning: function 'to_segment_count' has inline specifier but is implicitly inlined [readability-redundant-inline-specifier]
+  617 | inline constexpr SegmentCount to_segment_count() {
       | ^~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:574:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::LARGE, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:173:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
-  573 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:631:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::LARGE, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:221:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  630 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 | class JazzyIndex {
+  631 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  578 |                   "NumSegments must be in range [1, 4096]");
+  635 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  579 | 
-  580 |     // Type constraint: KeyExtractor must be callable with const T&
+  636 | 
+  637 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  581 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  638 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  582 |                   "KeyExtractor must be callable with const T&");
+  639 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  583 | 
-  584 |     // Type constraint: KeyExtractor must return an arithmetic type
+  640 | 
+  641 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  585 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  642 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  587 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  644 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  588 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  645 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:574:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::LARGE, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:173:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
-  573 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:631:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::LARGE, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:221:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
+  630 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 | class JazzyIndex {
+  631 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  578 |                   "NumSegments must be in range [1, 4096]");
+  635 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  579 | 
-  580 |     // Type constraint: KeyExtractor must be callable with const T&
+  636 | 
+  637 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  581 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  638 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  582 |                   "KeyExtractor must be callable with const T&");
+  639 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  583 | 
-  584 |     // Type constraint: KeyExtractor must return an arithmetic type
+  640 | 
+  641 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  585 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  642 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  587 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  644 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  588 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  645 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:574:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::MEDIUM, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:250:101 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
-  573 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:631:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::MEDIUM, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:342:101 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  630 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 | class JazzyIndex {
+  631 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  578 |                   "NumSegments must be in range [1, 4096]");
+  635 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  579 | 
-  580 |     // Type constraint: KeyExtractor must be callable with const T&
+  636 | 
+  637 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  581 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  638 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  582 |                   "KeyExtractor must be callable with const T&");
+  639 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  583 | 
-  584 |     // Type constraint: KeyExtractor must return an arithmetic type
+  640 | 
+  641 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  585 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  642 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  587 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  644 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  588 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  645 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:574:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::MEDIUM, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:250:101 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
-  573 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:631:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::MEDIUM, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:342:101 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
+  630 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 | class JazzyIndex {
+  631 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  578 |                   "NumSegments must be in range [1, 4096]");
+  635 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  579 | 
-  580 |     // Type constraint: KeyExtractor must be callable with const T&
+  636 | 
+  637 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  581 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  638 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  582 |                   "KeyExtractor must be callable with const T&");
+  639 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  583 | 
-  584 |     // Type constraint: KeyExtractor must return an arithmetic type
+  640 | 
+  641 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  585 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  642 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  587 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  644 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  588 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  645 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:574:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::SMALL, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:44:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
-  573 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:631:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::SMALL, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:48:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  630 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 | class JazzyIndex {
+  631 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  578 |                   "NumSegments must be in range [1, 4096]");
+  635 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  579 | 
-  580 |     // Type constraint: KeyExtractor must be callable with const T&
+  636 | 
+  637 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  581 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  638 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  582 |                   "KeyExtractor must be callable with const T&");
+  639 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  583 | 
-  584 |     // Type constraint: KeyExtractor must return an arithmetic type
+  640 | 
+  641 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  585 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  642 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  587 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  644 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  588 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  645 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:574:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::SMALL, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:44:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
-  573 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:631:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::SMALL, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:48:100 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
+  630 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 | class JazzyIndex {
+  631 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  578 |                   "NumSegments must be in range [1, 4096]");
+  635 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  579 | 
-  580 |     // Type constraint: KeyExtractor must be callable with const T&
+  636 | 
+  637 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  581 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  638 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  582 |                   "KeyExtractor must be callable with const T&");
+  639 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  583 | 
-  584 |     // Type constraint: KeyExtractor must return an arithmetic type
+  640 | 
+  641 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  585 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  642 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  587 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  644 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  588 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  645 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:574:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::greater<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:197:102 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
-  573 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:631:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::greater<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:256:102 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  630 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 | class JazzyIndex {
+  631 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  578 |                   "NumSegments must be in range [1, 4096]");
+  635 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  579 | 
-  580 |     // Type constraint: KeyExtractor must be callable with const T&
+  636 | 
+  637 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  581 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  638 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  582 |                   "KeyExtractor must be callable with const T&");
+  639 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  583 | 
-  584 |     // Type constraint: KeyExtractor must return an arithmetic type
+  640 | 
+  641 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  585 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  642 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  587 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  644 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  588 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  645 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:574:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::greater<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:197:102 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
-  573 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:631:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::greater<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:256:102 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
+  630 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 | class JazzyIndex {
+  631 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  578 |                   "NumSegments must be in range [1, 4096]");
+  635 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  579 | 
-  580 |     // Type constraint: KeyExtractor must be callable with const T&
+  636 | 
+  637 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  581 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  638 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  582 |                   "KeyExtractor must be callable with const T&");
+  639 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  583 | 
-  584 |     // Type constraint: KeyExtractor must return an arithmetic type
+  640 | 
+  641 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  585 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  642 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  587 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  644 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  588 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  645 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:574:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:210:99 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
-  573 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:631:7: warning: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:280:99 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members [clang-analyzer-optin.performance.Padding]
+  630 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 | class JazzyIndex {
+  631 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  578 |                   "NumSegments must be in range [1, 4096]");
+  635 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  579 | 
-  580 |     // Type constraint: KeyExtractor must be callable with const T&
+  636 | 
+  637 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  581 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  638 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  582 |                   "KeyExtractor must be callable with const T&");
+  639 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  583 | 
-  584 |     // Type constraint: KeyExtractor must return an arithmetic type
+  640 | 
+  641 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  585 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  642 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  587 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  644 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  588 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  645 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:574:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:210:99 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
-  573 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:631:7: note: Excessive padding in 'class jazzy::JazzyIndex<struct KeyValue, jazzy::SegmentCount::TINY, struct std::less<void>, int struct KeyValue::*>' instantiated here: /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:280:99 (70 padding bytes, where 6 is optimal). Optimal fields order: segments_, base_, size_, key_extract_, num_segments_, segment_scale_, min_, max_, comp_, is_uniform_, consider reordering the fields or adding explicit padding members
+  630 | template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
       | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  574 | class JazzyIndex {
+  631 | class JazzyIndex {
       | ~~~~~~^~~~~~~~~~~~
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  578 |                   "NumSegments must be in range [1, 4096]");
+  635 |                   "NumSegments must be in range [1, 4096]");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  579 | 
-  580 |     // Type constraint: KeyExtractor must be callable with const T&
+  636 | 
+  637 |     // Type constraint: KeyExtractor must be callable with const T&
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  581 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
+  638 |     static_assert(std::is_invocable_v<KeyExtractor, const T&>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  582 |                   "KeyExtractor must be callable with const T&");
+  639 |                   "KeyExtractor must be callable with const T&");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  583 | 
-  584 |     // Type constraint: KeyExtractor must return an arithmetic type
+  640 | 
+  641 |     // Type constraint: KeyExtractor must return an arithmetic type
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  585 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
+  642 |     using KeyType = std::invoke_result_t<KeyExtractor, const T&>;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  587 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
+  644 |     static_assert(std::is_arithmetic_v<KeyTypeClean>,
       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  588 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
+  645 |                   "KeyExtractor must return an arithmetic type (int, double, etc.)");
       |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:575:34: warning: invalid case style for constexpr variable 'NumSegments' [readability-identifier-naming]
-  575 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:632:34: warning: invalid case style for constexpr variable 'NumSegments' [readability-identifier-naming]
+  632 |     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
       |                                  ^~~~~~~~~~~
       |                                  NUM_SEGMENTS
-  576 | 
-  577 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
+  633 | 
+  634 |     static_assert(NumSegments > 0 && NumSegments <= 4096,
       |                   ~~~~~~~~~~~        ~~~~~~~~~~~
       |                   NUM_SEGMENTS       NUM_SEGMENTS
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:586:35: warning: use c++14 style type templates [modernize-type-traits]
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:643:35: warning: use c++14 style type templates [modernize-type-traits]
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |                          ~~~~~~~~ ^                                                            ~~~~~~
       |                                                 _t
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:586:59: warning: use c++14 style type templates [modernize-type-traits]
-  586 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:643:59: warning: use c++14 style type templates [modernize-type-traits]
+  643 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |                                                  ~~~~~~~~ ^                             ~~~~~~
       |                                                                                _t
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:643:33: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  643 |             segments_[0].params.constant.constant_idx = 0;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:685:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  685 |         DEBUG_LOG("JazzyIndex::build: Building index for %zu elements with %zu segments", size_, NumSegments);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:702:33: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  702 |             segments_[0].params.constant.constant_idx = 0;
       |                                 ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:705:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  705 |                     seg.params.linear.slope = static_cast<float>(analysis.linear_a);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:764:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  764 |                     seg.params.linear.slope = static_cast<float>(analysis.linear_a);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:706:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  706 |                     seg.params.linear.intercept = static_cast<float>(analysis.linear_b);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:765:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  765 |                     seg.params.linear.intercept = static_cast<float>(analysis.linear_b);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:709:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  709 |                     seg.params.quadratic.a = static_cast<float>(analysis.quad_a);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:768:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  768 |                     seg.params.quadratic.a = static_cast<float>(analysis.quad_a);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:710:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  710 |                     seg.params.quadratic.b = static_cast<float>(analysis.quad_b);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:769:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  769 |                     seg.params.quadratic.b = static_cast<float>(analysis.quad_b);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:711:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  711 |                     seg.params.quadratic.c = static_cast<float>(analysis.quad_c);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:770:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  770 |                     seg.params.quadratic.c = static_cast<float>(analysis.quad_c);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:714:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  714 |                     seg.params.cubic.a = static_cast<float>(analysis.cubic_a);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:773:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  773 |                     seg.params.cubic.a = static_cast<float>(analysis.cubic_a);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:715:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  715 |                     seg.params.cubic.b = static_cast<float>(analysis.cubic_b);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:774:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  774 |                     seg.params.cubic.b = static_cast<float>(analysis.cubic_b);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:716:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  716 |                     seg.params.cubic.c = static_cast<float>(analysis.cubic_c);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:775:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  775 |                     seg.params.cubic.c = static_cast<float>(analysis.cubic_c);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:717:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  717 |                     seg.params.cubic.d = static_cast<float>(analysis.cubic_d);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:776:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  776 |                     seg.params.cubic.d = static_cast<float>(analysis.cubic_d);
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:720:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
-  720 |                     seg.params.constant.constant_idx = start;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:779:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
+  779 |                     seg.params.constant.constant_idx = start;
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:984:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
-  984 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:789:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  789 |             DEBUG_LOG("JazzyIndex::build: Data is UNIFORM, segment_scale=%.6f", segment_scale_);
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:791:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  791 |             DEBUG_LOG("JazzyIndex::build: Data is NON-UNIFORM (is_uniform=%d, total_range=%.4f)",
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:794:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  794 |         DEBUG_LOG("JazzyIndex::build: Build complete with %zu segments", num_segments_);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:809:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  809 |         DEBUG_LOG("JazzyIndex::find: Called (size=%zu, is_built=%d)", size_, is_built());
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:813:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  813 |             DEBUG_LOG("JazzyIndex::find: Index not built or empty, returning end()");
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:821:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  821 |             DEBUG_LOG("JazzyIndex::find: Key out of bounds, returning end()");
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:828:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  828 |             DEBUG_LOG("JazzyIndex::find: find_segment returned nullptr, returning end()");
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:837:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  837 |         DEBUG_LOG("JazzyIndex::find: Predicted index %zu for key in segment [%zu-%zu]",
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:844:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  844 |             DEBUG_LOG("JazzyIndex::find: Found exact match at predicted index %zu", predicted);
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:852:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  852 |         DEBUG_LOG("JazzyIndex::find: Search direction: %s, max_radius: %zu",
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:870:21: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  870 |                     DEBUG_LOG("JazzyIndex::find: Found match at index %zu (left search, radius=%zu)",
+      |                     ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:880:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  880 |                 DEBUG_LOG("JazzyIndex::find: Left fallback search [%zu-%zu)", seg->start_idx, right_boundary);
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:883:21: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  883 |                     DEBUG_LOG("JazzyIndex::find: Found match at index %zu (left fallback)",
+      |                     ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:903:21: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  903 |                     DEBUG_LOG("JazzyIndex::find: Found match at index %zu (right search, radius=%zu)",
+      |                     ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:913:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  913 |                 DEBUG_LOG("JazzyIndex::find: Right fallback search [%zu-%zu)", left_boundary, seg->end_idx);
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:916:21: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  916 |                     DEBUG_LOG("JazzyIndex::find: Found match at index %zu (right fallback)",
+      |                     ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:923:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  923 |         DEBUG_LOG("JazzyIndex::find: Not found after exhaustive search, returning end()");
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:931:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  931 |         DEBUG_LOG("JazzyIndex::equal_range: Called for value");
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:936:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  936 |             DEBUG_LOG("JazzyIndex::equal_range: Empty index, returning [end, end)");
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:947:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  947 |             DEBUG_LOG("JazzyIndex::equal_range: Value not found, returning empty range");
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:951:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  951 |         DEBUG_LOG("JazzyIndex::equal_range: Found range [%zu, %zu)",
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:958:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  958 |         DEBUG_LOG("JazzyIndex::find_lower_bound: Called");
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:964:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  964 |             DEBUG_LOG("JazzyIndex::find_lower_bound: Segment not found, returning end()");
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:974:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  974 |         DEBUG_LOG("JazzyIndex::find_lower_bound: Predicted index %zu in segment [%zu-%zu]",
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:986:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+  986 |             std::size_t result_idx = static_cast<std::size_t>(ptr - base_);
       |             ^~~~~~~~~~~
       |             auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1026:37: warning: 1st argument 'rhs' (passed to 'lhs') looks like it might be swapped with the 2nd, 'lhs' (passed to 'rhs') [readability-suspicious-call-argument]
- 1026 |         return !comp_(lhs, rhs) && !comp_(rhs, lhs);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:987:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  987 |             DEBUG_LOG("JazzyIndex::find_lower_bound: Found lower bound at index %zu (scanned backward)", result_idx);
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:997:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+  997 |         DEBUG_LOG("JazzyIndex::find_lower_bound: Binary search result at index %zu",
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1004:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1004 |         DEBUG_LOG("JazzyIndex::find_upper_bound: Called");
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1010:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1010 |             DEBUG_LOG("JazzyIndex::find_upper_bound: Segment not found, returning end()");
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1020:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1020 |         DEBUG_LOG("JazzyIndex::find_upper_bound: Predicted index %zu in segment [%zu-%zu]",
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1032:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1032 |             std::size_t result_idx = static_cast<std::size_t>(ptr - base_);
+      |             ^~~~~~~~~~~
+      |             auto
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1033:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1033 |             DEBUG_LOG("JazzyIndex::find_upper_bound: Found upper bound at index %zu (scanned forward)", result_idx);
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1043:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1043 |         DEBUG_LOG("JazzyIndex::find_upper_bound: Binary search result at index %zu",
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1088:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1088 |         DEBUG_LOG("find_segment: Called with is_uniform=%d, num_segments=%zu", is_uniform_, num_segments_);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1091:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1091 |             DEBUG_LOG("find_segment: No segments, returning nullptr");
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1097:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1097 |             const double key_val = static_cast<double>(std::invoke(key_extract_, value));
+      |                   ^~~~~~
+      |                   auto
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1098:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1098 |             const double min_key = static_cast<double>(std::invoke(key_extract_, min_));
+      |                   ^~~~~~
+      |                   auto
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1100:13: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1100 |             std::size_t seg_idx = static_cast<std::size_t>(offset * segment_scale_);
+      |             ^~~~~~~~~~~
+      |             auto
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1102:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1102 |             DEBUG_LOG("find_segment: UNIFORM path - key_val=%.4f, offset=%.4f, segment_scale=%.6f, seg_idx=%zu",
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1108:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1108 |                 DEBUG_LOG("find_segment: Clamped seg_idx to %zu", seg_idx);
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1114:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1114 |                 DEBUG_LOG("find_segment: UNIFORM succeeded, returning segment %zu [%zu-%zu]",
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1119:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1119 |             DEBUG_LOG("find_segment: UNIFORM verification failed, falling back to binary search");
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1124:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1124 |         DEBUG_LOG("find_segment: Using binary search (non-uniform or fallback)");
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1133:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1133 |             DEBUG_LOG("find_segment: Binary search iter %d - left=%zu, mid=%zu, right=%zu",
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1137:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1137 |                 DEBUG_LOG("find_segment: Value < seg[%zu].min, searching left", mid);
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1140:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1140 |                 DEBUG_LOG("find_segment: Value > seg[%zu].max, searching right", mid);
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1144:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1144 |                 DEBUG_LOG("find_segment: Found segment %zu [%zu-%zu]", mid, segments_[mid].start_idx, segments_[mid].end_idx);
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1151:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1151 |             DEBUG_LOG("find_segment: Past all segments, returning last segment %zu", num_segments_ - 1);
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1155:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1155 |         DEBUG_LOG("find_segment: Returning segment %zu or nullptr (left=%zu)", left, left);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                                                       ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1160:37: warning: 1st argument 'rhs' (passed to 'lhs') looks like it might be swapped with the 2nd, 'lhs' (passed to 'rhs') [readability-suspicious-call-argument]
+ 1160 |         return !comp_(lhs, rhs) && !comp_(rhs, lhs);
       |                                     ^~~~~ ~~~
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:21:10: note: in the call to 'operator()', declared here
    21 |     bool operator()(const T& lhs, const T& rhs) const {
       |          ^                   ~~~           ~~~
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:38:9: warning: do not declare variables of type va_list; use variadic templates instead [cppcoreguidelines-pro-type-vararg]
+   38 |         va_list args;
+      |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp:50:16: warning: escaped string literal can be written as a raw string literal [modernize-raw-string-literal]
    50 |         oss << "      \"model_type\": \"";
       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -5609,284 +6075,347 @@ note: this fix will not be applied because it overlaps with another fix
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp:159:32: warning: do not access members of unions; use (boost::)variant instead [cppcoreguidelines-pro-type-union-access]
   159 |                     seg.params.constant.constant_idx = seg.start_idx;
       |                                ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:51:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-   50 |     for (int i = 0; i < 50; ++i) {
-   51 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:55:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+   54 |     for (int i = 0; i < 50; ++i) {
+   55 |         data.push_back(i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:84:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-   83 |     for (int i = 0; i < 100; ++i) {
-   84 |         data.push_back(static_cast<int>(std::pow(2.0, i * 0.2)));
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:114:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  113 |     for (int i = 0; i < 100; ++i) {
+  114 |         data.push_back(static_cast<int>(std::pow(2.0, i * 0.2)));
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:106:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  105 |     for (int i = 0; i < 10; ++i) {
-  106 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:148:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  147 |     for (int i = 0; i < 10; ++i) {
+  148 |         data.push_back(i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:142:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  141 |     for (int i = 0; i < 100; ++i) {
-  142 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:184:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  183 |     for (int i = 0; i < 100; ++i) {
+  184 |         data.push_back(i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:166:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  166 |     for (int i = 0; i < 25; ++i) data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:208:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  208 |     for (int i = 0; i < 25; ++i) data.push_back(i);
       |                                  ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:186:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  186 |     for (int i = 0; i < 20; ++i) data.push_back(i);          // Early segment
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:228:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  228 |     for (int i = 0; i < 20; ++i) data.push_back(i);          // Early segment
       |                                  ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:204:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  204 |     for (int i = 0; i < 20; ++i) data.push_back(i);          // Early segment
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:246:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  246 |     for (int i = 0; i < 20; ++i) data.push_back(i);          // Early segment
       |                                  ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:222:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  222 |     for (int i = 0; i < 10; ++i) data.push_back(i * 1000);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:264:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  264 |     for (int i = 0; i < 10; ++i) data.push_back(i * 1000);
       |                                  ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:252:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  251 |     for (int i = 0; i < 100; ++i) {
-  252 |         data.push_back(i * i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:294:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  293 |     for (int i = 0; i < 100; ++i) {
+  294 |         data.push_back(i * i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:270:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  270 |     for (int i = 0; i < 50; ++i) data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:312:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  312 |     for (int i = 0; i < 50; ++i) data.push_back(i);
       |                                  ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:301:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  300 |     for (int i = 0; i < 50; ++i) {
-  301 |         data.push_back(i * 1000);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:343:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  342 |     for (int i = 0; i < 50; ++i) {
+  343 |         data.push_back(i * 1000);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:327:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  326 |     for (int i = 0; i < 100; ++i) {
-  327 |         data.push_back(i * i);  // Non-uniform
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:369:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  368 |     for (int i = 0; i < 100; ++i) {
+  369 |         data.push_back(i * i);  // Non-uniform
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:344:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  344 |     for (int i = 0; i < 25; ++i) data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:386:34: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  386 |     for (int i = 0; i < 25; ++i) data.push_back(i);
       |                                  ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:429:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  428 |     for (int i = 0; i < 10; ++i) {
-  429 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp:471:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  470 |     for (int i = 0; i < 10; ++i) {
+  471 |         data.push_back(i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp:183:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  182 |     for (int i = 0; i < 100; ++i) {
-  183 |         data.push_back(i * 10);  // 0, 10, 20, ..., 990
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp:264:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  263 |     for (int i = 0; i < 100; ++i) {
+  264 |         data.push_back(i * 10);  // 0, 10, 20, ..., 990
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp:202:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  201 |     for (int i = 0; i < 50; ++i) {
-  202 |         data.push_back(10);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp:294:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  293 |     for (int i = 0; i < 50; ++i) {
+  294 |         data.push_back(10);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:44:60: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
-   44 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::greater<int>> index;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:48:60: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
+   48 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::greater<int>> index;
       |                                                            ^            ~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:106:60: warning: prefer transparent functors 'less<>' [modernize-use-transparent-functors]
-  106 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::less<int>> index;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:143:60: warning: prefer transparent functors 'less<>' [modernize-use-transparent-functors]
+  143 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::less<int>> index;
       |                                                            ^         ~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:131:59: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
-  131 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:190:59: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
+  190 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
       |                                                           ^            ~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:147:62: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
-  147 |     jazzy::JazzyIndex<double, jazzy::to_segment_count<64>(), std::greater<double>> index;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:217:62: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
+  217 |     jazzy::JazzyIndex<double, jazzy::to_segment_count<64>(), std::greater<double>> index;
       |                                                              ^            ~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:190:60: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
-  190 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::greater<int>> index;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:282:60: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
+  282 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::greater<int>> index;
       |                                                            ^            ~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:219:59: warning: prefer transparent functors 'less<>' [modernize-use-transparent-functors]
-  219 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::less<int>> index;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:333:59: warning: prefer transparent functors 'less<>' [modernize-use-transparent-functors]
+  333 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::less<int>> index;
       |                                                           ^         ~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:227:59: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
-  227 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index2;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:350:59: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
+  350 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index2;
       |                                                           ^            ~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:236:59: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
-  236 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:371:59: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
+  371 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
       |                                                           ^            ~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:248:59: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
-  248 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:394:59: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
+  394 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
       |                                                           ^            ~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:259:59: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
-  259 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:416:59: warning: prefer transparent functors 'greater<>' [modernize-use-transparent-functors]
+  416 |     jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
       |                                                           ^            ~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:49:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-   47 |     for (int i = 0; i < 100; ++i) {
-   48 |         // Exponential growth causes high prediction errors
-   49 |         data.push_back(static_cast<int>(std::pow(1.2, i)));
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:21:17: warning: method 'get_log' can be made static [readability-convert-member-functions-to-static]
+   21 |     std::string get_log() {
+      |                 ^
+      |     static 
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:25:10: warning: method 'contains' can be made static [readability-convert-member-functions-to-static]
+   25 |     bool contains(const std::string& log, const std::string& substr) {
+      |          ^
+      |     static 
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:103:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  102 |     for (int i = 0; i < 100; ++i) {
+  103 |         data.push_back(i * i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:66:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-   65 |     for (int i = 0; i < 100; ++i) {
-   66 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:175:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  175 |     auto* result = index.find(50);
+      |     ^
+      |     const 
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:213:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  213 |     auto* result = index.find(50);
+      |     ^
+      |     const 
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:238:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  237 |     for (int i = 0; i < 100; ++i) {
+  238 |         data.push_back(i * i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:94:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-   93 |     for (int i = 0; i < 10; ++i) {
-   94 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:246:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  246 |     auto* result = index.find(400); // 20^2
+      |     ^
+      |     const 
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:278:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  277 |     for (int i = 0; i < 100; ++i) {
+  278 |         data.push_back(i * i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:163:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  162 |     for (int i = 0; i < 50; ++i) {
-  163 |         data.push_back(100 + i % 10);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:286:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  286 |     auto* result = index.find(225); // 15^2
+      |     ^
+      |     const 
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:323:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  323 |     auto* result = index.find(200);
+      |     ^
+      |     const 
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:347:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  347 |     auto* result = index.find(42);
+      |     ^
+      |     const 
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:367:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  366 |     for (int i = 0; i < 200; ++i) {
+  367 |         data.push_back(i * i * i); // Cubic growth
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:185:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  184 |     for (int i = 0; i < 100; ++i) {
-  185 |         data.push_back(i * 100);  // 0, 100, 200, ..., 9900
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:413:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  413 |     auto* result = index.find(25);
+      |     ^
+      |     const 
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:494:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  494 |     auto* result = index.find(75);
+      |     ^
+      |     const 
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp:542:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  541 |     for (int i = 0; i < 100; ++i) {
+  542 |         data.push_back(i * i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:240:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  239 |     for (int i = 0; i < 50; ++i) {
-  240 |         data.push_back(1000000 + i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:53:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+   51 |     for (int i = 0; i < 100; ++i) {
+   52 |         // Exponential growth causes high prediction errors
+   53 |         data.push_back(static_cast<int>(std::pow(1.2, i)));
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:265:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  264 |     for (int i = 0; i < 90; ++i) {
-  265 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:100:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+   99 |     for (int i = 0; i < 100; ++i) {
+  100 |         data.push_back(i);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:140:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  139 |     for (int i = 0; i < 10; ++i) {
+  140 |         data.push_back(i);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:209:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  208 |     for (int i = 0; i < 50; ++i) {
+  209 |         data.push_back(100 + i % 10);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:231:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  230 |     for (int i = 0; i < 100; ++i) {
+  231 |         data.push_back(i * 100);  // 0, 100, 200, ..., 9900
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:286:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  285 |     for (int i = 0; i < 100; ++i) {
-  286 |         data.push_back(1);
+  285 |     for (int i = 0; i < 50; ++i) {
+  286 |         data.push_back(1000000 + i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp:81:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-   80 |     for (int i = 0; i < 1000; ++i) {
-   81 |         data.push_back(i * 0.001);  // 0.000, 0.001, 0.002, ..., 0.999
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:311:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  310 |     for (int i = 0; i < 90; ++i) {
+  311 |         data.push_back(i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp:152:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  151 |     for (int i = 0; i < 100; ++i) {
-  152 |         data.push_back(i + 0.5);  // 0.5, 1.5, 2.5, ..., 99.5
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp:332:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  331 |     for (int i = 0; i < 100; ++i) {
+  332 |         data.push_back(1);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp:181:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  180 |     for (int i = 0; i < 1000; ++i) {
-  181 |         data.push_back(static_cast<double>(i) / 10.0);  // 0.0, 0.1, 0.2, ..., 99.9
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp:107:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  106 |     for (int i = 0; i < 1000; ++i) {
+  107 |         data.push_back(i * 0.001);  // 0.000, 0.001, 0.002, ..., 0.999
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp:229:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  228 |     for (int i = 0; i < 100; ++i) {
-  229 |         data.push_back(static_cast<float>(i) * 0.1f);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp:233:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  232 |     for (int i = 0; i < 100; ++i) {
+  233 |         data.push_back(i + 0.5);  // 0.5, 1.5, 2.5, ..., 99.5
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp:301:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  300 |     for (int i = 0; i < 20; ++i) {
-  301 |         data.push_back(std::exp(static_cast<double>(i) * 0.5));
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp:284:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  283 |     for (int i = 0; i < 1000; ++i) {
+  284 |         data.push_back(static_cast<double>(i) / 10.0);  // 0.0, 0.1, 0.2, ..., 99.9
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:37:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-   37 |     auto it = index.find(5);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp:365:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  364 |     for (int i = 0; i < 100; ++i) {
+  365 |         data.push_back(static_cast<float>(i) * 0.1f);
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp:492:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  491 |     for (int i = 0; i < 20; ++i) {
+  492 |         data.push_back(std::exp(static_cast<double>(i) * 0.5));
+      |         ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:48:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+   48 |     auto it = index.find(5);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:52:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-   52 |     auto it = index.find(7);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:74:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+   74 |     auto it = index.find(7);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:66:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-   66 |     auto it = index.find(30);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:99:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+   99 |     auto it = index.find(30);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:76:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-   76 |     auto it = index.find(3);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:120:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+  120 |     auto it = index.find(3);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:85:5: warning: 'auto missing' can be declared as 'const auto *missing' [readability-qualified-auto]
-   85 |     auto missing = index.find(10);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:129:5: warning: 'auto missing' can be declared as 'const auto *missing' [readability-qualified-auto]
+  129 |     auto missing = index.find(10);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:105:10: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-  105 |     for (auto it = lower; it != upper; ++it) {
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:160:10: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+  160 |     for (auto it = lower; it != upper; ++it) {
       |          ^~~~
       |          const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:115:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-  115 |     auto it = index.find_lower_bound(3);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:181:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+  181 |     auto it = index.find_lower_bound(3);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:127:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-  127 |     auto it = index.find_upper_bound(3);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:204:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+  204 |     auto it = index.find_upper_bound(3);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:139:5: warning: 'auto it1' can be declared as 'const auto *it1' [readability-qualified-auto]
-  139 |     auto it1 = index.find(30);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:227:5: warning: 'auto it1' can be declared as 'const auto *it1' [readability-qualified-auto]
+  227 |     auto it1 = index.find(30);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:140:5: warning: 'auto it2' can be declared as 'const auto *it2' [readability-qualified-auto]
-  140 |     auto it2 = index.find(70);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:228:5: warning: 'auto it2' can be declared as 'const auto *it2' [readability-qualified-auto]
+  228 |     auto it2 = index.find(70);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:144:5: warning: 'auto it3' can be declared as 'const auto *it3' [readability-qualified-auto]
-  144 |     auto it3 = it1 + 2;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:232:5: warning: 'auto it3' can be declared as 'const auto *it3' [readability-qualified-auto]
+  232 |     auto it3 = it1 + 2;
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:147:5: warning: 'auto it4' can be declared as 'const auto *it4' [readability-qualified-auto]
-  147 |     auto it4 = it2 - 1;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:235:5: warning: 'auto it4' can be declared as 'const auto *it4' [readability-qualified-auto]
+  235 |     auto it4 = it2 - 1;
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:156:5: warning: 'auto it1' can be declared as 'const auto *it1' [readability-qualified-auto]
-  156 |     auto it1 = index.find(2);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:255:5: warning: 'auto it1' can be declared as 'const auto *it1' [readability-qualified-auto]
+  255 |     auto it1 = index.find(2);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:157:5: warning: 'auto it2' can be declared as 'const auto *it2' [readability-qualified-auto]
-  157 |     auto it2 = index.find(4);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:256:5: warning: 'auto it2' can be declared as 'const auto *it2' [readability-qualified-auto]
+  256 |     auto it2 = index.find(4);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:165:5: warning: 'auto it3' can be declared as 'const auto *it3' [readability-qualified-auto]
-  165 |     auto it3 = index.find(2);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:264:5: warning: 'auto it3' can be declared as 'const auto *it3' [readability-qualified-auto]
+  264 |     auto it3 = index.find(2);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:175:5: warning: 'auto it1' can be declared as 'const auto *it1' [readability-qualified-auto]
-  175 |     auto it1 = index.find(5);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:286:5: warning: 'auto it1' can be declared as 'const auto *it1' [readability-qualified-auto]
+  286 |     auto it1 = index.find(5);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:197:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-  197 |     auto it = index.find(5);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:326:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+  326 |     auto it = index.find(5);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:222:45: warning: prefer transparent functors 'less<>' [modernize-use-transparent-functors]
-  222 |     JazzyIndex<Record, SegmentCount::SMALL, std::less<Record>, decltype(key_extractor)> index;
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:355:45: warning: prefer transparent functors 'less<>' [modernize-use-transparent-functors]
+  355 |     JazzyIndex<Record, SegmentCount::SMALL, std::less<Record>, decltype(key_extractor)> index;
       |                                             ^         ~~~~~~
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:225:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-  225 |     auto it = index.find(Record{2, ""});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:365:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+  365 |     auto it = index.find(Record{2, ""});
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:251:9: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-  251 |         auto it = index.find(val);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:413:9: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+  413 |         auto it = index.find(val);
       |         ^~~~
       |         const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:262:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-  262 |     auto it = index.find(3.3);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:435:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+  435 |     auto it = index.find(3.3);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:276:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-  276 |     auto it = index.find(3);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:460:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+  460 |     auto it = index.find(3);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:293:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
-  293 |     auto it = index.find(500);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:479:17: warning: unused local variable 'build_log' of type 'std::string' (aka 'basic_string<char>') [bugprone-unused-local-non-trivial-variable]
+  479 |     std::string build_log = jazzy::get_debug_log();
+      |                 ^
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp:487:5: warning: 'auto it' can be declared as 'const auto *it' [readability-qualified-auto]
+  487 |     auto it = index.find(500);
       |     ^~~~
       |     const auto *
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:51:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
-   51 |     auto* result = index.find({2, ""});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:62:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+   62 |     auto* result = index.find({2, ""});
       |     ^
       |     const 
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:101:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
-  101 |     auto* result = index.find(Person{102, "", 0});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:123:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  123 |     auto* result = index.find(Person{102, "", 0});
       |     ^
       |     const 
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:117:5: warning: function 'get_key' should be marked [[nodiscard]] [modernize-use-nodiscard]
-  117 |     int get_key() const { return key; }
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:139:5: warning: function 'get_key' should be marked [[nodiscard]] [modernize-use-nodiscard]
+  139 |     int get_key() const { return key; }
       |     ^
       |     [[nodiscard]] 
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:145:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
-  145 |     auto* result = index.find(Record{30, 0.0});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:178:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  178 |     auto* result = index.find(Record{30, 0.0});
       |     ^
       |     const 
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:161:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
-  161 |     auto* result = index.find(20);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:205:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  205 |     auto* result = index.find(20);
       |     ^
       |     const 
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:170:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  169 |     for (int i = 0; i < 10000; ++i) {
-  170 |         data.push_back({i, "value_" + std::to_string(i)});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:218:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  217 |     for (int i = 0; i < 10000; ++i) {
+  218 |         data.push_back({i, "value_" + std::to_string(i)});
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:180:9: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
-  180 |         auto* result = index.find({i, ""});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:235:9: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  235 |         auto* result = index.find({i, ""});
       |         ^
       |         const 
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:200:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
-  200 |     auto* result = index.find({30, ""});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:266:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  266 |     auto* result = index.find({30, ""});
       |     ^
       |     const 
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:213:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
-  213 |     auto* result = index.find({42, ""});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:290:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  290 |     auto* result = index.find({42, ""});
       |     ^
       |     const 
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:236:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
-  236 |     auto* result = index.find({2, ""});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:324:5: warning: 'auto *result' can be declared as 'const auto *result' [readability-qualified-auto]
+  324 |     auto* result = index.find({2, ""});
       |     ^
       |     const 
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:247:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  246 |     for (int i = 0; i < 1000; ++i) {
-  247 |         data.push_back({i * 3, "value_" + std::to_string(i * 3)});  // 0, 3, 6, 9, ...
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:339:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  338 |     for (int i = 0; i < 1000; ++i) {
+  339 |         data.push_back({i * 3, "value_" + std::to_string(i * 3)});  // 0, 3, 6, 9, ...
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:255:9: warning: 'auto *jazzy_result' can be declared as 'const auto *jazzy_result' [readability-qualified-auto]
-  255 |         auto* jazzy_result = index.find({test_key, ""});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:354:9: warning: 'auto *jazzy_result' can be declared as 'const auto *jazzy_result' [readability-qualified-auto]
+  354 |         auto* jazzy_result = index.find({test_key, ""});
       |         ^
       |         const 
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp:85:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
@@ -5950,83 +6479,83 @@ note: this fix will not be applied because it overlaps with another fix
   582 |     for (int i = 0; i < 50; ++i) {
   583 |         data.push_back(i * 1.0);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:91:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-   90 |     for (int i = 0; i < 100; ++i) {
-   91 |         data.push_back(i * 10);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:153:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  152 |     for (int i = 0; i < 100; ++i) {
+  153 |         data.push_back(i * 10);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:111:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  110 |     for (int i = 0; i < 100; ++i) {
-  111 |         data.push_back(i * i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:187:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  186 |     for (int i = 0; i < 100; ++i) {
+  187 |         data.push_back(i * i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:133:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  132 |     for (int i = 0; i < 50; ++i) {
-  133 |         data.push_back(static_cast<int>(std::pow(1.5, i)));
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:238:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  237 |     for (int i = 0; i < 50; ++i) {
+  238 |         data.push_back(static_cast<int>(std::pow(1.5, i)));
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:170:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  169 |     for (int i = 0; i < 100; ++i) {
-  170 |         data.push_back(0);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:311:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  310 |     for (int i = 0; i < 100; ++i) {
+  311 |         data.push_back(0);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:232:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  230 |     for (int i = 0; i < 100; ++i) {
-  231 |         // All values near 1000, but not identical
-  232 |         data.push_back(1000 + (i % 3));  // Values: 1000, 1001, 1002
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:438:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  436 |     for (int i = 0; i < 100; ++i) {
+  437 |         // All values near 1000, but not identical
+  438 |         data.push_back(1000 + (i % 3));  // Values: 1000, 1001, 1002
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:250:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  249 |     for (int i = 0; i < 100; ++i) {
-  250 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp:469:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  468 |     for (int i = 0; i < 100; ++i) {
+  469 |         data.push_back(i);
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:26:5: warning: replace loop by 'std::ranges::all_of()' [readability-use-anyofallof]
    26 |     for (const auto& val : data) {
       |     ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:124:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  123 |     for (int i = 0; i < 1000; ++i) {
-  124 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:172:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  171 |     for (int i = 0; i < 1000; ++i) {
+  172 |         data.push_back(i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:142:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  141 |     for (int i = 0; i < 1000; ++i) {
-  142 |         data.push_back(i * i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:201:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  200 |     for (int i = 0; i < 1000; ++i) {
+  201 |         data.push_back(i * i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:155:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  154 |     for (int i = 0; i < 500; ++i) {
-  155 |         data.push_back(i * i * i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:225:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  224 |     for (int i = 0; i < 500; ++i) {
+  225 |         data.push_back(i * i * i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:247:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  246 |     for (int i = 0; i < 5000; ++i) {
-  247 |         data.push_back(std::sqrt(static_cast<double>(i)));
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:383:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  382 |     for (int i = 0; i < 5000; ++i) {
+  383 |         data.push_back(std::sqrt(static_cast<double>(i)));
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:273:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  272 |     for (auto& task : tasks) {
-  273 |         futures.push_back(std::async(std::launch::async, [task]() {
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:420:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  419 |     for (auto& task : tasks) {
+  420 |         futures.push_back(std::async(std::launch::async, [task]() {
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:281:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  280 |     for (auto& future : futures) {
-  281 |         results.push_back(future.get());
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:428:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  427 |     for (auto& future : futures) {
+  428 |         results.push_back(future.get());
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:366:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  365 |     for (int i = 0; i < 5000; ++i) {
-  366 |         data.push_back({i * 2, "value_" + std::to_string(i)});  // Even keys only
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp:568:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  567 |     for (int i = 0; i < 5000; ++i) {
+  568 |         data.push_back({i * 2, "value_" + std::to_string(i)});  // Even keys only
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:62:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-   61 |     for (int i = 0; i < 100; ++i) {
-   62 |         data.push_back(i * 10);  // 0, 10, 20, ..., 990
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:93:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+   92 |     for (int i = 0; i < 100; ++i) {
+   93 |         data.push_back(i * 10);  // 0, 10, 20, ..., 990
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:92:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-   91 |     for (int i = 0; i < 50; ++i) {
-   92 |         data.push_back(i);  // 0-49
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:127:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  126 |     for (int i = 0; i < 50; ++i) {
+  127 |         data.push_back(i);  // 0-49
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:129:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  128 |     for (int i = 0; i < 50; ++i) {
-  129 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:177:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  176 |     for (int i = 0; i < 50; ++i) {
+  177 |         data.push_back(i);
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:211:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  210 |     for (int i = 0; i < 100; ++i) {
-  211 |         data.push_back(static_cast<int>(std::exp(i * 0.1)));
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:259:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  258 |     for (int i = 0; i < 100; ++i) {
+  259 |         data.push_back(static_cast<int>(std::exp(i * 0.1)));
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:228:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
-  227 |     for (int i = 0; i < 100; ++i) {
-  228 |         data.push_back(i);
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp:276:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
+  275 |     for (int i = 0; i < 100; ++i) {
+  276 |         data.push_back(i);
       |         ^
-Suppressed 788459 warnings (788263 in non-user code, 196 NOLINT).
+Suppressed 1569543 warnings (1569137 in non-user code, 406 NOLINT).
 Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
         </pre>
     </div>
