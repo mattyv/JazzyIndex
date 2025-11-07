@@ -14,6 +14,15 @@ CMakeFiles/
 Testing/
 Makefile
 cmake_install.cmake
+CTestTestfile.cmake
+_deps/
+lib/
+
+# Executables and binaries
+jazzy_index_tests
+jazzy_index_benchmarks
+benchmark_*
+!benchmarks/
 
 # Documentation - ignore JSON files, keep PNG plots
 docs/images/index_data/*.json
