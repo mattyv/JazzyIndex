@@ -284,6 +284,32 @@ The template parameters are:
 - `NumSegments`: Number of segments (default 256, valid range 1-4096)
 - `Compare`: Comparison functor (default `std::less<>`)
 
+### Iterator Support
+
+JazzyIndex supports building from any contiguous container (std::vector, std::array, etc.) and returns iterators from query methods:
+
+```cpp
+#include "jazzy_index.hpp"
+#include <vector>
+
+std::vector<int> data = {1, 5, 10, 15, 20, 25, 30};
+
+// Build from iterators (works with std::vector, std::array, raw pointers)
+jazzy::JazzyIndex<int> index(data.begin(), data.end());
+
+// Query methods return const_iterator (which is const T*)
+auto it = index.find(15);
+if (it != data.data() + data.size()) {
+    std::cout << "Found: " << *it << "\n";
+}
+
+// Use with STL algorithms
+auto [lower, upper] = index.equal_range(10);
+int count = std::distance(lower, upper);
+```
+
+**Performance Note:** Iterator support is zero-cost. The implementation uses `std::to_address()` at compile-time to extract pointers from contiguous iterators, resulting in identical performance to the pointer-based API.
+
 ## Range Query Functions (Work in Progress)
 
 JazzyIndex now supports range queries similar to the STL's `std::lower_bound`, `std::upper_bound`, and `std::equal_range`. These functions use the same learned model infrastructure to accelerate range lookups.
@@ -292,13 +318,13 @@ JazzyIndex now supports range queries similar to the STL's `std::lower_bound`, `
 
 ```cpp
 // Find the first element not less than the given value
-const T* find_lower_bound(const T& value) const;
+const_iterator find_lower_bound(const T& value) const;
 
 // Find the first element greater than the given value
-const T* find_upper_bound(const T& value) const;
+const_iterator find_upper_bound(const T& value) const;
 
 // Find the range of elements equal to the given value (returns [lower, upper))
-std::pair<const T*, const T*> equal_range(const T& value) const;
+std::pair<const_iterator, const_iterator> equal_range(const T& value) const;
 ```
 
 ### Usage Example
