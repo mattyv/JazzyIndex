@@ -3,13 +3,15 @@
 
 #include <string>
 
-namespace jazzy {
-
 #ifdef JAZZY_DEBUG_LOGGING
-
 #include <mutex>
 #include <cstdio>
 #include <cstdarg>
+#endif
+
+namespace jazzy {
+
+#ifdef JAZZY_DEBUG_LOGGING
 
 // Thread-safe debug log buffer
 class DebugLogger {
