@@ -143,7 +143,6 @@ def plot_index_structure(data: Dict[str, Any], output_file: Path):
     segments = data['segments']
     size = data['size']
     num_segments = data['num_segments']
-    is_uniform = data['is_uniform']
 
     # Create figure
     fig, ax = plt.subplots(figsize=(14, 8))
@@ -211,7 +210,6 @@ def plot_index_structure(data: Dict[str, Any], output_file: Path):
     stats_text = f"""Statistics:
 Size: {size:,}
 Segments: {num_segments}
-Uniform: {is_uniform}
 Avg Error: {avg_error:.1f}
 Max Error: {max_max_error}
 L: {model_counts['LINEAR']} | Q: {model_counts['QUADRATIC']} | Cu: {model_counts['CUBIC']} | C: {model_counts['CONSTANT']}"""
