@@ -102,6 +102,7 @@ if(BUILD_TESTS)
         tests/gtest_binary_search_tests.cpp
         tests/gtest_parallel_tests.cpp
         tests/gtest_equal_range_tests.cpp
+        tests/gtest_iterator_tests.cpp
     )
     target_link_libraries(jazzy_index_tests PRIVATE
         jazzy_index

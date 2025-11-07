@@ -3,9 +3,11 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iterator>
 #include <limits>
 #include <stdexcept>
 #include <string>
@@ -590,9 +592,30 @@ class JazzyIndex {
                   "Compare must be callable with (const T&, const T&) and return bool");
 
 public:
+    // Iterator type aliases
+    using iterator = const T*;
+    using const_iterator = const T*;
+    using value_type = T;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using reference = const T&;
+    using const_reference = const T&;
+    using pointer = const T*;
+    using const_pointer = const T*;
+
     JazzyIndex() = default;
 
     JazzyIndex(const T* first, const T* last, Compare comp = Compare{}, KeyExtractor key_extract = KeyExtractor{}) {
+        build(first, last, comp, key_extract);
+    }
+
+    // Iterator-based constructor
+    template <typename Iterator>
+        requires std::random_access_iterator<Iterator> &&
+                 std::contiguous_iterator<Iterator> &&
+                 (!std::is_pointer_v<Iterator>) &&
+                 std::same_as<typename std::iterator_traits<Iterator>::value_type, T>
+    JazzyIndex(Iterator first, Iterator last, Compare comp = Compare{}, KeyExtractor key_extract = KeyExtractor{}) {
         build(first, last, comp, key_extract);
     }
 
@@ -707,7 +730,18 @@ public:
         }
     }
 
-    [[nodiscard]] const T* find(const T& key) const {
+    // Iterator-based build method
+    template <typename Iterator>
+        requires std::random_access_iterator<Iterator> &&
+                 std::contiguous_iterator<Iterator> &&
+                 (!std::is_pointer_v<Iterator>) &&
+                 std::same_as<typename std::iterator_traits<Iterator>::value_type, T>
+    void build(Iterator first, Iterator last, Compare comp = Compare{}, KeyExtractor key_extract = KeyExtractor{}) {
+        // Convert contiguous iterators to pointers for internal use
+        build(std::to_address(first), std::to_address(last), comp, key_extract);
+    }
+
+    [[nodiscard]] const_iterator find(const T& key) const {
         // Return end iterator if index not built or empty
         if (!is_built() || size_ == 0) {
             return base_ + size_;
@@ -804,10 +838,10 @@ public:
     }
 
     // Find the range of elements equal to the given value
-    // Returns a pair of pointers [lower, upper) where all elements in the range are equivalent to value
+    // Returns a pair of iterators [lower, upper) where all elements in the range are equivalent to value
     // For missing values, returns [position, position) where position is where the value would be inserted
-    [[nodiscard]] std::pair<const T*, const T*> equal_range(const T& value) const {
-        const T* end = base_ + size_;
+    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const T& value) const {
+        const_iterator end = base_ + size_;
 
         // Handle empty index
         if (size_ == 0) {
@@ -815,8 +849,8 @@ public:
         }
 
         // Find lower and upper bounds
-        const T* lower = find_lower_bound(value);
-        const T* upper = find_upper_bound(value);
+        const_iterator lower = find_lower_bound(value);
+        const_iterator upper = find_upper_bound(value);
 
         // If value is not found, both lower and upper point to insertion position
         // This matches std::equal_range behavior
@@ -828,8 +862,8 @@ public:
     }
 
     // Find the first occurrence of a value (lower bound)
-    [[nodiscard]] const T* find_lower_bound(const T& value) const {
-        const T* end = base_ + size_;
+    [[nodiscard]] const_iterator find_lower_bound(const T& value) const {
+        const_iterator end = base_ + size_;
 
         // Use the existing prediction mechanism to get close
         const auto* seg = find_segment(value);
@@ -864,8 +898,8 @@ public:
     }
 
     // Find one past the last occurrence of a value (upper bound)
-    [[nodiscard]] const T* find_upper_bound(const T& value) const {
-        const T* end = base_ + size_;
+    [[nodiscard]] const_iterator find_upper_bound(const T& value) const {
+        const_iterator end = base_ + size_;
 
         // Similar to lower_bound, but finds one past the last occurrence
         const auto* seg = find_segment(value);
@@ -880,7 +914,7 @@ public:
                                                            seg->end_idx > 0 ? seg->end_idx - 1 : 0);
 
         // Perform local search for upper bound
-        const T* ptr = base_ + predicted_index;
+        const_iterator ptr = base_ + predicted_index;
 
         // Check if we're at a matching value using comp_ for equivalence
         if (are_equivalent(*ptr, value)) {
@@ -917,6 +951,17 @@ public:
     void build_parallel(const T* first, const T* last,
                        Compare comp = Compare{},
                        KeyExtractor key_extract = KeyExtractor{});
+
+    // Iterator-based parallel build method
+    template <typename Iterator>
+        requires std::random_access_iterator<Iterator> &&
+                 std::contiguous_iterator<Iterator> &&
+                 (!std::is_pointer_v<Iterator>) &&
+                 std::same_as<typename std::iterator_traits<Iterator>::value_type, T>
+    void build_parallel(Iterator first, Iterator last, Compare comp = Compare{}, KeyExtractor key_extract = KeyExtractor{}) {
+        // Convert contiguous iterators to pointers for internal use
+        build_parallel(std::to_address(first), std::to_address(last), comp, key_extract);
+    }
 
     // Friend declarations
     template <typename U, SegmentCount S, typename C, typename K>
