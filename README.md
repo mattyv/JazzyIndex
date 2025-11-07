@@ -59,7 +59,7 @@ Here's JazzyIndex compared head-to-head with `std::lower_bound` (black X markers
 
 *All measurements on 10,000 elements (Apple M2, Release build with -O3 -march=native)*
 
-**Uniform data (bottom left):** This is where learned indexes shine. `std::lower_bound` follows the classic log(n) curve - growing logarithmically with dataset size. JazzyIndex? **Consistently flat around 3.2ns** across all sizes. The "Not found" queries (dash-dot lines) hit even lower latencies - that's the arithmetic fast path doing pure O(1) lookups. As your dataset grows, `std::lower_bound` slows proportionally with log(n) while JazzyIndex stays constant.
+**Uniform data (bottom left):** This is where learned indexes shine. `std::lower_bound` follows the classic log(n) curve - growing logarithmically with dataset size. JazzyIndex? **Consistently flat around 3.2ns** across all sizes. The "Not found" queries (dash-dot lines) hit even lower latencies - that's the arithmetic hint succeeding on every lookup, doing pure O(1) segment finding. As your dataset grows, `std::lower_bound` slows proportionally with log(n) while JazzyIndex stays constant.
 
 **Skewed distributions (everywhere else):** Here's where JazzyIndex proves it's not just a one-trick pony. On lognormal, exponential, and mixed distributions, we see **5.4x speedup** (17.4ns → 3.2ns) because the adaptive models fit the curves well. Even on pathological Zipf distributions (heavy-tailed, massive clustering), JazzyIndex still delivers **5.8x speedup**. Quantile segmentation means we're only searching 1/256th of the data, so even when models can't predict perfectly, performance stays fast and consistent.
 
@@ -112,15 +112,15 @@ When you call `build()`, here's what happens:
 
 2. **Analyze each segment**: For every segment, fit linear, quadratic, and cubic models using least-squares regression. Measure the maximum prediction error for each model. If linear error is ≤2 elements, use linear (it's faster). If quadratic reduces error by 30%+, use quadratic. If quadratic error is still high (>6 but <50) and cubic reduces it by another 30%+, use cubic. If all values are identical, use constant.
 
-3. **Detect uniformity**: Check if segments are evenly spaced in value range (±30% tolerance). If so, we can skip segment lookup entirely and use arithmetic: `segment_index = (value - min) × num_segments / (max - min)`. This is the "fast path" you see in uniform data benchmarks.
-
 ### Looking Up a Value
 
 The lookup process has three stages:
 
 **Stage 1: Find the segment** (O(log segments) or O(1))
-- Fast path: If data is uniform, compute segment index arithmetically.
-- Slow path: Binary search through segment metadata (min/max values).
+- **Always try arithmetic first**: Compute segment index using `segment_idx = (value - min) × num_segments / (max - min)`. Cost: ~5 cycles.
+- **Verify the guess**: Check if value falls within that segment's min/max range.
+- **On success**: Use the predicted segment (O(1) lookup!).
+- **On failure**: Use the failed prediction directionally - if value is less than segment min, binary search segments to the left; if greater than segment max, search right. This cuts the search space in half even when the arithmetic guess is wrong.
 
 **Stage 2: Predict within segment**
 - Use the segment's model (constant/linear/quadratic) to predict the index.
@@ -137,13 +137,17 @@ This exponential search pattern is crucial. When predictions are good (low error
 
 ```mermaid
 flowchart TD
-    Start([Search for value X]) --> Uniform{Data uniform?}
+    Start([Search for value X]) --> ArithSeg[Try arithmetic hint:<br/>idx = X - min × scale]
 
-    Uniform -->|Yes| ArithSeg[Compute segment: <br/>idx = X - min × scale]
-    Uniform -->|No| BinSeg[Binary search segments]
+    ArithSeg --> Verify{Value in<br/>segment range?}
+    Verify -->|Yes| Predict[Use segment's model<br/>to predict index]
+    Verify -->|No| Direction{Value < min?}
 
-    ArithSeg --> Predict
-    BinSeg --> Predict[Use segment's model<br/>to predict index]
+    Direction -->|Yes| BinLeft[Binary search<br/>left segments]
+    Direction -->|No| BinRight[Binary search<br/>right segments]
+
+    BinLeft --> Predict
+    BinRight --> Predict
 
     Predict --> Check1{Value at<br/>predicted index?}
     Check1 -->|Found!| Success([Return pointer])
@@ -164,14 +168,16 @@ flowchart TD
     style Success fill:#d4edda
     style NotFound fill:#f8d7da
     style Predict fill:#fff3cd
-    style Uniform fill:#fff3cd
+    style ArithSeg fill:#fff3cd
 ```
 
 ### Why This Works
 
-**For uniform data:** The arithmetic segment lookup is exact, models predict perfectly, and we find elements in ~1-2 comparisons. This is why you see 5-10ns in the benchmarks - we're barely doing any work.
+**For uniform data:** The arithmetic hint succeeds immediately (O(1) segment lookup), models predict perfectly, and we find elements in ~1-2 comparisons. This is why you see 5-10ns in the benchmarks - we're barely doing any work.
 
-**For skewed data:** Segment lookup might take a few comparisons (log of 256 ≈ 8), models have higher error, but exponential search contains the damage. Even in the worst case, we're searching within a segment (1/256th of the array), not the whole thing. And because segments are quantiles (equal element count), we never have pathological cases where one segment contains half the data.
+**For skewed data:** The arithmetic hint often gets us close to the right segment, and when it fails, we use it directionally to cut the search space in half. Even in worst case, we're searching within half the segments (log₂(128) ≈ 7 comparisons instead of log₂(256) ≈ 8). Models have higher error on skewed data, but exponential search contains the damage. And because segments are quantiles (equal element count), we never have pathological cases where one segment contains half the data.
+
+**The key insight:** The ~5-cycle cost of trying the arithmetic hint is less than one binary search iteration (~6-7 cycles), so we always benefit from trying it. Even when it's wrong, it gives us directional information for free.
 
 **Why not one big model?** Fitting a single model to complex distributions requires high-degree polynomials or piecewise functions, which are expensive to evaluate and prone to overfitting. Segmentation gives us locality: simple models that capture local behavior, with automatic adaptation to distribution changes across the array.
 
