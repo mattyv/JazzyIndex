@@ -165,7 +165,6 @@ if(BUILD_TESTS)
 
     enable_testing()
     add_test(NAME jazzy_index_tests COMMAND jazzy_index_tests)
-    add_test(NAME jazzy_index_tests_debug COMMAND jazzy_index_tests_debug)
 
     # Coverage configuration (optional, enabled with -DCMAKE_BUILD_TYPE=Coverage)
     if(ENABLE_COVERAGE OR CMAKE_BUILD_TYPE STREQUAL "Coverage")
