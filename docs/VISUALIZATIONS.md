@@ -77,7 +77,6 @@ The tan shaded regions surrounding each model line represent the **prediction er
 In the bottom-right corner, you'll find:
 - **Size**: Number of elements in the dataset
 - **Segments**: Number of segments the index uses
-- **Uniform**: Whether the index detected uniform spacing (enables O(1) segment lookup)
 - **Avg Error**: Average maximum error across all segments
 - **Max Error**: Worst-case maximum error among all segments
 - **L/Q/C Counts**: Number of LINEAR / QUADRATIC / CONSTANT models selected
