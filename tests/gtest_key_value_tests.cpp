@@ -350,7 +350,8 @@ TEST(KeyValueTests, CorrectnessAgainstStdLowerBound) {
 #endif
 
     // Test lookups and compare with std::lower_bound
-    for (int test_key : {0, 3, 6, 99, 150, 300, 999, 2997}) {
+    // Mix of keys that exist (multiples of 3) and keys that don't exist (non-multiples of 3)
+    for (int test_key : {0, 1, 3, 4, 6, 7, 99, 100, 150, 151, 300, 301, 999, 1000, 2997, 2998}) {
         auto* jazzy_result = index.find({test_key, ""});
 
         // Manual lower_bound with custom comparator
