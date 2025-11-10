@@ -13,41 +13,47 @@ import argparse
 import hashlib
 import os
 import struct
+import subprocess
 import sys
 import urllib.request
 from pathlib import Path
 from typing import List, Optional
 
-# SOSD dataset metadata
+# SOSD dataset metadata (updated with correct file IDs and zstd compression)
 # See: https://github.com/learnedsystems/SOSD
+# DOI: 10.7910/DVN/JGVF9A
 DATASETS = {
     "books": {
         "name": "Books (Amazon book popularity)",
-        "url": "https://dataverse.harvard.edu/api/access/datafile/3407241",
-        "size_mb": 762,
-        "num_elements": 100000000,  # 100M uint64_t values
+        "url": "https://dataverse.harvard.edu/api/access/datafile/3821002",
+        "size_mb": 1023,  # Compressed zstd size
+        "num_elements": 200000000,  # 200M uint64_t values
         "description": "Sorted book IDs from Amazon sales rankings (mostly uniform)",
+        "compressed": True,
     },
     "osm": {
         "name": "OpenStreetMap (Cell IDs)",
-        "url": "https://dataverse.harvard.edu/api/access/datafile/3407243",
-        "size_mb": 4577,
-        "num_elements": 800000000,  # 800M uint64_t values
+        "url": "https://dataverse.harvard.edu/api/access/datafile/3821004",
+        "size_mb": 1149,  # Compressed zstd size
+        "num_elements": 200000000,  # 200M uint64_t values
         "description": "Cell IDs from OpenStreetMap (highly skewed, Hilbert curve ordering)",
+        "compressed": True,
     },
     "wiki": {
         "name": "Wikipedia (Revision IDs)",
-        "url": "https://dataverse.harvard.edu/api/access/datafile/3407244",
-        "size_mb": 3052,
+        "url": "https://dataverse.harvard.edu/api/access/datafile/3860043",
+        "size_mb": 111,  # Compressed zstd size
         "num_elements": 200000000,  # 200M uint64_t values
         "description": "Wikipedia revision IDs (time-series with temporal clustering)",
+        "compressed": True,
     },
     "fb": {
         "name": "Facebook (User IDs)",
-        "url": "https://dataverse.harvard.edu/api/access/datafile/3407242",
-        "size_mb": 7629,
+        "url": "https://dataverse.harvard.edu/api/access/datafile/3811100",
+        "size_mb": 300,  # Compressed zstd size
         "num_elements": 200000000,  # 200M uint64_t values
         "description": "Facebook user IDs (clustered, power-law distribution)",
+        "compressed": True,
     }
 }
 
@@ -55,13 +61,19 @@ CACHE_DIR = Path(__file__).parent.parent / "benchmarks" / "datasets"
 CHUNK_SIZE = 8192
 
 
-def download_file(url: str, dest_path: Path, expected_size_mb: Optional[float] = None) -> bool:
+def download_file(url: str, dest_path: Path, expected_size_mb: Optional[float] = None, api_key: Optional[str] = None) -> bool:
     """Download a file with progress reporting."""
     print(f"Downloading from: {url}")
     print(f"Destination: {dest_path}")
 
     try:
-        with urllib.request.urlopen(url) as response:
+        # Create request with API key if provided
+        req = urllib.request.Request(url)
+        if api_key:
+            req.add_header('X-Dataverse-key', api_key)
+            print("Using API key for authentication")
+
+        with urllib.request.urlopen(req) as response:
             total_size = int(response.headers.get('content-length', 0))
 
             if expected_size_mb:
@@ -150,7 +162,7 @@ def save_binary_uint64(values: List[int], file_path: Path) -> None:
     print(f"Saved: {file_size_mb:.1f} MB")
 
 
-def prepare_dataset(dataset_name: str, target_size: int = 20_000_000, force: bool = False) -> Optional[Path]:
+def prepare_dataset(dataset_name: str, target_size: int = 20_000_000, force: bool = False, api_key: Optional[str] = None) -> Optional[Path]:
     """Download and prepare a dataset."""
 
     if dataset_name not in DATASETS:
@@ -164,7 +176,9 @@ def prepare_dataset(dataset_name: str, target_size: int = 20_000_000, force: boo
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
     # File paths
-    raw_file = CACHE_DIR / f"{dataset_name}_raw.bin"
+    is_compressed = dataset_info.get('compressed', False)
+    raw_file = CACHE_DIR / f"{dataset_name}_raw.{'zst' if is_compressed else 'bin'}"
+    decompressed_file = CACHE_DIR / f"{dataset_name}_decompressed.bin"
     processed_file = CACHE_DIR / f"{dataset_name}_{target_size // 1_000_000}M.bin"
 
     # Check if processed file already exists
@@ -183,14 +197,60 @@ def prepare_dataset(dataset_name: str, target_size: int = 20_000_000, force: boo
         print(f"Elements: {dataset_info['num_elements']:,}")
         print(f"{'='*70}\n")
 
-        if not download_file(dataset_info['url'], raw_file, dataset_info['size_mb']):
+        if not download_file(dataset_info['url'], raw_file, dataset_info['size_mb'], api_key):
             return None
     else:
         print(f"Using cached raw data: {raw_file}")
 
+    # Decompress if needed
+    source_file = raw_file
+    if is_compressed:
+        if not decompressed_file.exists() or force:
+            print(f"\nDecompressing {raw_file.name}...")
+            try:
+                # Try using zstd command
+                result = subprocess.run(
+                    ['zstd', '-d', str(raw_file), '-o', str(decompressed_file), '-f'],
+                    capture_output=True,
+                    text=True
+                )
+                if result.returncode != 0:
+                    print(f"zstd error: {result.stderr}")
+                    print("Trying alternative decompression...")
+                    # Try Python zstandard library
+                    try:
+                        import zstandard as zstd
+                        with open(raw_file, 'rb') as f_in:
+                            dctx = zstd.ZstdDecompressor()
+                            with open(decompressed_file, 'wb') as f_out:
+                                dctx.copy_stream(f_in, f_out)
+                        print(f"Decompressed using Python zstandard library")
+                    except ImportError:
+                        print("Error: zstd not found. Install with: pip install zstandard")
+                        print("Or install zstd command-line tool")
+                        return None
+                else:
+                    print(f"Decompressed successfully")
+            except FileNotFoundError:
+                print("Error: zstd command not found")
+                print("Trying Python zstandard library...")
+                try:
+                    import zstandard as zstd
+                    with open(raw_file, 'rb') as f_in:
+                        dctx = zstd.ZstdDecompressor()
+                        with open(decompressed_file, 'wb') as f_out:
+                            dctx.copy_stream(f_in, f_out)
+                    print(f"Decompressed using Python zstandard library")
+                except ImportError:
+                    print("Error: Python zstandard not installed. Install with: pip install zstandard")
+                    return None
+        else:
+            print(f"Using cached decompressed data: {decompressed_file}")
+        source_file = decompressed_file
+
     # Load and subsample
     print(f"\nProcessing dataset...")
-    values = load_binary_uint64(raw_file, dataset_info['num_elements'])
+    values = load_binary_uint64(source_file, dataset_info['num_elements'])
 
     if len(values) == 0:
         print("Error: No data loaded")
@@ -222,14 +282,14 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Download and prepare Wikipedia dataset (200M elements)
+  # Download and prepare Wikipedia dataset (20M elements, default)
   %(prog)s wiki
 
-  # Download OpenStreetMap dataset (200M subsampled from 800M)
+  # Download OpenStreetMap dataset (20M subsampled from 200M)
   %(prog)s osm
 
-  # Prepare smaller 50M element subset
-  %(prog)s wiki --size 50000000
+  # Prepare smaller 10M element subset
+  %(prog)s wiki --size 10000000
 
   # Force re-download and re-process
   %(prog)s wiki --force
@@ -246,18 +306,27 @@ Available datasets:
     parser.add_argument(
         "--size",
         type=int,
-        default=200_000_000,
-        help="Target number of elements (default: 200M)"
+        default=20_000_000,
+        help="Target number of elements (default: 20M)"
     )
     parser.add_argument(
         "--force",
         action="store_true",
         help="Force re-download and re-process even if cached"
     )
+    parser.add_argument(
+        "--api-key",
+        type=str,
+        default=None,
+        help="Harvard Dataverse API key for authentication"
+    )
 
     args = parser.parse_args()
 
-    result = prepare_dataset(args.dataset, args.size, args.force)
+    # Also check for API key in environment variable
+    api_key = args.api_key or os.environ.get('DATAVERSE_API_KEY')
+
+    result = prepare_dataset(args.dataset, args.size, args.force, api_key)
 
     if result:
         print(f"\n{'='*70}")
