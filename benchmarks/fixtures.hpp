@@ -127,6 +127,23 @@ inline std::vector<std::uint64_t> make_inverse_polynomial_values(std::size_t siz
                                                 static_cast<std::uint64_t>(size));
 }
 
+inline std::vector<std::uint64_t> load_real_world_dataset(const std::string& name,
+                                                            std::size_t max_elements = 0) {
+    // Try to load from benchmarks/datasets/ directory
+    const std::string base_path = "benchmarks/datasets/";
+    const std::string file_path = base_path + name;
+
+    auto data = dataset::load_binary_file(file_path.c_str(), max_elements);
+
+    if (data.empty()) {
+        std::cerr << "Warning: Failed to load real-world dataset: " << file_path << std::endl;
+        std::cerr << "         Download with: python3 scripts/download_sosd_dataset.py wiki" << std::endl;
+        std::cerr << "         Or try: osm, fb, books" << std::endl;
+    }
+
+    return data;
+}
+
 template <std::size_t Segments>
 inline jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> make_index(
     const std::vector<std::uint64_t>& values) {

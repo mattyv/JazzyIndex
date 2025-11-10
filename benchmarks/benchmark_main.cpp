@@ -101,6 +101,37 @@ void pre_generate_datasets_parallel(const std::vector<std::size_t>& sizes) {
         {"InversePoly", [](std::size_t s) { return qi::bench::make_inverse_polynomial_values(s); }}
     };
 
+    // Try to load real-world datasets if available
+    // Check for Wikipedia, OSM, Facebook, or Books datasets (200M default)
+    std::vector<std::pair<std::string, std::string>> real_world_datasets = {
+        {"wiki_200M.bin", "Wikipedia"},
+        {"osm_200M.bin", "OSM"},
+        {"fb_200M.bin", "Facebook"},
+        {"books_100M.bin", "Books"}
+    };
+
+    for (const auto& [filename, display_name] : real_world_datasets) {
+        auto data = qi::bench::load_real_world_dataset(filename);
+        if (!data.empty()) {
+            std::cout << "  Found real-world dataset: " << display_name
+                      << " (" << data.size() << " elements)" << std::endl;
+            distributions.push_back({display_name, [data](std::size_t s) {
+                // Subsample to requested size if needed
+                if (s >= data.size()) {
+                    return data;
+                }
+                std::vector<std::uint64_t> result;
+                result.reserve(s);
+                const std::size_t step = data.size() / s;
+                for (std::size_t i = 0; i < s; ++i) {
+                    result.push_back(data[i * step]);
+                }
+                return result;
+            }});
+            break;  // Only load one real-world dataset to avoid memory issues
+        }
+    }
+
     std::vector<std::future<void>> futures;
 
     // Launch parallel generation

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <fstream>
 #include <limits>
 #include <numeric>
 #include <random>
@@ -282,6 +283,38 @@ inline std::vector<std::uint64_t> generate_inverse_polynomial(std::size_t size,
         const double normalized = 1.0 - std::pow(1.0 - t, 5.0);
         const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
         result.push_back(std::min(value, max_value));
+    }
+
+    return result;
+}
+
+inline std::vector<std::uint64_t> load_binary_file(const char* file_path,
+                                                     std::size_t max_elements = 0) {
+    std::ifstream file(file_path, std::ios::binary | std::ios::ate);
+    if (!file) {
+        return {};
+    }
+
+    // Get file size and calculate number of uint64_t elements
+    const std::streamsize file_size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    const std::size_t total_elements = static_cast<std::size_t>(file_size) / sizeof(std::uint64_t);
+    const std::size_t elements_to_load = (max_elements > 0 && max_elements < total_elements)
+                                            ? max_elements
+                                            : total_elements;
+
+    std::vector<std::uint64_t> result;
+    result.reserve(elements_to_load);
+
+    // Read uint64_t values directly
+    for (std::size_t i = 0; i < elements_to_load; ++i) {
+        std::uint64_t value;
+        if (file.read(reinterpret_cast<char*>(&value), sizeof(value))) {
+            result.push_back(value);
+        } else {
+            break;
+        }
     }
 
     return result;
