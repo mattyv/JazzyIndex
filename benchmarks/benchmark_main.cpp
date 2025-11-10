@@ -15,6 +15,10 @@
 #include <vector>
 #include <sys/stat.h>
 
+#ifdef _WIN32
+#include <direct.h>
+#endif
+
 #include "fixtures.hpp"
 #include "jazzy_index_export.hpp"
 #include "jazzy_index_parallel.hpp"
@@ -29,6 +33,9 @@ static int benchmark_threads = 0;
 
 // Global flag to control benchmark dataset sizes
 static bool use_full_benchmarks = false;
+
+// Global flag to run ONLY 20 million element benchmarks
+static bool use_20m_benchmarks = false;
 
 // Key-value struct for benchmarking
 struct KeyValue {
@@ -310,20 +317,32 @@ void register_lower_bound_keyvalue_suite(const std::string& name,
 }
 
 void register_lower_bound_suites() {
-    std::vector<std::size_t> sizes = {100, 1'000, 10'000};
-    if (use_full_benchmarks) {
-        sizes.push_back(100'000);
-        sizes.push_back(1'000'000);
+    std::vector<std::size_t> sizes;
+    if (use_20m_benchmarks) {
+        sizes = {20'000'000};
+    } else {
+        sizes = {100, 1'000, 10'000};
+        if (use_full_benchmarks) {
+            sizes.push_back(100'000);
+            sizes.push_back(1'000'000);
+            sizes.push_back(20'000'000);
+        }
     }
 
     for (const std::size_t size : sizes) {
         register_lower_bound_uniform_suite(size);
     }
 
-    std::vector<std::size_t> dist_sizes = {100, 10'000};
-    if (use_full_benchmarks) {
-        dist_sizes.push_back(100'000);
-        dist_sizes.push_back(1'000'000);
+    std::vector<std::size_t> dist_sizes;
+    if (use_20m_benchmarks) {
+        dist_sizes = {20'000'000};
+    } else {
+        dist_sizes = {100, 10'000};
+        if (use_full_benchmarks) {
+            dist_sizes.push_back(100'000);
+            dist_sizes.push_back(1'000'000);
+            dist_sizes.push_back(20'000'000);
+        }
     }
 
     for (const std::size_t size : dist_sizes) {
@@ -386,10 +405,16 @@ void register_parallel_build_benchmark(std::size_t size, const std::string& dist
 }
 
 void register_build_suites() {
-    std::vector<std::size_t> sizes = {1'000, 10'000};
-    if (use_full_benchmarks) {
-        sizes.push_back(100'000);
-        sizes.push_back(1'000'000);
+    std::vector<std::size_t> sizes;
+    if (use_20m_benchmarks) {
+        sizes = {20'000'000};
+    } else {
+        sizes = {1'000, 10'000};
+        if (use_full_benchmarks) {
+            sizes.push_back(100'000);
+            sizes.push_back(1'000'000);
+            sizes.push_back(20'000'000);
+        }
     }
 
     for (const std::size_t size : sizes) {
@@ -562,10 +587,16 @@ void register_distribution_suite(const std::string& name,
 }
 
 void register_uniform_suites() {
-    std::vector<std::size_t> sizes = {100, 1'000, 10'000};
-    if (use_full_benchmarks) {
-        sizes.push_back(100'000);
-        sizes.push_back(1'000'000);
+    std::vector<std::size_t> sizes;
+    if (use_20m_benchmarks) {
+        sizes = {20'000'000};
+    } else {
+        sizes = {100, 1'000, 10'000};
+        if (use_full_benchmarks) {
+            sizes.push_back(100'000);
+            sizes.push_back(1'000'000);
+            sizes.push_back(20'000'000);
+        }
     }
 
     for (const std::size_t size : sizes) {
@@ -576,10 +607,16 @@ void register_uniform_suites() {
 }
 
 void register_distribution_suites() {
-    std::vector<std::size_t> sizes = {100, 10'000};
-    if (use_full_benchmarks) {
-        sizes.push_back(100'000);
-        sizes.push_back(1'000'000);
+    std::vector<std::size_t> sizes;
+    if (use_20m_benchmarks) {
+        sizes = {20'000'000};
+    } else {
+        sizes = {100, 10'000};
+        if (use_full_benchmarks) {
+            sizes.push_back(100'000);
+            sizes.push_back(1'000'000);
+            sizes.push_back(20'000'000);
+        }
     }
 
     for (const std::size_t size : sizes) {
@@ -680,10 +717,16 @@ void register_keyvalue_suite(const std::string& name,
 
 void register_keyvalue_suites() {
     // Only benchmark key-value for worst-case distributions
-    std::vector<std::size_t> sizes = {100, 10'000};
-    if (use_full_benchmarks) {
-        sizes.push_back(100'000);
-        sizes.push_back(1'000'000);
+    std::vector<std::size_t> sizes;
+    if (use_20m_benchmarks) {
+        sizes = {20'000'000};
+    } else {
+        sizes = {100, 10'000};
+        if (use_full_benchmarks) {
+            sizes.push_back(100'000);
+            sizes.push_back(1'000'000);
+            sizes.push_back(20'000'000);
+        }
     }
 
     for (const std::size_t size : sizes) {
@@ -864,6 +907,15 @@ int main(int argc, char** argv) {
             }
             --argc;
             --i;
+        } else if (arg == "--20m-benchmarks") {
+            use_20m_benchmarks = true;
+            std::cout << "Running ONLY 20 million element benchmarks" << std::endl;
+            // Remove this flag so benchmark library doesn't see it
+            for (int j = i; j < argc - 1; ++j) {
+                argv[j] = argv[j + 1];
+            }
+            --argc;
+            --i;
         } else if (arg.find("--benchmark_threads=") == 0) {
             try {
                 benchmark_threads = std::stoi(arg.substr(20));  // Length of "--benchmark_threads="
@@ -889,10 +941,16 @@ int main(int argc, char** argv) {
     }
 
     // Pre-generate all datasets in parallel (major speedup!)
-    std::vector<std::size_t> dataset_sizes = {100, 1'000, 10'000};
-    if (use_full_benchmarks) {
-        dataset_sizes.push_back(100'000);
-        dataset_sizes.push_back(1'000'000);
+    std::vector<std::size_t> dataset_sizes;
+    if (use_20m_benchmarks) {
+        dataset_sizes = {20'000'000};
+    } else {
+        dataset_sizes = {100, 1'000, 10'000};
+        if (use_full_benchmarks) {
+            dataset_sizes.push_back(100'000);
+            dataset_sizes.push_back(1'000'000);
+            dataset_sizes.push_back(20'000'000);
+        }
     }
     pre_generate_datasets_parallel(dataset_sizes);
 

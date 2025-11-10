@@ -22,3 +22,6 @@ docs/images/index_data/*.json
 *_results.json
 threading_results*.json
 benchmark_parallelism_test/
+
+# Claude Code
+.claude/
