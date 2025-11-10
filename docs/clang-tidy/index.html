@@ -6414,8 +6414,8 @@ note: this fix will not be applied because it overlaps with another fix
   338 |     for (int i = 0; i < 1000; ++i) {
   339 |         data.push_back({i * 3, "value_" + std::to_string(i * 3)});  // 0, 3, 6, 9, ...
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:354:9: warning: 'auto *jazzy_result' can be declared as 'const auto *jazzy_result' [readability-qualified-auto]
-  354 |         auto* jazzy_result = index.find({test_key, ""});
+/home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp:355:9: warning: 'auto *jazzy_result' can be declared as 'const auto *jazzy_result' [readability-qualified-auto]
+  355 |         auto* jazzy_result = index.find({test_key, ""});
       |         ^
       |         const 
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp:85:9: warning: 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop [performance-inefficient-vector-operation]
