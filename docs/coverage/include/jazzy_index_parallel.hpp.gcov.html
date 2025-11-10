@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2025-11-07 08:59:20</td>
+            <td class="headerValue">2025-11-10 06:19:56</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
@@ -88,8 +88,8 @@
 <span id="L26"><span class="lineNum">      26</span>              :     KeyExtractor key_extract;</span>
 <span id="L27"><span class="lineNum">      27</span>              : </span>
 <span id="L28"><span class="lineNum">      28</span>              :     // Execute the segment analysis</span>
-<span id="L29"><span class="lineNum">      29</span> <span class="tlaGNC tlaBgGNC">        5774 :     detail::SegmentAnalysis&lt;T&gt; execute() const {</span></span>
-<span id="L30"><span class="lineNum">      30</span> <span class="tlaGNC">        5774 :         return detail::analyze_segment(data, start_idx, end_idx, comp, key_extract);</span></span>
+<span id="L29"><span class="lineNum">      29</span> <span class="tlaGNC tlaBgGNC">        5770 :     detail::SegmentAnalysis&lt;T&gt; execute() const {</span></span>
+<span id="L30"><span class="lineNum">      30</span> <span class="tlaGNC">        5770 :         return detail::analyze_segment(data, start_idx, end_idx, comp, key_extract);</span></span>
 <span id="L31"><span class="lineNum">      31</span>              :     }</span>
 <span id="L32"><span class="lineNum">      32</span>              : };</span>
 <span id="L33"><span class="lineNum">      33</span>              : </span>
@@ -271,8 +271,8 @@
 <span id="L209"><span class="lineNum">     209</span> <span class="tlaGNC">          21 :         futures.reserve(tasks.size());</span></span>
 <span id="L210"><span class="lineNum">     210</span>              : </span>
 <span id="L211"><span class="lineNum">     211</span> <span class="tlaGNC">        5283 :         for (auto&amp; task : tasks) {</span></span>
-<span id="L212"><span class="lineNum">     212</span> <span class="tlaGNC">       10524 :             futures.push_back(std::async(std::launch::async, [task]() {</span></span>
-<span id="L213"><span class="lineNum">     213</span> <span class="tlaGNC">        5262 :                 return task.execute();</span></span>
+<span id="L212"><span class="lineNum">     212</span> <span class="tlaGNC">       10521 :             futures.push_back(std::async(std::launch::async, [task]() {</span></span>
+<span id="L213"><span class="lineNum">     213</span> <span class="tlaGNC">        5259 :                 return task.execute();</span></span>
 <span id="L214"><span class="lineNum">     214</span>              :             }));</span>
 <span id="L215"><span class="lineNum">     215</span>              :         }</span>
 <span id="L216"><span class="lineNum">     216</span>              : </span>
