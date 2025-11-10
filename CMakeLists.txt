@@ -206,6 +206,15 @@ if(BUILD_BENCHMARKS)
     set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(benchmark)
 
+    # Workaround for Google Benchmark v1.8.3 switch warning on Windows
+    # The benchmark library has an unhandled enum value in sysinfo.cc
+    if(TARGET benchmark)
+        target_compile_options(benchmark PRIVATE -Wno-error=switch)
+    endif()
+    if(TARGET benchmark_main)
+        target_compile_options(benchmark_main PRIVATE -Wno-error=switch)
+    endif()
+
     add_executable(jazzy_index_benchmarks
         benchmarks/benchmark_main.cpp
     )
