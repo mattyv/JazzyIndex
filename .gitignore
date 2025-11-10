@@ -34,3 +34,6 @@ benchmark_parallelism_test/
 
 # Downloaded benchmark datasets (large files, download on-demand)
 benchmarks/datasets/
+
+# Claude Code
+.claude/
