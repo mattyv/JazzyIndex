@@ -896,37 +896,37 @@ void register_synthetic_rmi_benchmarks() {
 
 #ifdef HAS_UNIFORM_RMI
     std::cout << "  - Uniform RMI" << std::endl;
-    register_synthetic_rmi("Uniform", dataset_size, uniform::load, uniform::lookup,
+    register_synthetic_rmi("Uniform", dataset_size, uniform_rmi::load, uniform_rmi::lookup,
                           []() { return qi::bench::make_uniform_values(10000); });
 #endif
 
 #ifdef HAS_EXPONENTIAL_RMI
     std::cout << "  - Exponential RMI" << std::endl;
-    register_synthetic_rmi("Exponential", dataset_size, exponential::load, exponential::lookup,
+    register_synthetic_rmi("Exponential", dataset_size, exponential_rmi::load, exponential_rmi::lookup,
                           []() { return qi::bench::make_exponential_values(10000); });
 #endif
 
 #ifdef HAS_CLUSTERED_RMI
     std::cout << "  - Clustered RMI" << std::endl;
-    register_synthetic_rmi("Clustered", dataset_size, clustered::load, clustered::lookup,
+    register_synthetic_rmi("Clustered", dataset_size, clustered_rmi::load, clustered_rmi::lookup,
                           []() { return qi::bench::make_clustered_values(10000); });
 #endif
 
 #ifdef HAS_LOGNORMAL_RMI
     std::cout << "  - Lognormal RMI" << std::endl;
-    register_synthetic_rmi("Lognormal", dataset_size, lognormal::load, lognormal::lookup,
+    register_synthetic_rmi("Lognormal", dataset_size, lognormal_rmi::load, lognormal_rmi::lookup,
                           []() { return qi::bench::make_lognormal_values(10000); });
 #endif
 
 #ifdef HAS_ZIPF_RMI
     std::cout << "  - Zipf RMI" << std::endl;
-    register_synthetic_rmi("Zipf", dataset_size, zipf::load, zipf::lookup,
+    register_synthetic_rmi("Zipf", dataset_size, zipf_rmi::load, zipf_rmi::lookup,
                           []() { return qi::bench::make_zipf_values(10000); });
 #endif
 
 #ifdef HAS_MIXED_RMI
     std::cout << "  - Mixed RMI" << std::endl;
-    register_synthetic_rmi("Mixed", dataset_size, mixed::load, mixed::lookup,
+    register_synthetic_rmi("Mixed", dataset_size, mixed_rmi::load, mixed_rmi::lookup,
                           []() { return qi::bench::make_mixed_values(10000); });
 #endif
 }

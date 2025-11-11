@@ -280,6 +280,13 @@ if(BUILD_BENCHMARKS)
             target_include_directories(jazzy_index_benchmarks PRIVATE
                 ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/rmi_generated
             )
+
+            # Add all generated RMI .cpp files to the benchmark executable
+            file(GLOB RMI_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/rmi_generated/*_rmi.cpp")
+            if(RMI_SOURCES)
+                target_sources(jazzy_index_benchmarks PRIVATE ${RMI_SOURCES})
+            endif()
+
             target_compile_definitions(jazzy_index_benchmarks PRIVATE ENABLE_RMI_BENCHMARKS)
             add_dependencies(jazzy_index_benchmarks rmi_compiler)
 
