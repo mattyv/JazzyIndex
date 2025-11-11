@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fstream>
 #include <limits>
 #include <memory>
 #include <random>
@@ -172,6 +173,27 @@ inline jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> mak
         index.build(values.data(), values.data() + values.size());
     }
     return index;
+}
+
+// Write dataset in RMI binary format
+// Format: [8-byte count][sorted uint64_t values...]
+// Filename should end with _uint64 for RMI compiler
+inline bool write_rmi_dataset(const std::string& filename,
+                               const std::vector<std::uint64_t>& data) {
+    std::ofstream file(filename, std::ios::binary);
+    if (!file) {
+        return false;
+    }
+
+    // Write count as 64-bit unsigned integer (little endian)
+    std::uint64_t count = data.size();
+    file.write(reinterpret_cast<const char*>(&count), sizeof(count));
+
+    // Write sorted data values
+    file.write(reinterpret_cast<const char*>(data.data()),
+               data.size() * sizeof(std::uint64_t));
+
+    return file.good();
 }
 
 }  // namespace qi::bench

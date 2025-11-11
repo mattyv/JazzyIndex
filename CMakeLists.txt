@@ -263,8 +263,18 @@ if(BUILD_BENCHMARKS)
             )
             add_custom_target(rmi_compiler DEPENDS ${RMI_COMPILER})
 
-            # Create directory for RMI-generated code
+            # Create directory for RMI-generated code and datasets
             file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/rmi_generated)
+            file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/datasets)
+
+            # Helper program to generate synthetic datasets in RMI format
+            add_executable(generate_rmi_datasets EXCLUDE_FROM_ALL
+                benchmarks/generate_rmi_datasets.cpp
+            )
+            target_link_libraries(generate_rmi_datasets PRIVATE jazzy_index)
+            target_include_directories(generate_rmi_datasets PRIVATE
+                ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
+            )
 
             # Add RMI generated code directory to benchmark includes
             target_include_directories(jazzy_index_benchmarks PRIVATE
@@ -274,6 +284,7 @@ if(BUILD_BENCHMARKS)
             add_dependencies(jazzy_index_benchmarks rmi_compiler)
 
             message(STATUS "RMI generated code will be placed in benchmarks/rmi_generated/")
+            message(STATUS "Dataset generator: cmake --build build --target generate_rmi_datasets")
             message(STATUS "To generate RMI code for datasets, run:")
             message(STATUS "  cd external/RMI && cargo run --release -- <dataset> <output_name> <models> <branching>")
         else()

@@ -84,6 +84,62 @@ mv osm_rmi.h osm_rmi.cpp ../../benchmarks/rmi_generated/
 mv fb_rmi.h fb_rmi.cpp ../../benchmarks/rmi_generated/
 ```
 
+## Generating RMI for Synthetic Distributions
+
+To compare RMI against JazzyIndex on synthetic distributions (Uniform, Exponential, Clustered, etc.):
+
+### 1. Generate Synthetic Datasets
+
+```bash
+# Build the dataset generator
+cmake -B build -DENABLE_RMI_BENCHMARKS=ON
+cmake --build build --target generate_rmi_datasets
+
+# Generate datasets (default: 10,000 elements)
+./build/generate_rmi_datasets 10000
+```
+
+This creates binary files in `benchmarks/datasets/`:
+- `uniform_10000_uint64`
+- `exponential_10000_uint64`
+- `clustered_10000_uint64`
+- `lognormal_10000_uint64`
+- `zipf_10000_uint64`
+- `mixed_10000_uint64`
+
+### 2. Generate RMI Code for Synthetic Datasets
+
+```bash
+cd external/RMI
+
+# Generate RMI for each distribution
+cargo run --release -- ../../benchmarks/datasets/uniform_10000_uint64 uniform_rmi linear,linear 100
+cargo run --release -- ../../benchmarks/datasets/exponential_10000_uint64 exponential_rmi linear,linear 100
+cargo run --release -- ../../benchmarks/datasets/clustered_10000_uint64 clustered_rmi linear,linear 100
+cargo run --release -- ../../benchmarks/datasets/lognormal_10000_uint64 lognormal_rmi linear,linear 100
+cargo run --release -- ../../benchmarks/datasets/zipf_10000_uint64 zipf_rmi linear,linear 100
+cargo run --release -- ../../benchmarks/datasets/mixed_10000_uint64 mixed_rmi linear,linear 100
+
+# Move generated files
+mv uniform_rmi.h uniform_rmi.cpp ../../benchmarks/rmi_generated/
+mv exponential_rmi.h exponential_rmi.cpp ../../benchmarks/rmi_generated/
+mv clustered_rmi.h clustered_rmi.cpp ../../benchmarks/rmi_generated/
+mv lognormal_rmi.h lognormal_rmi.cpp ../../benchmarks/rmi_generated/
+mv zipf_rmi.h zipf_rmi.cpp ../../benchmarks/rmi_generated/
+mv mixed_rmi.h mixed_rmi.cpp ../../benchmarks/rmi_generated/
+```
+
+### 3. Move RMI Data Directory
+
+The RMI compiler generates model parameters in the `rmi_data/` directory. You need to move this to your build directory:
+
+```bash
+cd external/RMI
+mv rmi_data ../../build/
+```
+
+**Important**: The `rmi_data/` directory must be in the same location where you run benchmarks from.
+
 ## Building with RMI Benchmarks
 
 Enable RMI benchmarks when configuring CMake:
@@ -95,6 +151,8 @@ cmake --build build --target jazzy_index_benchmarks
 
 ## Running RMI Comparison Benchmarks
 
+### Real-World Datasets (200M elements)
+
 Run the 200M benchmarks with RMI comparisons:
 
 ```bash
@@ -105,6 +163,22 @@ The benchmark output will include:
 - `JazzyIndex/<dataset>/S<segments>/N200000000/...` - JazzyIndex lookups
 - `RMI/<dataset>/N200000000/...` - RMI lookups
 - `LowerBound/<dataset>/N200000000/...` - std::lower_bound baseline
+
+### Synthetic Distributions (10K elements)
+
+Run regular benchmarks with RMI comparisons:
+
+```bash
+./build/jazzy_index_benchmarks
+```
+
+The benchmark output will include RMI comparisons for:
+- Uniform distribution
+- Exponential distribution
+- Clustered distribution
+- Lognormal distribution
+- Zipf distribution
+- Mixed distribution
 
 ## Tuning RMI Models
 
