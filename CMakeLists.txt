@@ -20,6 +20,7 @@ option(BUILD_TESTS "Build JazzyIndex unit and property tests" ON)
 option(BUILD_BENCHMARKS "Build JazzyIndex benchmark suite" ON)
 option(ENABLE_COVERAGE "Enable coverage instrumentation for tests" OFF)
 option(ENABLE_DEBUG_LOGGING "Enable debug logging for tests" OFF)
+option(ENABLE_RMI_BENCHMARKS "Enable RMI (Recursive Model Index) comparison benchmarks" OFF)
 
 # Benchmark configuration
 set(BENCHMARK_REPETITIONS "1" CACHE STRING "Number of times to repeat each benchmark (default: 1)")
@@ -240,6 +241,46 @@ if(BUILD_BENCHMARKS)
     target_include_directories(benchmark_range_functions PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
     )
+
+    # RMI (Recursive Model Index) comparison benchmarks
+    if(ENABLE_RMI_BENCHMARKS)
+        # Check if Rust/Cargo is available for building RMI compiler
+        find_program(CARGO_EXECUTABLE cargo)
+        if(CARGO_EXECUTABLE)
+            message(STATUS "Found Cargo: ${CARGO_EXECUTABLE}")
+            message(STATUS "RMI benchmarks enabled - will build RMI compiler")
+
+            # Build RMI compiler using Cargo
+            set(RMI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/RMI)
+            set(RMI_COMPILER ${RMI_DIR}/target/release/rmi)
+
+            add_custom_command(
+                OUTPUT ${RMI_COMPILER}
+                COMMAND ${CARGO_EXECUTABLE} build --release
+                WORKING_DIRECTORY ${RMI_DIR}
+                COMMENT "Building RMI compiler with Cargo"
+                VERBATIM
+            )
+            add_custom_target(rmi_compiler DEPENDS ${RMI_COMPILER})
+
+            # Create directory for RMI-generated code
+            file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/rmi_generated)
+
+            # Add RMI generated code directory to benchmark includes
+            target_include_directories(jazzy_index_benchmarks PRIVATE
+                ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/rmi_generated
+            )
+            target_compile_definitions(jazzy_index_benchmarks PRIVATE ENABLE_RMI_BENCHMARKS)
+            add_dependencies(jazzy_index_benchmarks rmi_compiler)
+
+            message(STATUS "RMI generated code will be placed in benchmarks/rmi_generated/")
+            message(STATUS "To generate RMI code for datasets, run:")
+            message(STATUS "  cd external/RMI && cargo run --release -- <dataset> <output_name> <models> <branching>")
+        else()
+            message(WARNING "Cargo not found - RMI benchmarks disabled. Install Rust to enable.")
+            message(WARNING "Visit https://rustup.rs/ to install Rust and Cargo")
+        endif()
+    endif()
 
     find_package(Python3 COMPONENTS Interpreter)
     if(Python3_Interpreter_FOUND)

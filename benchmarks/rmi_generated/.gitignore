@@ -1,0 +1,6 @@
+# Ignore RMI-generated C++ files (dataset-specific, regenerated as needed)
+*.h
+*.cpp
+
+# Keep the README
+!README.md
