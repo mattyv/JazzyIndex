@@ -135,11 +135,12 @@ void pre_generate_datasets_parallel(const std::vector<std::size_t>& sizes) {
 
     // Try to load real-world datasets if available
     // Check for Wikipedia, OSM, Facebook, or Books datasets (200M default)
+    // Note: These filenames match the Harvard Dataverse SOSD benchmark dataset names
     std::vector<std::pair<std::string, std::string>> real_world_datasets = {
-        {"wiki_200M.bin", "Wikipedia"},
-        {"osm_200M.bin", "OSM"},
-        {"fb_200M.bin", "Facebook"},
-        {"books_200M.bin", "Books"}
+        {"wiki_200M_uint64", "Wikipedia"},
+        {"osm_cellids_200M_uint64", "OSM"},
+        {"fb_200M_uint64", "Facebook"},
+        {"books_200M_uint64", "Books"}
     };
 
     for (const auto& [filename, display_name] : real_world_datasets) {
@@ -707,16 +708,17 @@ void register_rmi_benchmarks() {
         // Load the dataset once for all RMI benchmarks
         auto data_cache = std::make_shared<std::shared_ptr<std::vector<std::uint64_t>>>();
 
-        auto load_once = [dataset_name, data_cache]() -> std::shared_ptr<std::vector<std::uint64_t>> {
+        auto load_once = [dataset_name, data_cache, load_fn]() -> std::shared_ptr<std::vector<std::uint64_t>> {
             if (!*data_cache) {
                 std::cout << "Loading " << dataset_name << " dataset for RMI benchmarks..." << std::endl;
-                auto data = qi::bench::load_real_world_dataset(dataset_name + "_200M.bin");
+                auto data = qi::bench::load_real_world_dataset(dataset_name + "_200M_uint64");
                 *data_cache = std::make_shared<std::vector<std::uint64_t>>(std::move(data));
 
-                // Load RMI model data
-                std::string rmi_data_path = "benchmarks/rmi_generated/" + dataset_name + "_200M.bin";
-                if (!load_fn(rmi_data_path.c_str())) {
+                // Load RMI model data (default location is rmi_data/ in current directory)
+                // The RMI compiler generates this directory when you run it
+                if (!load_fn("rmi_data")) {
                     std::cerr << "Warning: Failed to load RMI model for " << dataset_name << std::endl;
+                    std::cerr << "         Make sure rmi_data/ directory exists with model parameters" << std::endl;
                 }
             }
             return *data_cache;
@@ -800,11 +802,12 @@ void register_real_world_dataset_suites() {
 
     // List of real-world datasets to try
     // Only register benchmarks, don't load data yet (lazy loading on first run)
+    // Note: These filenames match the Harvard Dataverse SOSD benchmark dataset names
     std::vector<std::pair<std::string, std::string>> datasets = {
-        {"books_200M.bin", "Books"},
-        {"wiki_200M.bin", "Wikipedia"},
-        {"osm_200M.bin", "OSM"},
-        {"fb_200M.bin", "Facebook"}
+        {"books_200M_uint64", "Books"},
+        {"wiki_200M_uint64", "Wikipedia"},
+        {"osm_cellids_200M_uint64", "OSM"},
+        {"fb_200M_uint64", "Facebook"}
     };
 
     for (const auto& [filename, display_name] : datasets) {
