@@ -760,6 +760,26 @@ void register_real_world_dataset_suites() {
                                                  state.counters["size"] = static_cast<double>(data_ptr->size());
                                              })
                     ->Unit(benchmark::kNanosecond));
+
+            maybe_add_threads(
+                benchmark::RegisterBenchmark((base + "/FindRandom").c_str(),
+                                             [load_once](benchmark::State& state) {
+                                                 auto data_ptr = load_once();
+                                                 auto index = qi::bench::make_index<Segments>(*data_ptr);
+
+                                                 // Pre-generate random targets to avoid RNG overhead in measurement
+                                                 auto random_targets = qi::bench::generate_random_targets(*data_ptr);
+
+                                                 std::size_t idx = 0;
+                                                 for (auto _ : state) {
+                                                     const auto* result = index.find(random_targets[idx % random_targets.size()]);
+                                                     benchmark::DoNotOptimize(result);
+                                                     ++idx;
+                                                 }
+                                                 state.counters["segments"] = Segments;
+                                                 state.counters["size"] = static_cast<double>(data_ptr->size());
+                                             })
+                    ->Unit(benchmark::kNanosecond));
         });
     }
 }

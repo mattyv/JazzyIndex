@@ -31,6 +31,7 @@ docs/images/index_data/*.json
 *_results.json
 threading_results*.json
 benchmark_parallelism_test/
+benchmark_results/
 
 # Downloaded benchmark datasets (large files, download on-demand)
 benchmarks/datasets/

@@ -144,6 +144,26 @@ inline std::vector<std::uint64_t> load_real_world_dataset(const std::string& nam
     return data;
 }
 
+// Generate random target values from a dataset for benchmarking
+// Uses fixed seed for reproducibility
+inline std::vector<std::uint64_t> generate_random_targets(
+    const std::vector<std::uint64_t>& data,
+    std::size_t num_targets = 1000,
+    std::uint64_t seed = 12345) {
+
+    std::vector<std::uint64_t> targets;
+    targets.reserve(num_targets);
+
+    std::mt19937_64 rng(seed);
+    std::uniform_int_distribution<std::size_t> dist(0, data.size() - 1);
+
+    for (std::size_t i = 0; i < num_targets; ++i) {
+        targets.push_back(data[dist(rng)]);
+    }
+
+    return targets;
+}
+
 template <std::size_t Segments>
 inline jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> make_index(
     const std::vector<std::uint64_t>& values) {
