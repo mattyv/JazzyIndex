@@ -31,6 +31,18 @@ docs/images/index_data/*.json
 *_results.json
 threading_results*.json
 benchmark_parallelism_test/
+benchmark_results/
+
+# Downloaded benchmark datasets (large files, download on-demand)
+benchmarks/datasets/
+
+# API keys and credentials (NEVER commit these!)
+.env
+.env.*
+*_api_key.txt
+*_credentials.txt
+*.key
+dataverse_key.txt
 
 # Claude Code
 .claude/

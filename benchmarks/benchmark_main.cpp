@@ -34,8 +34,8 @@ static int benchmark_threads = 0;
 // Global flag to control benchmark dataset sizes
 static bool use_full_benchmarks = false;
 
-// Global flag to run ONLY 20 million element benchmarks
-static bool use_20m_benchmarks = false;
+// Global flag to run ONLY 200 million element benchmarks
+static bool use_200m_benchmarks = false;
 
 // Key-value struct for benchmarking
 struct KeyValue {
@@ -107,6 +107,37 @@ void pre_generate_datasets_parallel(const std::vector<std::size_t>& sizes) {
         {"ExtremePoly", [](std::size_t s) { return qi::bench::make_extreme_polynomial_values(s); }},
         {"InversePoly", [](std::size_t s) { return qi::bench::make_inverse_polynomial_values(s); }}
     };
+
+    // Try to load real-world datasets if available
+    // Check for Wikipedia, OSM, Facebook, or Books datasets (200M default)
+    std::vector<std::pair<std::string, std::string>> real_world_datasets = {
+        {"wiki_200M.bin", "Wikipedia"},
+        {"osm_200M.bin", "OSM"},
+        {"fb_200M.bin", "Facebook"},
+        {"books_200M.bin", "Books"}
+    };
+
+    for (const auto& [filename, display_name] : real_world_datasets) {
+        auto data = qi::bench::load_real_world_dataset(filename);
+        if (!data.empty()) {
+            std::cout << "  Found real-world dataset: " << display_name
+                      << " (" << data.size() << " elements)" << std::endl;
+            distributions.push_back({display_name, [data](std::size_t s) {
+                // Subsample to requested size if needed
+                if (s >= data.size()) {
+                    return data;
+                }
+                std::vector<std::uint64_t> result;
+                result.reserve(s);
+                const std::size_t step = data.size() / s;
+                for (std::size_t i = 0; i < s; ++i) {
+                    result.push_back(data[i * step]);
+                }
+                return result;
+            }});
+            break;  // Only load one real-world dataset to avoid memory issues
+        }
+    }
 
     std::vector<std::future<void>> futures;
 
@@ -318,8 +349,8 @@ void register_lower_bound_keyvalue_suite(const std::string& name,
 
 void register_lower_bound_suites() {
     std::vector<std::size_t> sizes;
-    if (use_20m_benchmarks) {
-        sizes = {20'000'000};
+    if (use_200m_benchmarks) {
+        sizes = {200'000'000};
     } else {
         sizes = {100, 1'000, 10'000};
         if (use_full_benchmarks) {
@@ -334,14 +365,14 @@ void register_lower_bound_suites() {
     }
 
     std::vector<std::size_t> dist_sizes;
-    if (use_20m_benchmarks) {
-        dist_sizes = {20'000'000};
+    if (use_200m_benchmarks) {
+        dist_sizes = {200'000'000};
     } else {
         dist_sizes = {100, 10'000};
         if (use_full_benchmarks) {
             dist_sizes.push_back(100'000);
             dist_sizes.push_back(1'000'000);
-            dist_sizes.push_back(20'000'000);
+            dist_sizes.push_back(200'000'000);
         }
     }
 
@@ -406,8 +437,8 @@ void register_parallel_build_benchmark(std::size_t size, const std::string& dist
 
 void register_build_suites() {
     std::vector<std::size_t> sizes;
-    if (use_20m_benchmarks) {
-        sizes = {20'000'000};
+    if (use_200m_benchmarks) {
+        sizes = {200'000'000};
     } else {
         sizes = {1'000, 10'000};
         if (use_full_benchmarks) {
@@ -588,8 +619,8 @@ void register_distribution_suite(const std::string& name,
 
 void register_uniform_suites() {
     std::vector<std::size_t> sizes;
-    if (use_20m_benchmarks) {
-        sizes = {20'000'000};
+    if (use_200m_benchmarks) {
+        sizes = {200'000'000};
     } else {
         sizes = {100, 1'000, 10'000};
         if (use_full_benchmarks) {
@@ -608,8 +639,8 @@ void register_uniform_suites() {
 
 void register_distribution_suites() {
     std::vector<std::size_t> sizes;
-    if (use_20m_benchmarks) {
-        sizes = {20'000'000};
+    if (use_200m_benchmarks) {
+        sizes = {200'000'000};
     } else {
         sizes = {100, 10'000};
         if (use_full_benchmarks) {
@@ -630,6 +661,125 @@ void register_distribution_suites() {
             register_distribution_suite<Segments>("Quadratic", qi::bench::make_quadratic_values, size);
             register_distribution_suite<Segments>("ExtremePoly", qi::bench::make_extreme_polynomial_values, size);
             register_distribution_suite<Segments>("InversePoly", qi::bench::make_inverse_polynomial_values, size);
+        });
+    }
+}
+
+// Register benchmarks for a real-world dataset with lazy loading
+void register_real_world_dataset_suites() {
+    // Only register if running 200M benchmarks
+    if (!use_200m_benchmarks) {
+        return;
+    }
+
+    // List of real-world datasets to try
+    // Only register benchmarks, don't load data yet (lazy loading on first run)
+    std::vector<std::pair<std::string, std::string>> datasets = {
+        {"books_200M.bin", "Books"},
+        {"wiki_200M.bin", "Wikipedia"},
+        {"osm_200M.bin", "OSM"},
+        {"fb_200M.bin", "Facebook"}
+    };
+
+    for (const auto& [filename, display_name] : datasets) {
+        // Check if file exists without loading it
+        std::ifstream test_file("benchmarks/datasets/" + filename, std::ios::binary);
+        if (!test_file.good()) {
+            continue;  // Dataset not found, skip registration
+        }
+        test_file.close();
+
+        std::cout << "Registering benchmarks for: " << display_name << " (lazy loading)" << std::endl;
+
+        // Assume 200M elements for benchmark names (actual size determined at runtime)
+        const std::size_t expected_size = 200'000'000;
+
+        // Create ONE shared cache for this dataset (shared across ALL benchmarks)
+        auto data_cache = std::make_shared<std::shared_ptr<std::vector<std::uint64_t>>>();
+
+        // Helper to load data on first access (shared by all benchmarks for this dataset)
+        auto load_once = [filename, display_name, data_cache]() -> std::shared_ptr<std::vector<std::uint64_t>> {
+            if (!*data_cache) {
+                std::cout << "Loading " << display_name << " dataset..." << std::endl;
+                auto data = qi::bench::load_real_world_dataset(filename);
+                *data_cache = std::make_shared<std::vector<std::uint64_t>>(std::move(data));
+            }
+            return *data_cache;
+        };
+
+        // Register for each segment count with lazy loading
+        for_each_segment_count([load_once, display_name, expected_size](auto seg_tag) {
+            constexpr std::size_t Segments = decltype(seg_tag)::value;
+
+            const std::string base = "JazzyIndex/" + display_name + "/S" + std::to_string(Segments) +
+                                     "/N" + std::to_string(expected_size);
+
+            maybe_add_threads(
+                benchmark::RegisterBenchmark((base + "/FoundMiddle").c_str(),
+                                             [load_once](benchmark::State& state) {
+                                                 auto data_ptr = load_once();
+                                                 const std::uint64_t mid_target = (*data_ptr)[data_ptr->size() / 2];
+                                                 auto index = qi::bench::make_index<Segments>(*data_ptr);
+                                                 for (auto _ : state) {
+                                                     const auto* result = index.find(mid_target);
+                                                     benchmark::DoNotOptimize(result);
+                                                 }
+                                                 state.counters["segments"] = Segments;
+                                                 state.counters["size"] = static_cast<double>(data_ptr->size());
+                                             })
+                    ->Unit(benchmark::kNanosecond));
+
+            maybe_add_threads(
+                benchmark::RegisterBenchmark((base + "/FoundEnd").c_str(),
+                                             [load_once](benchmark::State& state) {
+                                                 auto data_ptr = load_once();
+                                                 const std::uint64_t end_target = data_ptr->back();
+                                                 auto index = qi::bench::make_index<Segments>(*data_ptr);
+                                                 for (auto _ : state) {
+                                                     const auto* result = index.find(end_target);
+                                                     benchmark::DoNotOptimize(result);
+                                                 }
+                                                 state.counters["segments"] = Segments;
+                                                 state.counters["size"] = static_cast<double>(data_ptr->size());
+                                             })
+                    ->Unit(benchmark::kNanosecond));
+
+            maybe_add_threads(
+                benchmark::RegisterBenchmark((base + "/NotFound").c_str(),
+                                             [load_once](benchmark::State& state) {
+                                                 auto data_ptr = load_once();
+                                                 const std::uint64_t end_target = data_ptr->back();
+                                                 const std::uint64_t miss_target =
+                                                     end_target == std::numeric_limits<std::uint64_t>::max() ? end_target : end_target + 1;
+                                                 auto index = qi::bench::make_index<Segments>(*data_ptr);
+                                                 for (auto _ : state) {
+                                                     const auto* result = index.find(miss_target);
+                                                     benchmark::DoNotOptimize(result);
+                                                 }
+                                                 state.counters["segments"] = Segments;
+                                                 state.counters["size"] = static_cast<double>(data_ptr->size());
+                                             })
+                    ->Unit(benchmark::kNanosecond));
+
+            maybe_add_threads(
+                benchmark::RegisterBenchmark((base + "/FindRandom").c_str(),
+                                             [load_once](benchmark::State& state) {
+                                                 auto data_ptr = load_once();
+                                                 auto index = qi::bench::make_index<Segments>(*data_ptr);
+
+                                                 // Pre-generate random targets to avoid RNG overhead in measurement
+                                                 auto random_targets = qi::bench::generate_random_targets(*data_ptr);
+
+                                                 std::size_t idx = 0;
+                                                 for (auto _ : state) {
+                                                     const auto* result = index.find(random_targets[idx % random_targets.size()]);
+                                                     benchmark::DoNotOptimize(result);
+                                                     ++idx;
+                                                 }
+                                                 state.counters["segments"] = Segments;
+                                                 state.counters["size"] = static_cast<double>(data_ptr->size());
+                                             })
+                    ->Unit(benchmark::kNanosecond));
         });
     }
 }
@@ -718,8 +868,8 @@ void register_keyvalue_suite(const std::string& name,
 void register_keyvalue_suites() {
     // Only benchmark key-value for worst-case distributions
     std::vector<std::size_t> sizes;
-    if (use_20m_benchmarks) {
-        sizes = {20'000'000};
+    if (use_200m_benchmarks) {
+        sizes = {200'000'000};
     } else {
         sizes = {100, 10'000};
         if (use_full_benchmarks) {
@@ -907,9 +1057,9 @@ int main(int argc, char** argv) {
             }
             --argc;
             --i;
-        } else if (arg == "--20m-benchmarks") {
-            use_20m_benchmarks = true;
-            std::cout << "Running ONLY 20 million element benchmarks" << std::endl;
+        } else if (arg == "--200m-benchmarks") {
+            use_200m_benchmarks = true;
+            std::cout << "Running ONLY 200 million element benchmarks" << std::endl;
             // Remove this flag so benchmark library doesn't see it
             for (int j = i; j < argc - 1; ++j) {
                 argv[j] = argv[j + 1];
@@ -942,30 +1092,37 @@ int main(int argc, char** argv) {
 
     // Pre-generate all datasets in parallel (major speedup!)
     std::vector<std::size_t> dataset_sizes;
-    if (use_20m_benchmarks) {
-        dataset_sizes = {20'000'000};
+    if (use_200m_benchmarks) {
+        dataset_sizes = {200'000'000};
     } else {
         dataset_sizes = {100, 1'000, 10'000};
         if (use_full_benchmarks) {
             dataset_sizes.push_back(100'000);
             dataset_sizes.push_back(1'000'000);
-            dataset_sizes.push_back(20'000'000);
+            dataset_sizes.push_back(200'000'000);
         }
     }
-    pre_generate_datasets_parallel(dataset_sizes);
+    // Disabled pre-generation to save memory - datasets generated on-demand per benchmark
+    // pre_generate_datasets_parallel(dataset_sizes);
 
-    // Register baseline std::lower_bound benchmarks first
-    register_lower_bound_suites();
+    // When using 200M benchmarks, only register real-world datasets to avoid memory issues
+    if (use_200m_benchmarks) {
+        std::cout << "200M mode: Only registering real-world dataset benchmarks" << std::endl;
+        register_real_world_dataset_suites();
+    } else {
+        // Register baseline std::lower_bound benchmarks first
+        register_lower_bound_suites();
 
-    // Register JazzyIndex query benchmarks
-    register_uniform_suites();
-    register_distribution_suites();
+        // Register JazzyIndex query benchmarks
+        register_uniform_suites();
+        register_distribution_suites();
 
-    // Register key-value benchmarks (worst-case distributions)
-    register_keyvalue_suites();
+        // Register key-value benchmarks (worst-case distributions)
+        register_keyvalue_suites();
 
-    // Register JazzyIndex build time benchmarks
-    register_build_suites();
+        // Register JazzyIndex build time benchmarks
+        register_build_suites();
+    }
 
     ::benchmark::Initialize(&argc, argv);
     if (::benchmark::ReportUnrecognizedArguments(argc, argv)) {

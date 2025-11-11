@@ -221,7 +221,8 @@ JazzyIndex comes with comprehensive technical documentation:
 - **Graceful degradation**: Fast on uniform data, consistent on skewed data
 - **Range query support**: STL-compatible `equal_range`, `find_lower_bound`, `find_upper_bound` functions (work in progress - see below)
 - **Comprehensive testing**: Unit tests + RapidCheck property-based tests for correctness
-- **Extensive benchmarks**: 9 distributions tested (Uniform, Exponential, Clustered, Lognormal, Zipf, Mixed, Quadratic, ExtremePoly, InversePoly)
+- **Extensive benchmarks**: 9 synthetic distributions + real-world datasets from SOSD (Wikipedia, OSM, Facebook, Books)
+- **Real-world dataset support**: Download-on-demand integration with standard learned index benchmarks
 - **Configurable segment count**: Template parameter for tuning space vs. speed tradeoff
 - **Rich visualization**: Index structure plots showing model selection and error bounds
 
@@ -456,6 +457,42 @@ Benchmarks are organized by:
 - **Segment count**: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512
 - **Dataset size**: 100 to 1,000,000 elements
 - **Query pattern**: FoundMiddle, FoundEnd, NotFound
+
+### Real-World Dataset Benchmarks
+
+JazzyIndex supports benchmarking against **real-world datasets from SOSD** (Searching on Sorted Data), the standard benchmark suite for learned indexes. These datasets provide credibility by demonstrating performance on actual production data with realistic skew, clustering, and outliers.
+
+**Download a dataset** (cached locally, not committed to repo):
+
+```bash
+# Wikipedia revision IDs (200M elements, ~1.5 GB download)
+# Time-series data with temporal clustering
+python3 scripts/download_sosd_dataset.py wiki
+
+# OpenStreetMap cell IDs (800M total, subsampled to 200M, ~3.5 GB download)
+# Highly skewed due to Hilbert curve spatial encoding
+python3 scripts/download_sosd_dataset.py osm
+
+# Facebook user IDs (200M elements, ~1.5 GB download)
+# Clustered power-law distribution
+python3 scripts/download_sosd_dataset.py fb
+
+# Amazon Books IDs (100M elements, ~750 MB download)
+# Mostly uniform with mild skew from popularity
+python3 scripts/download_sosd_dataset.py books
+```
+
+**Run benchmarks** with the dataset (automatically detected):
+
+```bash
+# Benchmarks will automatically include the real-world dataset if found
+./build/jazzy_index_benchmarks --benchmark_format=console
+
+# Filter to only real-world benchmarks
+./build/jazzy_index_benchmarks --benchmark_filter="Wikipedia|OSM|Books|Facebook"
+```
+
+Datasets are cached in `benchmarks/datasets/` (gitignored). The benchmark suite automatically detects and includes any downloaded dataset in the test runs, allowing direct comparisons against synthetic distributions.
 
 ### Plotting Benchmarks
 
