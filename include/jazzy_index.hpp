@@ -1102,9 +1102,9 @@ private:
             DEBUG_LOG("find_segment: UNIFORM path - key_val=%.4f, offset=%.4f, segment_scale=%.6f, seg_idx=%zu",
                       key_val, offset, segment_scale_, seg_idx);
 
-            // Clamp to valid range
-            if (seg_idx >= num_segments_) {
-                seg_idx = num_segments_ - 1;
+            // Clamp to valid range (use compile-time constant for better optimization)
+            if (seg_idx >= NumSegments) {
+                seg_idx = NumSegments - 1;
                 DEBUG_LOG("find_segment: Clamped seg_idx to %zu", seg_idx);
             }
 
@@ -1153,7 +1153,8 @@ private:
         }
 
         DEBUG_LOG("find_segment: Returning segment %zu or nullptr (left=%zu)", left, left);
-        return left < num_segments_ ? &segments_[left] : nullptr;
+        // Array bounds check uses compile-time constant for better optimization
+        return left < NumSegments ? &segments_[left] : nullptr;
     }
 
     [[nodiscard]] bool equal(const T& lhs, const T& rhs) const {
