@@ -10,6 +10,19 @@
 #include <random>
 #include <vector>
 
+TEST(ReviewRegression, SparseUniformKeysPredictExactPositions) {
+    std::vector<std::uint64_t> data(4096);
+    for (std::size_t i = 0; i < data.size(); ++i) {
+        data[i] = (std::uint64_t{1} << 63) + i * 1'000'001;
+    }
+    const auto segment = jazzy::detail::make_segment(
+        data.data(), 137, data.size(), std::less<>{}, jazzy::identity{});
+    ASSERT_EQ(segment.model_type, jazzy::detail::ModelType::LINEAR);
+    for (std::size_t i = segment.start_idx; i < segment.end_idx; ++i) {
+        ASSERT_EQ(segment.predict(data[i]), i) << "key " << data[i];
+    }
+}
+
 TEST(ReviewRegression, LargeIntegerModelsUseTheSameCoordinatesAsLookup) {
     const auto check = []<typename T>(T origin) {
         std::vector<T> data;

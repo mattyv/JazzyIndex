@@ -52,6 +52,38 @@ TEST(ModelPredictionTest, ClampsNonFinitePredictionsBeforeIntegerConversion) {
     EXPECT_EQ(segment.predict(42), segment.start_idx);
 }
 
+TEST(ModelPredictionTest, RoundsToNearestPositionAndClampsForEveryPolynomial) {
+    for (auto model : {jazzy::detail::ModelType::LINEAR,
+                       jazzy::detail::ModelType::QUADRATIC,
+                       jazzy::detail::ModelType::CUBIC}) {
+        jazzy::detail::Segment<double> segment{};
+        segment.model_type = model;
+        segment.start_idx = 3;
+        segment.end_idx = 8;
+        segment.inv_scale = 1.0f;
+        switch (model) {
+            case jazzy::detail::ModelType::LINEAR:
+                segment.params.linear = {1.0f, 0.0f};
+                break;
+            case jazzy::detail::ModelType::QUADRATIC:
+                segment.params.quadratic = {0.0f, 1.0f, 0.0f};
+                break;
+            case jazzy::detail::ModelType::CUBIC:
+                segment.params.cubic = {0.0f, 0.0f, 1.0f, 0.0f};
+                break;
+            default:
+                FAIL() << "Unexpected model";
+        }
+        EXPECT_EQ(segment.predict(3.49), 3u);
+        EXPECT_EQ(segment.predict(3.5), 4u);
+        EXPECT_EQ(segment.predict(6.99999), 7u);
+        EXPECT_EQ(segment.predict(-100.0), 3u);
+        EXPECT_EQ(segment.predict(7.5), 7u);
+        EXPECT_EQ(segment.predict(100.0), 7u);
+        EXPECT_EQ(segment.predict(std::numeric_limits<double>::quiet_NaN()), 3u);
+    }
+}
+
 // Test: CONSTANT model - all values are identical
 TEST_F(IntModelTest, ConstantModelAllIdenticalValues) {
 #ifdef JAZZY_DEBUG_LOGGING

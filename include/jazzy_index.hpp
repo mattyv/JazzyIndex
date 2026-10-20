@@ -194,7 +194,9 @@ struct alignas(64) Segment {  // Cache line aligned
             // whenever a prediction lands on a segment edge.
             const double lowest = static_cast<double>(start_idx);
             const double highest = static_cast<double>(end_idx - 1);
-            return static_cast<std::size_t>(std::fmin(std::fmax(prediction, lowest), highest));
+            // Rounding avoids a search when float coefficients predict just below an integer.
+            return static_cast<std::size_t>(
+                std::round(std::fmin(std::fmax(prediction, lowest), highest)));
         };
 
         switch (model_type) {
