@@ -1,23 +1,22 @@
 cmake_minimum_required(VERSION 3.20)
-project(jazzy_index LANGUAGES CXX)
+project(JazzyIndex VERSION 0.1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-if(MSVC)
-    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG")
-else()
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
-endif()
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+find_package(Threads REQUIRED)
 
 add_library(jazzy_index INTERFACE)
+add_library(jazzy::jazzy_index ALIAS jazzy_index)
+target_compile_features(jazzy_index INTERFACE cxx_std_20)
 target_include_directories(jazzy_index INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
+target_link_libraries(jazzy_index INTERFACE Threads::Threads)
 
-option(BUILD_TESTS "Build JazzyIndex unit and property tests" ON)
-option(BUILD_BENCHMARKS "Build JazzyIndex benchmark suite" ON)
+option(BUILD_TESTS "Build JazzyIndex unit and property tests" OFF)
+option(BUILD_BENCHMARKS "Build JazzyIndex benchmark suite" OFF)
+option(BUILD_EXAMPLES "Build JazzyIndex examples" OFF)
 option(ENABLE_COVERAGE "Enable coverage instrumentation for tests" OFF)
 option(ENABLE_DEBUG_LOGGING "Enable debug logging for tests" OFF)
 
@@ -77,9 +76,11 @@ if(BUILD_TESTS)
     FetchContent_Declare(
         rapidcheck
         GIT_REPOSITORY https://github.com/emil-e/rapidcheck.git
-        GIT_TAG master
+        GIT_TAG b2d9ed2dddefc4b84318d664b4f221eb792d89c7
     )
     FetchContent_MakeAvailable(rapidcheck)
+    # RapidCheck is test-only; exclude its targets and install rules from consumers.
+    set_property(DIRECTORY "${rapidcheck_SOURCE_DIR}" PROPERTY EXCLUDE_FROM_ALL TRUE)
 
     # Fix RapidCheck compilation on Windows with sanitizers - add /EHsc for exception handling
     if(MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
@@ -89,8 +90,9 @@ if(BUILD_TESTS)
     endif()
 
     # Google Test suite with comprehensive coverage
-    add_executable(jazzy_index_tests
+    set(JAZZY_TEST_SOURCES
         tests/gtest_unit_tests.cpp
+        tests/gtest_review_regressions.cpp
         tests/gtest_model_tests.cpp
         tests/gtest_model_selection_verification.cpp
         tests/gtest_boundary_tests.cpp
@@ -106,6 +108,7 @@ if(BUILD_TESTS)
         tests/gtest_iterator_tests.cpp
         tests/gtest_debug_logging_tests.cpp
     )
+    add_executable(jazzy_index_tests ${JAZZY_TEST_SOURCES})
     target_link_libraries(jazzy_index_tests PRIVATE
         jazzy_index
         GTest::gtest
@@ -130,22 +133,7 @@ if(BUILD_TESTS)
     # Create a separate target for tests with debug logging always enabled
     # Usage: cmake --build build --target jazzy_index_tests_debug && ./build/jazzy_index_tests_debug
     # This target validates internal logging and provides visibility into JazzyIndex operations
-    add_executable(jazzy_index_tests_debug EXCLUDE_FROM_ALL
-        tests/gtest_unit_tests.cpp
-        tests/gtest_model_tests.cpp
-        tests/gtest_boundary_tests.cpp
-        tests/gtest_floating_point_tests.cpp
-        tests/gtest_comparator_tests.cpp
-        tests/gtest_error_recovery_tests.cpp
-        tests/gtest_uniformity_tests.cpp
-        tests/gtest_property_tests.cpp
-        tests/gtest_key_value_tests.cpp
-        tests/gtest_binary_search_tests.cpp
-        tests/gtest_parallel_tests.cpp
-        tests/gtest_equal_range_tests.cpp
-        tests/gtest_iterator_tests.cpp
-        tests/gtest_debug_logging_tests.cpp
-    )
+    add_executable(jazzy_index_tests_debug EXCLUDE_FROM_ALL ${JAZZY_TEST_SOURCES})
     target_link_libraries(jazzy_index_tests_debug PRIVATE
         jazzy_index
         GTest::gtest
@@ -196,15 +184,35 @@ if(BUILD_TESTS)
     endif()
 endif()
 
+if(BUILD_EXAMPLES OR BUILD_TESTS)
+    add_executable(jazzy_index_basic_example examples/basic_usage.cpp)
+    target_link_libraries(jazzy_index_basic_example PRIVATE jazzy_index)
+
+    add_executable(jazzy_index_parallel_example examples/parallel_build_example.cpp)
+    target_link_libraries(jazzy_index_parallel_example PRIVATE jazzy_index)
+endif()
+
 if(BUILD_BENCHMARKS)
     FetchContent_Declare(
         benchmark
         GIT_REPOSITORY https://github.com/google/benchmark.git
         GIT_TAG v1.8.3
     )
+    FetchContent_Declare(
+        pgm_index
+        GIT_REPOSITORY https://github.com/gvinciguerra/PGM-index.git
+        GIT_TAG c6fcf3d34e55eb0061b01e2f49dfcbdb711f1407
+        SOURCE_SUBDIR cmake/unused
+    )
+    FetchContent_Declare(
+        radix_spline
+        GIT_REPOSITORY https://github.com/learnedsystems/RadixSpline.git
+        GIT_TAG ab96aa59d429e7423beba2350bdcdf88952df282
+        SOURCE_SUBDIR cmake/unused
+    )
     set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
     set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(benchmark)
+    FetchContent_MakeAvailable(benchmark pgm_index radix_spline)
 
     # Workaround for Google Benchmark v1.8.3 switch warning on Windows
     # The benchmark library has an unhandled enum value in sysinfo.cc
@@ -221,6 +229,18 @@ if(BUILD_BENCHMARKS)
     target_link_libraries(jazzy_index_benchmarks PRIVATE jazzy_index benchmark::benchmark)
     target_include_directories(jazzy_index_benchmarks PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
+    )
+
+    add_executable(benchmark_competitors
+        benchmarks/benchmark_competitors.cpp
+    )
+    target_link_libraries(benchmark_competitors PRIVATE jazzy_index benchmark::benchmark)
+    target_include_directories(benchmark_competitors PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks
+    )
+    target_include_directories(benchmark_competitors SYSTEM PRIVATE
+        ${pgm_index_SOURCE_DIR}/include
+        ${radix_spline_SOURCE_DIR}/include
     )
 
     # Worst-case key-value benchmark
@@ -397,3 +417,35 @@ if(BUILD_BENCHMARKS)
         message(STATUS "Python interpreter not found; benchmark plotting is disabled.")
     endif()
 endif()
+
+install(TARGETS jazzy_index EXPORT JazzyIndexTargets)
+install(
+    DIRECTORY include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILES_MATCHING PATTERN "*.hpp"
+)
+install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/JazzyIndex)
+install(
+    EXPORT JazzyIndexTargets
+    FILE JazzyIndexTargets.cmake
+    NAMESPACE jazzy::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/JazzyIndex
+)
+
+configure_package_config_file(
+    cmake/JazzyIndexConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/JazzyIndexConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/JazzyIndex
+)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/JazzyIndexConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+    ARCH_INDEPENDENT
+)
+install(
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/JazzyIndexConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/JazzyIndexConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/JazzyIndex
+)

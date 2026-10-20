@@ -27,6 +27,7 @@ std::vector<std::string> extract_model_types(const std::string& json) {
         search_start = match.suffix().first;
     }
 
+    EXPECT_FALSE(models.empty()) << "Metadata must contain model types";
     return models;
 }
 

@@ -529,3 +529,25 @@ TEST_F(DoubleTest, InterleavedPositiveNegative) {
     EXPECT_TRUE(is_found(index.find(0.0), data, 0.0));
     EXPECT_TRUE(is_found(index.find(25.0), data, 25.0));
 }
+
+TEST(FloatingPointValidationTest, RejectsNonFiniteKeysAndQueries) {
+    const double infinity = std::numeric_limits<double>::infinity();
+    const double nan = std::numeric_limits<double>::quiet_NaN();
+    std::vector<double> finite{1.0, 2.0, 3.0};
+    std::vector<double> with_infinity{1.0, 2.0, infinity};
+    std::vector<double> with_nan{1.0, nan, 3.0};
+    jazzy::JazzyIndex<double> index(finite.data(), finite.data() + finite.size());
+
+    for (const double query : {nan, infinity}) {
+        EXPECT_THROW((void)index.find(query), std::invalid_argument);
+        EXPECT_THROW((void)index.find_lower_bound(query), std::invalid_argument);
+        EXPECT_THROW((void)index.find_upper_bound(query), std::invalid_argument);
+        EXPECT_THROW((void)index.equal_range(query), std::invalid_argument);
+    }
+
+    EXPECT_THROW(index.build(with_infinity.data(), with_infinity.data() + with_infinity.size()),
+                 std::invalid_argument);
+    EXPECT_THROW(index.build(with_nan.data(), with_nan.data() + with_nan.size()),
+                 std::invalid_argument);
+    EXPECT_EQ(index.find(2.0), finite.data() + 1);
+}

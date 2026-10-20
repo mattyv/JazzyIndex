@@ -24,7 +24,7 @@ cd "${COVERAGE_DIR}"
 
 # Configure with coverage flags
 echo -e "${GREEN}Configuring with coverage instrumentation...${NC}"
-cmake -DCMAKE_BUILD_TYPE=Coverage ..
+cmake -DCMAKE_BUILD_TYPE=Coverage -DBUILD_TESTS=ON ..
 
 # Build tests
 echo -e "${GREEN}Building tests with coverage...${NC}"

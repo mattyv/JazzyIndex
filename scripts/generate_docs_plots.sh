@@ -21,7 +21,7 @@ echo
 # Ensure build directory exists
 if [ ! -d "$BUILD_DIR" ]; then
     echo "Error: Build directory not found at $BUILD_DIR"
-    echo "Please run: cmake -S . -B build"
+    echo "Please run: cmake -S . -B build -DBUILD_BENCHMARKS=ON"
     exit 1
 fi
 
@@ -36,6 +36,12 @@ fi
 mkdir -p "$DOCS_IMAGES/benchmarks"
 mkdir -p "$DOCS_IMAGES/index_data"
 
+# Use the same environment for both plotting scripts.
+if [ ! -x "$BUILD_DIR/jazzy_venv/bin/python" ]; then
+    python3 -m venv "$BUILD_DIR/jazzy_venv"
+    "$BUILD_DIR/jazzy_venv/bin/python" -m pip install -r "$SCRIPT_DIR/requirements.txt"
+fi
+
 echo "Step 1/3: Running performance benchmarks..."
 "$BUILD_DIR/jazzy_index_benchmarks" \
     --benchmark_format=json \
@@ -43,21 +49,13 @@ echo "Step 1/3: Running performance benchmarks..."
 
 echo
 echo "Step 2/3: Generating performance plots..."
-python3 "$SCRIPT_DIR/plot_benchmarks.py" \
+"$BUILD_DIR/jazzy_venv/bin/python" "$SCRIPT_DIR/plot_benchmarks.py" \
     --input "$BUILD_DIR/jazzy_benchmarks.json" \
     --output "$DOCS_IMAGES/benchmarks/jazzy_benchmarks.png"
 
 echo
 echo "Step 3/3: Generating index structure visualizations..."
-"$BUILD_DIR/jazzy_index_benchmarks" --visualize-index
-
-# Set up Python venv if needed
-if [ ! -d "$BUILD_DIR/jazzy_venv" ]; then
-    echo "Creating Python virtual environment..."
-    python3 -m venv "$BUILD_DIR/jazzy_venv"
-    "$BUILD_DIR/jazzy_venv/bin/pip" install --upgrade pip
-    "$BUILD_DIR/jazzy_venv/bin/pip" install -r "$SCRIPT_DIR/requirements.txt"
-fi
+"$BUILD_DIR/jazzy_index_benchmarks" --visualize-index-output="$BUILD_DIR/index_data"
 
 # Copy JSON files from build to docs
 echo "Copying visualization data to docs..."

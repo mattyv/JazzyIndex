@@ -4,20 +4,17 @@
 #include <cstdint>
 #include <functional>
 #include <fstream>
+#include <filesystem>
 #include <future>
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <sys/stat.h>
-
-#ifdef _WIN32
-#include <direct.h>
-#endif
 
 #include "fixtures.hpp"
 #include "jazzy_index_export.hpp"
@@ -27,6 +24,7 @@ namespace {
 
 // Global dataset cache for parallel pre-generation
 std::unordered_map<std::string, std::shared_ptr<std::vector<std::uint64_t>>> dataset_cache;
+std::mutex dataset_cache_mutex;
 
 // Optional: number of threads for benchmark execution (0 = single-threaded)
 static int benchmark_threads = 0;
@@ -87,6 +85,21 @@ std::shared_ptr<std::vector<std::uint64_t>> get_or_generate_dataset(
     return data;
 }
 
+// Registration is serial; all configurations share these large payload arrays.
+std::shared_ptr<std::vector<KeyValue>> get_or_generate_keyvalue_dataset(
+    const std::string& name, std::size_t size,
+    const std::function<std::vector<std::uint64_t>(std::size_t)>& generator) {
+    static std::unordered_map<std::string, std::shared_ptr<std::vector<KeyValue>>> cache;
+    const auto cache_key = name + "_" + std::to_string(size);
+    if (const auto it = cache.find(cache_key); it != cache.end()) return it->second;
+    const auto keys = get_or_generate_dataset(name, size, generator);
+    auto data = std::make_shared<std::vector<KeyValue>>();
+    data->reserve(keys->size());
+    for (auto key : *keys) data->push_back({key, "value_" + std::to_string(key)});
+    cache.emplace(cache_key, data);
+    return data;
+}
+
 // Pre-generate all datasets in parallel (called once at startup)
 void pre_generate_datasets_parallel(const std::vector<std::size_t>& sizes) {
     std::cout << "Pre-generating datasets in parallel..." << std::endl;
@@ -113,10 +126,11 @@ void pre_generate_datasets_parallel(const std::vector<std::size_t>& sizes) {
     // Launch parallel generation
     for (const auto& dist : distributions) {
         for (std::size_t size : sizes) {
-            futures.push_back(std::async(std::launch::async, [&dist, size]() {
+            std::cout << "  Generating " << dist.name << " (N=" << size << ")..." << std::endl;
+            futures.push_back(std::async(std::launch::async, [dist, size]() {
                 const std::string key = dist.name + "_" + std::to_string(size);
-                std::cout << "  Generating " << dist.name << " (N=" << size << ")..." << std::endl;
                 auto data = std::make_shared<std::vector<std::uint64_t>>(dist.generator(size));
+                std::lock_guard lock(dataset_cache_mutex);
                 dataset_cache[key] = data;
             }));
         }
@@ -124,7 +138,7 @@ void pre_generate_datasets_parallel(const std::vector<std::size_t>& sizes) {
 
     // Wait for all to complete
     for (auto& f : futures) {
-        f.wait();
+        f.get();
     }
 
     std::cout << "Dataset generation complete! Generated " << dataset_cache.size() << " datasets." << std::endl;
@@ -160,6 +174,8 @@ void register_lower_bound_uniform_suite(std::size_t size) {
     const std::uint64_t end_target = data->back();
     const std::uint64_t miss_target =
         end_target == std::numeric_limits<std::uint64_t>::max() ? end_target : end_target + 1;
+    const auto queries = std::make_shared<std::vector<std::uint64_t>>(
+        qi::bench::make_random_queries(*data, qi::bench::kQueryCount));
 
     const std::string base = "LowerBound/Uniform/N" + std::to_string(size);
 
@@ -195,6 +211,20 @@ void register_lower_bound_uniform_suite(std::size_t size) {
                                          state.counters["size"] = static_cast<double>(data->size());
                                      })
             ->Unit(benchmark::kNanosecond));
+
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/RandomMixed").c_str(),
+                                     [data, queries](benchmark::State& state) {
+                                         std::size_t i = 0;
+                                         for (auto _ : state) {
+                                             const auto query = (*queries)[i++ % queries->size()];
+                                             const auto* result = find_with_lower_bound(*data, query);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
+
 }
 
 template <typename Generator>
@@ -214,6 +244,8 @@ void register_lower_bound_distribution_suite(const std::string& name,
     const std::uint64_t end_target = data->back();
     const std::uint64_t miss_target =
         end_target == std::numeric_limits<std::uint64_t>::max() ? end_target : end_target + 1;
+    const auto queries = std::make_shared<std::vector<std::uint64_t>>(
+        qi::bench::make_random_queries(*data, qi::bench::kQueryCount));
 
     const std::string base = "LowerBound/" + name + "/N" + std::to_string(size);
 
@@ -249,6 +281,19 @@ void register_lower_bound_distribution_suite(const std::string& name,
                                          state.counters["size"] = static_cast<double>(data->size());
                                      })
             ->Unit(benchmark::kNanosecond));
+
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/RandomMixed").c_str(),
+                                     [data, queries](benchmark::State& state) {
+                                         std::size_t i = 0;
+                                         for (auto _ : state) {
+                                             const auto query = (*queries)[i++ % queries->size()];
+                                             const auto* result = find_with_lower_bound(*data, query);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
 }
 
 // Lower bound benchmarks for key-value pairs
@@ -260,20 +305,10 @@ void register_lower_bound_keyvalue_suite(const std::string& name,
         return;
     }
 
-    // Generate keys and create key-value pairs
-    auto keys = std::make_shared<std::vector<std::uint64_t>>(generator(size));
-    if (keys->empty()) {
-        return;
-    }
-
-    auto data = std::make_shared<std::vector<KeyValue>>();
-    data->reserve(size);
-    for (std::size_t i = 0; i < size; ++i) {
-        data->push_back({(*keys)[i], "value_" + std::to_string((*keys)[i])});
-    }
-
-    const std::uint64_t mid_key = (*keys)[keys->size() / 2];
-    const std::uint64_t end_key = keys->back();
+    auto data = get_or_generate_keyvalue_dataset(name, size, generator);
+    if (data->empty()) return;
+    const std::uint64_t mid_key = (*data)[data->size() / 2].key;
+    const std::uint64_t end_key = data->back().key;
     const std::uint64_t miss_key =
         end_key == std::numeric_limits<std::uint64_t>::max() ? end_key : end_key + 1;
 
@@ -325,7 +360,6 @@ void register_lower_bound_suites() {
         if (use_full_benchmarks) {
             sizes.push_back(100'000);
             sizes.push_back(1'000'000);
-            sizes.push_back(20'000'000);
         }
     }
 
@@ -341,7 +375,6 @@ void register_lower_bound_suites() {
         if (use_full_benchmarks) {
             dist_sizes.push_back(100'000);
             dist_sizes.push_back(1'000'000);
-            dist_sizes.push_back(20'000'000);
         }
     }
 
@@ -366,7 +399,7 @@ void register_lower_bound_suites() {
 // Build time benchmarks
 template <std::size_t Segments>
 void register_build_benchmark(std::size_t size, const std::string& distribution,
-                               const std::vector<std::uint64_t>& data) {
+                              std::shared_ptr<const std::vector<std::uint64_t>> data) {
     const std::string name = "JazzyIndexBuild/" + distribution + "/S" +
                             std::to_string(Segments) + "/N" + std::to_string(size);
 
@@ -375,11 +408,11 @@ void register_build_benchmark(std::size_t size, const std::string& distribution,
                                      [data](benchmark::State& state) {
                                          for (auto _ : state) {
                                              jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> index;
-                                             index.build(data.data(), data.data() + data.size());
+                                             index.build(data->data(), data->data() + data->size());
                                              benchmark::DoNotOptimize(index);
                                          }
                                          state.counters["segments"] = Segments;
-                                         state.counters["size"] = static_cast<double>(data.size());
+                                         state.counters["size"] = static_cast<double>(data->size());
                                      })
             ->Unit(benchmark::kMicrosecond));
 }
@@ -387,7 +420,7 @@ void register_build_benchmark(std::size_t size, const std::string& distribution,
 // Parallel build time benchmarks
 template <std::size_t Segments>
 void register_parallel_build_benchmark(std::size_t size, const std::string& distribution,
-                                       const std::vector<std::uint64_t>& data) {
+                                       std::shared_ptr<const std::vector<std::uint64_t>> data) {
     const std::string name = "JazzyIndexBuildParallel/" + distribution + "/S" +
                             std::to_string(Segments) + "/N" + std::to_string(size);
 
@@ -395,11 +428,11 @@ void register_parallel_build_benchmark(std::size_t size, const std::string& dist
                                  [data](benchmark::State& state) {
                                      for (auto _ : state) {
                                          jazzy::JazzyIndex<std::uint64_t, jazzy::to_segment_count<Segments>()> index;
-                                         index.build_parallel(data.data(), data.data() + data.size());
+                                         index.build_parallel(data->data(), data->data() + data->size());
                                          benchmark::DoNotOptimize(index);
                                      }
                                      state.counters["segments"] = Segments;
-                                     state.counters["size"] = static_cast<double>(data.size());
+                                     state.counters["size"] = static_cast<double>(data->size());
                                  })
         ->Unit(benchmark::kMicrosecond);
 }
@@ -413,48 +446,51 @@ void register_build_suites() {
         if (use_full_benchmarks) {
             sizes.push_back(100'000);
             sizes.push_back(1'000'000);
-            sizes.push_back(20'000'000);
         }
     }
 
     for (const std::size_t size : sizes) {
         // Uniform distribution
-        auto uniform_data = qi::bench::make_uniform_values(size);
+        auto uniform_data = get_or_generate_dataset("Uniform", size, [](std::size_t count) {
+            return qi::bench::make_uniform_values(count);
+        });
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "Uniform", uniform_data);
             register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "Uniform", uniform_data);
         });
 
         // Exponential distribution
-        auto exp_data = qi::bench::make_exponential_values(size);
+        auto exp_data = get_or_generate_dataset("Exponential", size, qi::bench::make_exponential_values);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "Exponential", exp_data);
             register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "Exponential", exp_data);
         });
 
         // Zipf distribution
-        auto zipf_data = qi::bench::make_zipf_values(size);
+        auto zipf_data = get_or_generate_dataset("Zipf", size, qi::bench::make_zipf_values);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "Zipf", zipf_data);
             register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "Zipf", zipf_data);
         });
 
         // Quadratic distribution
-        auto quadratic_data = qi::bench::make_quadratic_values(size);
+        auto quadratic_data = get_or_generate_dataset("Quadratic", size, qi::bench::make_quadratic_values);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "Quadratic", quadratic_data);
             register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "Quadratic", quadratic_data);
         });
 
         // Extreme polynomial distribution
-        auto extreme_poly_data = qi::bench::make_extreme_polynomial_values(size);
+        auto extreme_poly_data =
+            get_or_generate_dataset("ExtremePoly", size, qi::bench::make_extreme_polynomial_values);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "ExtremePoly", extreme_poly_data);
             register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "ExtremePoly", extreme_poly_data);
         });
 
         // Inverse polynomial distribution
-        auto inverse_poly_data = qi::bench::make_inverse_polynomial_values(size);
+        auto inverse_poly_data =
+            get_or_generate_dataset("InversePoly", size, qi::bench::make_inverse_polynomial_values);
         for_each_segment_count([&](auto seg_tag) {
             register_build_benchmark<decltype(seg_tag)::value>(size, "InversePoly", inverse_poly_data);
             register_parallel_build_benchmark<decltype(seg_tag)::value>(size, "InversePoly", inverse_poly_data);
@@ -478,6 +514,8 @@ void register_uniform_suite(std::size_t size) {
     const std::uint64_t end_target = data->back();
     const std::uint64_t miss_target =
         end_target == std::numeric_limits<std::uint64_t>::max() ? end_target : end_target + 1;
+    const auto queries = std::make_shared<std::vector<std::uint64_t>>(
+        qi::bench::make_random_queries(*data, qi::bench::kQueryCount));
 
     const std::string base =
         "JazzyIndex/Uniform/S" + std::to_string(Segments) + "/N" + std::to_string(size);
@@ -521,6 +559,21 @@ void register_uniform_suite(std::size_t size) {
                                      })
             ->Unit(benchmark::kNanosecond));
 
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/RandomMixed").c_str(),
+                                     [data, queries](benchmark::State& state) {
+                                         auto index = qi::bench::make_index<Segments>(*data);
+                                         std::size_t i = 0;
+                                         for (auto _ : state) {
+                                             const auto query = (*queries)[i++ % queries->size()];
+                                             const auto* result = index.find(query);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
+
 }
 
 template <std::size_t Segments, typename Generator>
@@ -541,6 +594,8 @@ void register_distribution_suite(const std::string& name,
     const std::uint64_t end_target = data->back();
     const std::uint64_t miss_target =
         end_target == std::numeric_limits<std::uint64_t>::max() ? end_target : end_target + 1;
+    const auto queries = std::make_shared<std::vector<std::uint64_t>>(
+        qi::bench::make_random_queries(*data, qi::bench::kQueryCount));
 
     const std::string base = "JazzyIndex/" + name + "/S" + std::to_string(Segments) +
                              "/N" + std::to_string(size);
@@ -584,6 +639,21 @@ void register_distribution_suite(const std::string& name,
                                      })
             ->Unit(benchmark::kNanosecond));
 
+    maybe_add_threads(
+        benchmark::RegisterBenchmark((base + "/RandomMixed").c_str(),
+                                     [data, queries](benchmark::State& state) {
+                                         auto index = qi::bench::make_index<Segments>(*data);
+                                         std::size_t i = 0;
+                                         for (auto _ : state) {
+                                             const auto query = (*queries)[i++ % queries->size()];
+                                             const auto* result = index.find(query);
+                                             benchmark::DoNotOptimize(result);
+                                         }
+                                         state.counters["segments"] = Segments;
+                                         state.counters["size"] = static_cast<double>(data->size());
+                                     })
+            ->Unit(benchmark::kNanosecond));
+
 }
 
 void register_uniform_suites() {
@@ -595,7 +665,6 @@ void register_uniform_suites() {
         if (use_full_benchmarks) {
             sizes.push_back(100'000);
             sizes.push_back(1'000'000);
-            sizes.push_back(20'000'000);
         }
     }
 
@@ -615,7 +684,6 @@ void register_distribution_suites() {
         if (use_full_benchmarks) {
             sizes.push_back(100'000);
             sizes.push_back(1'000'000);
-            sizes.push_back(20'000'000);
         }
     }
 
@@ -643,20 +711,10 @@ void register_keyvalue_suite(const std::string& name,
         return;
     }
 
-    // Generate keys and create key-value pairs
-    auto keys = std::make_shared<std::vector<std::uint64_t>>(generator(size));
-    if (keys->empty()) {
-        return;
-    }
-
-    auto data = std::make_shared<std::vector<KeyValue>>();
-    data->reserve(size);
-    for (std::size_t i = 0; i < size; ++i) {
-        data->push_back({(*keys)[i], "value_" + std::to_string((*keys)[i])});
-    }
-
-    const std::uint64_t mid_key = (*keys)[keys->size() / 2];
-    const std::uint64_t end_key = keys->back();
+    auto data = get_or_generate_keyvalue_dataset(name, size, generator);
+    if (data->empty()) return;
+    const std::uint64_t mid_key = (*data)[data->size() / 2].key;
+    const std::uint64_t end_key = data->back().key;
     const std::uint64_t miss_key =
         end_key == std::numeric_limits<std::uint64_t>::max() ? end_key : end_key + 1;
 
@@ -725,7 +783,6 @@ void register_keyvalue_suites() {
         if (use_full_benchmarks) {
             sizes.push_back(100'000);
             sizes.push_back(1'000'000);
-            sizes.push_back(20'000'000);
         }
     }
 
@@ -738,22 +795,6 @@ void register_keyvalue_suites() {
     }
 }
 
-// Helper to create output directory
-bool ensure_directory_exists(const std::string& path) {
-    struct stat info;
-    if (stat(path.c_str(), &info) != 0) {
-        // Directory doesn't exist, try to create it
-        #ifdef _WIN32
-        return _mkdir(path.c_str()) == 0;
-        #else
-        return mkdir(path.c_str(), 0755) == 0;
-        #endif
-    } else if (info.st_mode & S_IFDIR) {
-        return true;
-    }
-    return false;
-}
-
 template <std::size_t Segments>
 std::string export_metadata_for_segments(const std::vector<std::uint64_t>& data) {
     auto index = qi::bench::make_index<Segments>(data);
@@ -761,12 +802,14 @@ std::string export_metadata_for_segments(const std::vector<std::uint64_t>& data)
 }
 
 // Export visualization data for various index configurations
-void export_visualization_data(const std::string& output_dir) {
+bool export_visualization_data(const std::string& output_dir) {
     std::cout << "Exporting index visualization data to " << output_dir << "..." << std::endl;
 
-    if (!ensure_directory_exists(output_dir)) {
-        std::cerr << "Warning: Could not create directory " << output_dir << std::endl;
-        std::cerr << "Attempting to write to current directory instead." << std::endl;
+    std::error_code error;
+    std::filesystem::create_directories(output_dir, error);
+    if (error) {
+        std::cerr << "Could not create " << output_dir << ": " << error.message() << '\n';
+        return false;
     }
 
     // Configuration: which distributions, sizes, and segment counts to visualize
@@ -853,9 +896,9 @@ void export_visualization_data(const std::string& output_dir) {
                                      std::to_string(size) + "_S" + std::to_string(segments) + ".json";
 
                 std::ofstream out(filename);
+                out << json_data;
+                out.close();
                 if (out) {
-                    out << json_data;
-                    out.close();
                     total_exports++;
                     std::cout << "  Exported: " << filename << std::endl;
                 } else {
@@ -871,6 +914,7 @@ void export_visualization_data(const std::string& output_dir) {
         std::cout << " (" << failed_exports << " failed)";
     }
     std::cout << std::endl;
+    return failed_exports == 0;
 }
 
 }  // namespace
@@ -934,7 +978,7 @@ int main(int argc, char** argv) {
     }
 
     if (visualize_mode) {
-        export_visualization_data(output_dir);
+        if (!export_visualization_data(output_dir)) return 1;
         std::cout << "\nVisualization data exported. Now run:" << std::endl;
         std::cout << "  python3 scripts/plot_index_structure.py " << output_dir << std::endl;
         return 0;
@@ -949,7 +993,6 @@ int main(int argc, char** argv) {
         if (use_full_benchmarks) {
             dataset_sizes.push_back(100'000);
             dataset_sizes.push_back(1'000'000);
-            dataset_sizes.push_back(20'000'000);
         }
     }
     pre_generate_datasets_parallel(dataset_sizes);

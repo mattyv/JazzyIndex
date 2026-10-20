@@ -190,7 +190,7 @@ TEST_F(DebugLoggingTest, FindOperationLogging) {
     EXPECT_TRUE(contains(log, "result=")) << "Missing result in predict log";
 
     // Verify the result is correct (element with value 50 is at index 50)
-    ASSERT_NE(result, nullptr);
+    ASSERT_NE(result, index.end());
     ASSERT_NE(result, data.data() + data.size());
     EXPECT_EQ(*result, 50) << "Should find value 50";
     EXPECT_EQ(result - data.data(), 50) << "Value 50 should be at index 50";
@@ -226,7 +226,7 @@ TEST_F(DebugLoggingTest, UniformSegmentFinding) {
         << "Sequential data should succeed uniform path verification";
 
     // Verify we got the right result
-    ASSERT_NE(result, nullptr);
+    ASSERT_NE(result, index.end());
     EXPECT_EQ(*result, 50) << "Should find value 50";
 }
 
@@ -247,66 +247,28 @@ TEST_F(DebugLoggingTest, BinarySearchSegmentFinding) {
 
     std::string log = get_log();
 
-    // Non-uniform data should use binary search (unless uniform path accidentally succeeds)
-    if (contains(log, "binary search")) {
-        EXPECT_TRUE(contains(log, "Binary search iter")) << "Missing binary search iteration logs";
-        EXPECT_TRUE(contains(log, "left=") && contains(log, "mid=") && contains(log, "right="))
-            << "Missing binary search position variables";
-
-        // Count number of binary search iterations
-        size_t iter_count = 0;
-        size_t pos = 0;
-        while ((pos = log.find("Binary search iter", pos)) != std::string::npos) {
-            ++iter_count;
-            ++pos;
-        }
-        // For 8 segments, binary search should take at most log2(8) = 3 iterations
-        EXPECT_LE(iter_count, 3) << "Binary search should take at most 3 iterations for 8 segments";
-        EXPECT_GE(iter_count, 1) << "Binary search should take at least 1 iteration";
-    }
+    EXPECT_TRUE(contains(log, "Using binary search")) << "Missing segment search log";
+    EXPECT_TRUE(contains(log, "Found segment")) << "Missing selected segment log";
 
     // Verify we found the correct value
-    ASSERT_NE(result, nullptr);
+    ASSERT_NE(result, index.end());
     EXPECT_EQ(*result, 400) << "Should find value 400 (20^2)";
 }
 
-// Test: Exponential search logging
-TEST_F(DebugLoggingTest, ExponentialSearchLogging) {
+// Test: Bounded search logging must exercise a prediction miss.
+TEST_F(DebugLoggingTest, BoundedSearchLogging) {
     std::vector<int> data;
-    // Create data where prediction might be slightly off
-    for (int i = 0; i < 100; ++i) {
-        data.push_back(i * i);
-    }
-
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<4>()> index;
-    index.build(data.data(), data.data() + data.size());
-
+    for (int i = 0; i < 100; ++i) data.push_back(i * i);
+    jazzy::JazzyIndex<int, jazzy::SegmentCount::PICO> index(data.begin(), data.end());
     jazzy::clear_debug_log();
-
-    auto* result = index.find(225); // 15^2
-
-    std::string log = get_log();
-
-    // Verify prediction occurred
-    EXPECT_TRUE(contains(log, "Predicted index")) << "Missing prediction log";
-
-    // Should see search operation (either exact match or direction-based search)
-    bool has_exact_match = contains(log, "Found exact match");
-    bool has_search_direction = contains(log, "Search direction:");
-
-    EXPECT_TRUE(has_exact_match || has_search_direction)
-        << "Missing search logging - log:\n" << log;
-
-    // If search direction was logged, should also have max_radius
-    if (has_search_direction) {
-        EXPECT_TRUE(contains(log, "max_radius:")) << "Missing max_radius log";
-        EXPECT_TRUE(contains(log, "segment_start=") && contains(log, "segment_end="))
-            << "Missing segment boundaries in search";
+    for (int key : data) {
+        const auto* result = index.find(key);
+        ASSERT_NE(result, index.end());
+        EXPECT_EQ(*result, key);
     }
-
-    // Verify we found the correct value
-    ASSERT_NE(result, nullptr);
-    EXPECT_EQ(*result, 225) << "Should find value 225 (15^2)";
+    const auto log = get_log();
+    EXPECT_TRUE(contains(log, "Bounded search"));
+    EXPECT_TRUE(contains(log, "radius="));
 }
 
 // Test: Bounds checking logging
@@ -424,12 +386,12 @@ TEST_F(DebugLoggingTest, PredictionLoggingAllModels) {
     EXPECT_TRUE(contains(log, "LINEAR")) << "Sequential data should use LINEAR model";
 
     // Verify all prediction parameters are logged
-    EXPECT_TRUE(contains(log, "key=")) << "Missing key value in prediction";
+    EXPECT_TRUE(contains(log, "delta=")) << "Missing relative key in prediction";
     EXPECT_TRUE(contains(log, "pred=")) << "Missing predicted value in prediction";
     EXPECT_TRUE(contains(log, "result=")) << "Missing result index in prediction";
 
     // Verify the prediction result is correct
-    ASSERT_NE(result, nullptr);
+    ASSERT_NE(result, index.end());
     EXPECT_EQ(*result, 25) << "Should find value 25";
     EXPECT_EQ(result - data.data(), 25) << "Value 25 should be at index 25";
 }
@@ -449,10 +411,6 @@ TEST_F(DebugLoggingTest, EqualRangeLogging) {
 
     // Verify equal_range was called
     EXPECT_TRUE(contains(log, "equal_range: Called")) << "Missing equal_range log";
-
-    // Should see both lower_bound and upper_bound operations
-    EXPECT_TRUE(contains(log, "find_lower_bound")) << "Missing find_lower_bound log";
-    EXPECT_TRUE(contains(log, "find_upper_bound")) << "Missing find_upper_bound log";
 
     // Verify the range is correct
     // Data has 4 instances of value 3 at indices 5, 6, 7, 8
@@ -500,7 +458,7 @@ TEST_F(DebugLoggingTest, NumericValuesValidation) {
     EXPECT_TRUE(contains(log, "result=")) << "Missing predicted result index";
 
     // Verify actual result is correct
-    ASSERT_NE(result, nullptr);
+    ASSERT_NE(result, index.end());
     EXPECT_EQ(*result, 75) << "Should find value 75";
     EXPECT_EQ(result - data.data(), 75) << "Value 75 should be at index 75";
 }
@@ -567,9 +525,12 @@ TEST_F(DebugLoggingTest, ErrorMetricsValidation) {
 
 #else
 
-// Placeholder test when debug logging is disabled
 TEST(DebugLoggingDisabled, NoLogsWhenDisabled) {
-    GTEST_SKIP() << "Debug logging tests require -DENABLE_DEBUG_LOGGING=ON";
+    int evaluated = 0;
+    DEBUG_LOG("disabled: %d", ++evaluated);
+    EXPECT_EQ(evaluated, 0);
+    jazzy::clear_debug_log();
+    EXPECT_TRUE(jazzy::get_debug_log().empty());
 }
 
 #endif // JAZZY_DEBUG_LOGGING

@@ -1,6 +1,7 @@
 # JazzyIndex Performance Benchmarks
 
-Comprehensive performance analysis of JazzyIndex vs. `std::lower_bound` across multiple data distributions and segment configurations.
+Performance analysis of JazzyIndex, `std::lower_bound`, PGM-index, and
+RadixSpline across multiple data distributions and index configurations.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -8,7 +9,7 @@ Comprehensive performance analysis of JazzyIndex vs. `std::lower_bound` across m
 - [Performance by Segment Group](#performance-by-segment-group)
 - [Distribution Analysis](#distribution-analysis)
 - [Segment Count Selection Guide](#segment-count-selection-guide)
-- [Range Function Benchmarks (Work in Progress)](#range-function-benchmarks-work-in-progress)
+- [Range Function Benchmarks](#range-function-benchmarks)
 - [Running Benchmarks](#running-benchmarks)
 - [Key Takeaways](#key-takeaways)
 
@@ -21,6 +22,48 @@ JazzyIndex is benchmarked against `std::lower_bound` (binary search) across 9 di
 - **Query scenarios:** Found (middle/end) vs. Not Found cases
 
 All benchmarks use Google Benchmark on sorted `uint64_t` arrays with datasets from 100 to 10,000 elements.
+
+The committed plots are historical, hardware-specific results and were not regenerated for the current correctness release. Re-run the suite on an otherwise idle target machine before using these figures for capacity planning or release claims.
+
+### Competitive learned-index suite
+
+`benchmark_competitors` runs identical deterministic query streams generated
+with a 90% target hit probability against:
+
+- JazzyIndex with 64, 256, and 512 segments
+- PGM-index with epsilon 16, 64, and 256
+- RadixSpline with maximum error 16, 64, and 256, using both 12- and 18-bit radix tables
+- `std::lower_bound`
+
+Each lookup reports logical `index_bytes`, excluding the shared source array,
+allocator overhead, and unused container capacity; construction is benchmarked
+separately with destruction outside the timed region.
+PGM-index and RadixSpline are fetched only when `BUILD_BENCHMARKS=ON` and are
+pinned to exact upstream revisions.
+Build measurements are serial for all three indexes; PGM-index's optional
+OpenMP construction path is intentionally not enabled in this target.
+
+For some synthetic long duplicate runs, preflight found that the upstream
+RadixSpline search window did not cover the first occurrence needed by an exact
+lower-bound lookup. The competitive suite therefore maps each occurrence to an
+order-preserving unique key
+(`key * (N + 1) + occurrence`) for every implementation, rejecting an input if
+that checked transform would overflow `uint64_t`. The primary JazzyIndex suite
+continues to test the original duplicate-heavy data.
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCHMARKS=ON
+cmake --build build --target benchmark_competitors
+
+# 10K rows across all distributions
+./build/benchmark_competitors
+
+# 10K, 100K, and 1M rows
+./build/benchmark_competitors --full-benchmarks
+```
+
+These synthetic distributions make implementations directly comparable but do
+not replace validation on real application data or SOSD datasets.
 
 ## Benchmark Setup
 
@@ -38,10 +81,11 @@ All benchmarks use Google Benchmark on sorted `uint64_t` arrays with datasets fr
 
 ### Query Scenarios
 
-Each distribution is tested with 3 query patterns:
+Each distribution is tested with 4 query patterns:
 - **FoundMiddle (`--` dashed):** Search for value at middle position
 - **FoundEnd (`:` dotted):** Search for value at end position
 - **NotFound (`-.` dash-dot):** Search for value not in dataset
+- **RandomMixed:** A deterministic rotation of 90% hits and 10% interior/out-of-range misses
 
 ### Segment Counts Tested
 
@@ -62,7 +106,7 @@ For clarity, performance plots are split into three groups:
 - **Best for:** Very small datasets (< 1K elements) or memory-constrained systems
 
 **Key Observations:**
-- Segment count 1 (purple) is essentially linear scan - only useful for tiny datasets
+- Segment count 1 (purple) has the broadest fallback search window and is mainly useful for tiny datasets
 - Segments 4-8 show reasonable performance for simple distributions (Uniform, Exponential)
 - Complex distributions (Zipf, Lognormal) struggle with low segment counts
 
@@ -79,7 +123,7 @@ For clarity, performance plots are split into three groups:
 - Quadratic models provide measurable benefits
 
 **Key Observations:**
-- **Segments 64 (blue)** is the recommended default for general use
+- **Segments 64-128** are often a useful low-overhead range; the API default remains 256
 - All JazzyIndex configurations beat binary search on most distributions
 - NotFound queries (dash-dot lines) often perform best due to early termination
 - Uniform distribution shows minimal difference between segment counts (already optimal)
@@ -115,7 +159,7 @@ For clarity, performance plots are split into three groups:
 - **Best Case for JazzyIndex**
 - Perfect linear fit, minimal error bounds
 - All segment counts perform well
-- Matches `std::lower_bound` performance (both ~O(log n))
+- Uses arithmetic segment selection and a small local verification search in the common case
 
 **Recommendation:** Use any segment count 32+
 
@@ -153,7 +197,7 @@ For clarity, performance plots are split into three groups:
 
 ### Zipf Distribution
 - **Heavy-Tailed Challenge**
-- Power-law distribution (α=1.5) common in web traffic
+- Power-law distribution (α=1.2) common in web traffic
 - Steep initial curve, long tail
 - JazzyIndex **2-4x faster** due to quadratic model selection
 
@@ -225,20 +269,20 @@ For clarity, performance plots are split into three groups:
 ### Memory Footprint
 
 Per index:
-- **Segment metadata:** S × 32 bytes (segment boundaries + model coefficients)
-- **Original array:** N × 8 bytes (uint64_t values)
-- **Total:** Approximately `(N × 8) + (S × 32)` bytes
+- **Segment metadata:** Approximately S × 64 bytes for `uint64_t` keys
+- **Original array:** Not owned by JazzyIndex; the caller retains N × 8 bytes
+- **Application working set:** Approximately `(N × 8) + (S × 64)` bytes when counting both
 
 Examples:
-- 10K elements, 256 segments: ~80KB + 8KB = **88KB**
-- 100K elements, 512 segments: ~800KB + 16KB = **816KB**
-- 1M elements, 1024 segments: ~8MB + 32KB = **~8MB**
+- 10K elements, 256 segments: ~80KB source + 16KB index = **96KB**
+- 100K elements, 512 segments: ~800KB source + 32KB index = **832KB**
+- 1M elements, 1024 segments: ~8MB source + 64KB index = **~8.06MB**
 
 ---
 
-## Range Function Benchmarks (Work in Progress)
+## Range Function Benchmarks
 
-JazzyIndex now supports range query functions (`equal_range`, `find_lower_bound`, `find_upper_bound`) that complement the core `find()` operation. These functions are benchmarked separately to measure their performance characteristics.
+JazzyIndex supports `equal_range`, `find_lower_bound`, and `find_upper_bound`. The current implementations use the corresponding standard-library algorithms over the complete indexed range, providing O(log N) bounds and STL-equivalent behavior.
 
 ### Range Functions Tested
 
@@ -277,17 +321,7 @@ cmake --build build --target benchmark_range_functions
 - `docs/images/benchmarks/jazzy_lowerbound_benchmarks_{low,medium,high}.png`
 - `docs/images/benchmarks/jazzy_upperbound_benchmarks_{low,medium,high}.png`
 
-### Known Performance Issues
-
-The range functions are **functionally correct** (validated against STL behavior) but have identified optimization opportunities:
-
-1. **Linear duplicate scanning** - Current O(k) backward scan for k duplicates should use exponential search → O(log k). Impact: 10µs on 10K duplicates vs optimal ~14ns.
-
-2. **equal_range inefficiency** - Currently calls `find_lower_bound` and `find_upper_bound` independently (2× work). Should use combined single-pass search.
-
-3. **Code duplication** - 90% overlap between lower_bound and upper_bound implementations.
-
-See [README.md](../README.md#range-query-functions-work-in-progress) for full details on current status and planned improvements.
+Learned acceleration is deferred until representative profiles justify the extra search logic. See [DEFERRED_WORK.md](DEFERRED_WORK.md#2-learned-acceleration-for-range-queries) for its entry criteria and correctness requirements.
 
 ---
 
@@ -340,14 +374,13 @@ This script:
 
 ## Key Takeaways
 
-1. **JazzyIndex consistently outperforms `std::lower_bound`** on real-world distributions (1.5-4x faster)
-2. **Segment count 64-256** is optimal for most use cases
-3. **Quadratic models matter:** Curved distributions see biggest gains
-4. **NotFound queries** often perform best (early termination)
-5. **Memory vs. Speed:** Segment count is a tunable dial
+1. The historical fixed-query runs show that JazzyIndex can outperform `std::lower_bound`; they are not a universal guarantee.
+2. Segment count is workload-dependent and should be selected with representative measurements.
+3. Curved distributions can benefit from quadratic models.
+4. Randomized hit/miss queries should accompany fixed-position cases in new reports.
+5. Segment count trades index memory for narrower local searches.
 
 **Next Steps:**
 - See [VISUALIZATIONS.md](VISUALIZATIONS.md) to understand how model selection works
 - See [MODEL_SELECTION.md](MODEL_SELECTION.md) for mathematical details
 - See [README.md](../README.md) for usage guide and API documentation
-

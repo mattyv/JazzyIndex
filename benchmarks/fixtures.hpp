@@ -38,23 +38,31 @@ inline std::vector<std::uint64_t> make_random_queries(const std::vector<std::uin
     std::mt19937_64 rng(seed);
     std::bernoulli_distribution hit_dist(hit_ratio);
     std::uniform_int_distribution<std::size_t> index_dist(0, values.size() - 1);
-    const std::uint64_t max_gap = 1024;
-    const std::uint64_t upper_bound =
-        values.back() > std::numeric_limits<std::uint64_t>::max() - max_gap
-            ? std::numeric_limits<std::uint64_t>::max()
-            : values.back() + max_gap;
-    const std::uint64_t lower_bound =
-        values.back() == std::numeric_limits<std::uint64_t>::max()
-            ? values.back()
-            : values.back() + 1;
-    std::uniform_int_distribution<std::uint64_t> miss_dist(lower_bound, upper_bound);
+    std::vector<std::size_t> gaps;
+    for (std::size_t i = 1; i < values.size(); ++i) {
+        if (values[i - 1] != std::numeric_limits<std::uint64_t>::max() &&
+            values[i - 1] + 1 < values[i]) {
+            gaps.push_back(i);
+        }
+    }
+    std::uniform_int_distribution<std::size_t> gap_dist(
+        0, gaps.empty() ? 0 : gaps.size() - 1);
 
     std::vector<std::uint64_t> queries(count);
     for (auto& query : queries) {
         if (hit_dist(rng)) {
             query = values[index_dist(rng)];
-        } else {
+        } else if (!gaps.empty()) {
+            const std::size_t gap = gaps[gap_dist(rng)];
+            std::uniform_int_distribution<std::uint64_t> miss_dist(
+                values[gap - 1] + 1, values[gap] - 1);
             query = miss_dist(rng);
+        } else if (values.front() > 0) {
+            query = values.front() - 1;
+        } else if (values.back() < std::numeric_limits<std::uint64_t>::max()) {
+            query = values.back() + 1;
+        } else {
+            query = values.front();
         }
     }
     return queries;

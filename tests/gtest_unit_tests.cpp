@@ -387,3 +387,85 @@ TEST_F(IntIndex, NegativeNumbers) {
     EXPECT_TRUE(expect_missing(index, data, 101));
     EXPECT_TRUE(expect_missing(index, data, -25));
 }
+
+TEST(JazzyIndexBuildTest, RejectsInternalInversionAndReversedRange) {
+    std::vector<int> data{0, 2, 1, 3};
+    jazzy::JazzyIndex<int, jazzy::SegmentCount::SINGLE> index;
+
+    EXPECT_THROW(index.build(data.data(), data.data() + data.size()), std::runtime_error);
+    EXPECT_THROW(index.build(data.data() + 3, data.data() + 1), std::invalid_argument);
+    EXPECT_FALSE(index.is_built());
+}
+
+TEST(JazzyIndexBuildTest, EmptyRebuildClearsState) {
+    std::vector<int> data{1, 2, 3};
+    std::vector<int> empty;
+    jazzy::JazzyIndex<int> index(data.data(), data.data() + data.size());
+
+    index.build(empty.data(), empty.data());
+
+    EXPECT_TRUE(index.is_built());
+    EXPECT_EQ(index.size(), 0u);
+    EXPECT_EQ(index.num_segments(), 0u);
+    EXPECT_EQ(index.find(2), index.end());
+    EXPECT_EQ(index.find_lower_bound(2), index.end());
+    EXPECT_EQ(index.find_upper_bound(2), index.end());
+    EXPECT_EQ(index.equal_range(2), std::make_pair(index.end(), index.end()));
+}
+
+TEST(JazzyIndexBuildTest, FailedRebuildPreservesPreviousIndex) {
+    std::vector<int> good{1, 2, 3, 4};
+    std::vector<int> bad{5, 7, 6, 8};
+    jazzy::JazzyIndex<int> index(good.data(), good.data() + good.size());
+
+    EXPECT_THROW(index.build(bad.data(), bad.data() + bad.size()), std::runtime_error);
+
+    EXPECT_TRUE(index.is_built());
+    EXPECT_EQ(index.size(), good.size());
+    EXPECT_EQ(index.find(3), good.data() + 2);
+    EXPECT_EQ(index.find(7), index.end());
+}
+
+// Regression: refine_segments must split segments whose fit misses the error
+// budget. A single linear model over piecewise data with a huge jump has an
+// enormous max_error, so a SINGLE-segment index must end up with more than one
+// segment and still answer every query correctly.
+TEST(JazzyIndexRefineTest, SplitsSegmentsThatMissErrorBudget) {
+    std::vector<std::int64_t> data;
+    data.reserve(4096);
+    for (std::int64_t i = 0; i < 4096; ++i) {
+        data.push_back(i < 2048 ? i : 100000000LL + i * 7);
+    }
+
+    jazzy::JazzyIndex<std::int64_t, jazzy::SegmentCount::SINGLE> index;
+    index.build(data.data(), data.data() + data.size());
+
+    EXPECT_GT(index.num_segments(), 1u) << "badly-fit segment was not split";
+
+    for (const auto& value : data) {
+        const auto* it = index.find(value);
+        ASSERT_NE(it, index.end());
+        EXPECT_EQ(*it, value);
+    }
+    EXPECT_EQ(index.find(50000000LL), index.end());  // in the jump gap
+}
+
+// Refinement must stop splitting below MIN_SPLIT_SIZE even when no model can
+// fit the data (duplicate runs make every model's error irreducible).
+TEST(JazzyIndexRefineTest, SplitTerminatesOnUnfittableData) {
+    std::vector<int> data;
+    for (int v = 0; v < 64; ++v) {
+        for (int r = 0; r < 200; ++r) {
+            data.push_back(v * v * v);
+        }
+    }
+
+    jazzy::JazzyIndex<int, jazzy::SegmentCount::SINGLE> index;
+    index.build(data.data(), data.data() + data.size());
+
+    for (int v = 0; v < 64; ++v) {
+        const auto* it = index.find(v * v * v);
+        ASSERT_NE(it, index.end());
+        EXPECT_EQ(*it, v * v * v);
+    }
+}

@@ -8,8 +8,10 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <functional>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -61,13 +63,8 @@ TEST(EqualRangeTest, MultipleDuplicates) {
 #ifdef JAZZY_DEBUG_LOGGING
     std::string log = jazzy::get_debug_log();
     if (!log.empty()) {
-        // equal_range should call both find_lower_bound and find_upper_bound
         EXPECT_NE(log.find("equal_range: Called"), std::string::npos)
             << "Should log equal_range call";
-        EXPECT_NE(log.find("find_lower_bound"), std::string::npos)
-            << "Should call find_lower_bound";
-        EXPECT_NE(log.find("find_upper_bound"), std::string::npos)
-            << "Should call find_upper_bound";
     }
     jazzy::clear_debug_log();
 #endif
@@ -415,4 +412,59 @@ TEST(EqualRangeTest, ConsecutiveDuplicateGroups) {
 
     // Verify no overlap
     EXPECT_EQ(upper3, lower4);
+}
+
+TEST(EqualRangeTest, LargeDuplicateRunMatchesStandardLibrary) {
+    std::vector<int> data(10'000, 42);
+    jazzy::JazzyIndex<int> index(data.data(), data.data() + data.size());
+
+    for (const int query : {41, 42, 43}) {
+        const auto expected = std::equal_range(data.data(), data.data() + data.size(), query);
+        EXPECT_EQ(index.equal_range(query), expected);
+        EXPECT_EQ(index.find_lower_bound(query), expected.first);
+        EXPECT_EQ(index.find_upper_bound(query), expected.second);
+    }
+}
+
+TEST(EqualRangeTest, LargeIntegerKeysMatchStandardLibrary) {
+    std::vector<std::uint64_t> data(1024);
+    std::iota(data.begin(), data.end(), std::uint64_t{1} << 60);
+    jazzy::JazzyIndex<std::uint64_t> index(data.data(), data.data() + data.size());
+
+    for (const auto query : {data.front(), data[3], data.back(), data.back() + 1}) {
+        const auto expected = std::equal_range(data.data(), data.data() + data.size(), query);
+        EXPECT_EQ(index.equal_range(query), expected);
+        EXPECT_EQ(index.find_lower_bound(query), expected.first);
+        EXPECT_EQ(index.find_upper_bound(query), expected.second);
+        const auto found = index.find(query);
+        if (expected.first != data.data() + data.size() && *expected.first == query) {
+            ASSERT_NE(found, index.end());
+            EXPECT_EQ(*found, query);
+        } else {
+            EXPECT_EQ(found, index.end());
+        }
+    }
+}
+
+TEST(EqualRangeTest, RandomizedBoundsMatchStandardLibrary) {
+    std::mt19937_64 rng(0x5A17u);
+
+    for (int round = 0; round < 40; ++round) {
+        std::vector<std::uint64_t> data(257 + (rng() % 512));
+        std::uint64_t value = (round % 2 == 0) ? (std::uint64_t{1} << 60) : 0;
+        for (auto& item : data) {
+            value += rng() % 8;
+            item = value;
+        }
+
+        jazzy::JazzyIndex<std::uint64_t> index(data.data(), data.data() + data.size());
+        for (int sample = 0; sample < 80; ++sample) {
+            const std::uint64_t query =
+                sample % 2 == 0 ? data[rng() % data.size()] : data.front() + (rng() % (data.back() - data.front() + 2));
+            const auto expected = std::equal_range(data.data(), data.data() + data.size(), query);
+            EXPECT_EQ(index.equal_range(query), expected);
+            EXPECT_EQ(index.find_lower_bound(query), expected.first);
+            EXPECT_EQ(index.find_upper_bound(query), expected.second);
+        }
+    }
 }

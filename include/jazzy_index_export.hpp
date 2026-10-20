@@ -1,5 +1,6 @@
 #pragma once
 
+#include <locale>
 #include <sstream>
 #include <string>
 #include "jazzy_index.hpp"
@@ -10,6 +11,7 @@ namespace jazzy {
 template <typename T, SegmentCount Segments, typename Compare, typename KeyExtractor = jazzy::identity>
 std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtractor>& index) {
     std::ostringstream oss;
+    oss.imbue(std::locale::classic());
     oss << std::scientific;
     oss.precision(17);  // Full double precision
 
@@ -21,14 +23,16 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
     oss << "  \"num_segments\": " << num_segments << ",\n";
     oss << "  \"is_uniform\": " << (index.is_uniform_ ? "true" : "false") << ",\n";
     oss << "  \"segment_scale\": " << index.segment_scale_ << ",\n";
-    oss << "  \"min\": " << static_cast<double>(index.min_) << ",\n";
-    oss << "  \"max\": " << static_cast<double>(index.max_) << ",\n";
+    oss << "  \"min\": "
+        << (size ? +std::invoke(index.key_extract_, index.min_) : 0) << ",\n";
+    oss << "  \"max\": "
+        << (size ? +std::invoke(index.key_extract_, index.max_) : 0) << ",\n";
 
     // Export keys
     oss << "  \"keys\": [";
     for (std::size_t i = 0; i < size; ++i) {
         if (i > 0) oss << ", ";
-        oss << static_cast<double>(std::invoke(index.key_extract_, index.base_[i]));
+        oss << +std::invoke(index.key_extract_, index.base_[i]);
     }
     oss << "],\n";
 
@@ -42,9 +46,13 @@ std::string export_index_metadata(const JazzyIndex<T, Segments, Compare, KeyExtr
         oss << "      \"index\": " << i << ",\n";
         oss << "      \"start_idx\": " << seg.start_idx << ",\n";
         oss << "      \"end_idx\": " << seg.end_idx << ",\n";
-        oss << "      \"min_val\": " << static_cast<double>(seg.min_val) << ",\n";
-        oss << "      \"max_val\": " << static_cast<double>(seg.max_val) << ",\n";
-        oss << "      \"max_error\": " << static_cast<int>(seg.max_error) << ",\n";
+        oss << "      \"min_val\": "
+            << +std::invoke(index.key_extract_, seg.min_val) << ",\n";
+        oss << "      \"max_val\": "
+            << +std::invoke(index.key_extract_, seg.max_val) << ",\n";
+        oss << "      \"max_error\": " << seg.max_error << ",\n";
+        oss << "      \"key_origin\": " << +std::invoke(index.key_extract_, seg.min_val) << ",\n";
+        oss << "      \"inv_scale\": " << seg.inv_scale << ",\n";
 
         // Model type
         oss << "      \"model_type\": \"";

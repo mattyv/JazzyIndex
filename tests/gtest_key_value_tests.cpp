@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 #include "jazzy_index.hpp"
+#include "jazzy_index_export.hpp"
 
 // Simple key-value struct for testing
 struct KeyValue {
@@ -370,4 +371,30 @@ TEST(KeyValueTests, CorrectnessAgainstStdLowerBound) {
             EXPECT_EQ(jazzy_result, data.data() + data.size()) << "JazzyIndex incorrectly found key: " << test_key;
         }
     }
+}
+
+TEST(KeyValueTests, MetadataExportUsesExtractedKeys) {
+    std::vector<KeyValue> data{{1, "one"}, {3, "three"}, {5, "five"}};
+    jazzy::JazzyIndex<KeyValue, jazzy::SegmentCount::TINY,
+                      std::less<>, decltype(&KeyValue::key)> index;
+    index.build(data.data(), data.data() + data.size(), std::less<>{}, &KeyValue::key);
+
+    const std::string metadata = jazzy::export_index_metadata(index);
+
+    EXPECT_NE(metadata.find("\"min\": 1"), std::string::npos);
+    EXPECT_NE(metadata.find("\"max\": 5"), std::string::npos);
+    EXPECT_NE(metadata.find("\"keys\": [1, 3, 5]"), std::string::npos);
+}
+
+TEST(KeyValueTests, MetadataExportPreservesLargeIntegerKeys) {
+    std::vector<std::uint64_t> data{
+        (std::uint64_t{1} << 60) + 1,
+        (std::uint64_t{1} << 60) + 3,
+    };
+    jazzy::JazzyIndex<std::uint64_t> index(data.data(), data.data() + data.size());
+
+    const std::string metadata = jazzy::export_index_metadata(index);
+
+    EXPECT_NE(metadata.find("1152921504606846977"), std::string::npos);
+    EXPECT_NE(metadata.find("1152921504606846979"), std::string::npos);
 }

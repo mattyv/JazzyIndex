@@ -36,7 +36,7 @@ protected:
     }
 };
 
-using IntErrorRecoveryTest = ErrorRecoveryTest<int, 256>;
+using IntErrorRecoveryTest = ErrorRecoveryTest<int, 1>;
 
 }  // namespace
 

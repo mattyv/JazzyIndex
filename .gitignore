@@ -21,7 +21,7 @@ lib/
 # Executables and binaries
 jazzy_index_tests
 jazzy_index_benchmarks
-benchmark_*
+/benchmark_*
 !benchmarks/
 
 # Documentation - ignore JSON files, keep PNG plots
@@ -34,3 +34,6 @@ benchmark_parallelism_test/
 
 # Claude Code
 .claude/
+
+# Python test and plotting caches
+__pycache__/

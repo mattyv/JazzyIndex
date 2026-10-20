@@ -12,7 +12,7 @@
 #include <vector>
 
 using value_type = std::uint64_t;
-using qi_index = jazzy::JazzyIndex<value_type, jazzy::to_segment_count<256>()>;
+using qi_index = jazzy::JazzyIndex<value_type, jazzy::to_segment_count<8>()>;
 
 // Property: All inserted values can be found
 TEST(PropertyTests, FindsAllInsertedIntegers) {
@@ -100,6 +100,10 @@ TEST(PropertyTests, FindReturnsValidPointer) {
         const value_type* end = begin + values.size();
 
         RC_ASSERT(result >= begin && result <= end);
+        const auto expected = std::lower_bound(begin, end, query);
+        const bool present = expected != end && *expected == query;
+        RC_ASSERT((result != end) == present);
+        if (present) RC_ASSERT(*result == query);
     });
     EXPECT_TRUE(result);
 }

@@ -1,0 +1,255 @@
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+
+#include <benchmark/benchmark.h>
+#include <pgm/pgm_index.hpp>
+#include <rs/builder.h>
+
+#include "fixtures.hpp"
+
+namespace {
+
+using Key = std::uint64_t;
+using Data = std::vector<Key>;
+
+bool use_full_benchmarks = false;
+
+Data make_unique_keys(Data values) {
+    if (values.size() >= std::numeric_limits<Key>::max()) {
+        throw std::overflow_error("dataset is too large for unique-key encoding");
+    }
+    const Key stride = static_cast<Key>(values.size()) + 1;
+    Key previous = 0;
+    Key occurrence = 0;
+    for (std::size_t i = 0; i < values.size(); ++i) {
+        const Key original = values[i];
+        if (i != 0 && original < previous) {
+            throw std::invalid_argument("unique-key encoding requires sorted input");
+        }
+        occurrence = i != 0 && original == previous ? occurrence + 1 : 0;
+        if (original > (std::numeric_limits<Key>::max() - occurrence) / stride) {
+            throw std::overflow_error("unique-key encoding exceeds uint64_t");
+        }
+        values[i] = original * stride + occurrence;
+        previous = original;
+    }
+    return values;
+}
+
+std::size_t exact_lower_bound(const Data& data, Key key,
+                              std::size_t first, std::size_t last) {
+    if (first > last || last > data.size()) {
+        throw std::out_of_range("learned index returned an invalid search bound");
+    }
+    const auto it = std::lower_bound(data.begin() + static_cast<std::ptrdiff_t>(first),
+                                     data.begin() + static_cast<std::ptrdiff_t>(last), key);
+    return it != data.begin() + static_cast<std::ptrdiff_t>(last) && *it == key
+        ? static_cast<std::size_t>(it - data.begin())
+        : data.size();
+}
+
+std::size_t exact_lower_bound(const Data& data, Key key) {
+    return exact_lower_bound(data, key, 0, data.size());
+}
+
+template <typename Lookup>
+void register_lookup(const std::string& implementation, const std::string& configuration,
+                     const std::string& distribution, std::shared_ptr<const Data> data,
+                     std::shared_ptr<const Data> queries, std::size_t index_bytes,
+                     Lookup lookup) {
+    for (const Key query : *queries) {
+        const std::size_t expected = exact_lower_bound(*data, query);
+        const std::size_t actual = lookup(query);
+        if (expected != actual) {
+            throw std::logic_error(implementation + "/" + configuration +
+                                   " returned an incorrect exact result for key " +
+                                   std::to_string(query));
+        }
+    }
+
+    std::string name = "Lookup/" + implementation;
+    if (!configuration.empty()) {
+        name += "/" + configuration;
+    }
+    name += "/" + distribution + "/N" + std::to_string(data->size()) + "/RandomMixed";
+
+    benchmark::RegisterBenchmark(
+        name.c_str(),
+        [data = std::move(data), queries = std::move(queries), index_bytes,
+         lookup = std::move(lookup)](benchmark::State& state) {
+            std::size_t i = 0;
+            for (auto _ : state) {
+                auto result = lookup((*queries)[i++ % queries->size()]);
+                benchmark::DoNotOptimize(result);
+            }
+            state.counters["index_bytes"] = static_cast<double>(index_bytes);
+            state.counters["size"] = static_cast<double>(data->size());
+        })->Unit(benchmark::kNanosecond);
+}
+
+template <typename Build>
+void register_build(const std::string& implementation, const std::string& configuration,
+                    const std::string& distribution, std::shared_ptr<const Data> data,
+                    Build build) {
+    const std::string name = "Build/" + implementation + "/" + configuration + "/" +
+                             distribution + "/N" + std::to_string(data->size());
+    benchmark::RegisterBenchmark(
+        name.c_str(),
+        [data = std::move(data), build = std::move(build)](benchmark::State& state) {
+            for (auto _ : state) {
+                {
+                    auto index = build(*data);
+                    benchmark::DoNotOptimize(index);
+                    state.PauseTiming();
+                }
+                state.ResumeTiming();
+            }
+            state.counters["size"] = static_cast<double>(data->size());
+        })->Unit(benchmark::kMicrosecond);
+}
+
+template <std::size_t Segments>
+void register_jazzy(const std::string& distribution, std::shared_ptr<const Data> data,
+                    std::shared_ptr<const Data> queries) {
+    using Index = jazzy::JazzyIndex<Key, jazzy::to_segment_count<Segments>()>;
+    auto index = std::make_shared<Index>();
+    index->build(data->data(), data->data() + data->size());
+    const std::string config = "S" + std::to_string(Segments);
+
+    register_lookup("JazzyIndex", config, distribution, data, queries,
+                    sizeof(Index) + index->size_in_bytes(),
+                    [index, data](Key key) {
+                        const auto* result = index->find(key);
+                        return result == index->end()
+                            ? data->size()
+                            : static_cast<std::size_t>(result - data->data());
+                    });
+    register_build("JazzyIndex", config, distribution, std::move(data),
+                   [](const Data& values) {
+                       Index result;
+                       result.build(values.data(), values.data() + values.size());
+                       return result;
+                   });
+}
+
+template <std::size_t Epsilon>
+void register_pgm(const std::string& distribution, std::shared_ptr<const Data> data,
+                  std::shared_ptr<const Data> queries) {
+    using Index = pgm::PGMIndex<Key, Epsilon>;
+    auto index = std::make_shared<Index>(data->begin(), data->end());
+    const std::string config = "E" + std::to_string(Epsilon);
+
+    register_lookup("PGM", config, distribution, data, queries,
+                    sizeof(Index) + index->size_in_bytes(),
+                    [index, data](Key key) {
+                        const auto range = index->search(key);
+                        return exact_lower_bound(*data, key, range.lo, range.hi);
+                    });
+    register_build("PGM", config, distribution, std::move(data),
+                   [](const Data& values) {
+                       return Index(values.begin(), values.end());
+                   });
+}
+
+template <std::size_t RadixBits, std::size_t MaxError>
+void register_radix_spline(const std::string& distribution,
+                           std::shared_ptr<const Data> data,
+                           std::shared_ptr<const Data> queries) {
+    auto build = [](const Data& values) {
+        rs::Builder<Key> builder(values.front(), values.back(), RadixBits, MaxError);
+        for (const Key key : values) {
+            builder.AddKey(key);
+        }
+        return builder.Finalize();
+    };
+
+    auto index = std::make_shared<rs::RadixSpline<Key>>(build(*data));
+    const std::string config = "R" + std::to_string(RadixBits) +
+                               "/E" + std::to_string(MaxError);
+    register_lookup("RadixSpline", config, distribution, data, queries, index->GetSize(),
+                    [index, data](Key key) {
+                        const auto range = index->GetSearchBound(key);
+                        return exact_lower_bound(*data, key, range.begin, range.end);
+                    });
+    register_build("RadixSpline", config, distribution, std::move(data), std::move(build));
+}
+
+void register_dataset(const std::string& distribution, Data values) {
+    auto data = std::make_shared<const Data>(make_unique_keys(std::move(values)));
+    auto queries = std::make_shared<const Data>(
+        qi::bench::make_random_queries(*data, qi::bench::kQueryCount));
+
+    register_lookup("LowerBound", "", distribution, data, queries, 0,
+                    [data](Key key) { return exact_lower_bound(*data, key); });
+
+    register_jazzy<64>(distribution, data, queries);
+    register_jazzy<256>(distribution, data, queries);
+    register_jazzy<512>(distribution, data, queries);
+
+    register_pgm<16>(distribution, data, queries);
+    register_pgm<64>(distribution, data, queries);
+    register_pgm<256>(distribution, data, queries);
+
+    register_radix_spline<12, 16>(distribution, data, queries);
+    register_radix_spline<12, 64>(distribution, data, queries);
+    register_radix_spline<12, 256>(distribution, data, queries);
+    register_radix_spline<18, 16>(distribution, data, queries);
+    register_radix_spline<18, 64>(distribution, data, queries);
+    register_radix_spline<18, 256>(distribution, data, queries);
+}
+
+void register_suites() {
+    std::vector<std::size_t> sizes{10'000};
+    if (use_full_benchmarks) {
+        sizes.push_back(100'000);
+        sizes.push_back(1'000'000);
+    }
+
+    for (const std::size_t size : sizes) {
+        register_dataset("Uniform", qi::bench::make_uniform_values(size));
+        register_dataset("Exponential", qi::bench::make_exponential_values(size));
+        register_dataset("Clustered", qi::bench::make_clustered_values(size));
+        register_dataset("Lognormal", qi::bench::make_lognormal_values(size));
+        register_dataset("Zipf", qi::bench::make_zipf_values(size));
+        register_dataset("Mixed", qi::bench::make_mixed_values(size));
+        register_dataset("Quadratic", qi::bench::make_quadratic_values(size));
+        register_dataset("ExtremePoly", qi::bench::make_extreme_polynomial_values(size));
+        register_dataset("InversePoly", qi::bench::make_inverse_polynomial_values(size));
+    }
+}
+
+void consume_custom_flags(int& argc, char** argv) {
+    for (int i = 1; i < argc; ++i) {
+        if (std::string_view(argv[i]) != "--full-benchmarks") {
+            continue;
+        }
+        use_full_benchmarks = true;
+        for (int j = i; j + 1 < argc; ++j) {
+            argv[j] = argv[j + 1];
+        }
+        --argc;
+        argv[argc] = nullptr;
+        --i;
+    }
+}
+
+}  // namespace
+
+int main(int argc, char** argv) {
+    consume_custom_flags(argc, argv);
+    register_suites();
+    benchmark::Initialize(&argc, argv);
+    if (benchmark::ReportUnrecognizedArguments(argc, argv)) {
+        return 1;
+    }
+    benchmark::RunSpecifiedBenchmarks();
+    benchmark::Shutdown();
+}

@@ -1,4 +1,4 @@
-# Jazzy Index - Proof of Concept
+# JazzyIndex
 
 <img src="docs/images/Jazzy.JPG" width="230">
 
@@ -43,13 +43,13 @@ That's a learned index. Build a lightweight model of your data's distribution, u
 
 ## Performance
 
-Here's JazzyIndex compared head-to-head with `std::lower_bound` (black X markers) across various data distributions:
+The following is a historical fixed-query snapshot comparing JazzyIndex with `std::lower_bound` (black X markers):
 
 ![JazzyIndex vs std::lower_bound Benchmark Results](docs/images/benchmarks/jazzy_benchmarks_medium.png)
 
-*Medium segment counts (16-128) - the sweet spot for most workloads. See [BENCHMARKS.md](docs/BENCHMARKS.md) for detailed analysis.*
+*These plots predate the current correctness release and randomized query cases. They show potential, not a current release guarantee; reproduce them on the target workload and hardware before relying on the result. See [BENCHMARKS.md](docs/BENCHMARKS.md) for the method.*
 
-**The numbers tell the story:**
+**Archived Apple M2 snapshot:**
 
 | Distribution | `std::lower_bound` | JazzyIndex (S=256) | **Speedup** |
 |--------------|-------------------:|-------------------:|------------:|
@@ -62,11 +62,11 @@ Here's JazzyIndex compared head-to-head with `std::lower_bound` (black X markers
 
 *All measurements on 10,000 elements (Apple M2, Release build with -O3 -march=native)*
 
-**Uniform data (bottom left):** This is where learned indexes shine. `std::lower_bound` follows the classic log(n) curve - growing logarithmically with dataset size. JazzyIndex? **Consistently flat around 3.2ns** across all sizes. The "Not found" queries (dash-dot lines) hit even lower latencies - that's the arithmetic fast path doing pure O(1) lookups. As your dataset grows, `std::lower_bound` slows proportionally with log(n) while JazzyIndex stays constant.
+**Uniform data (bottom left):** The historical run shows the benefit of arithmetic segment selection and accurate position prediction. The implementation still verifies predictions and can fall back to a wider search, so the plot must not be read as a universal O(1) complexity guarantee.
 
-**Skewed distributions (everywhere else):** Here's where JazzyIndex proves it's not just a one-trick pony. On lognormal, exponential, and mixed distributions, we see **5.4x speedup** (17.4ns → 3.2ns) because the adaptive models fit the curves well. Even on pathological Zipf distributions (heavy-tailed, massive clustering), JazzyIndex still delivers **5.8x speedup**. Quantile segmentation means we're only searching 1/256th of the data, so even when models can't predict perfectly, performance stays fast and consistent.
+**Skewed distributions (everywhere else):** The archived fixed-key cases also benefited from quantile segmentation and adaptive models. Real hit/miss ratios, duplicate runs, cache state, compiler settings, and concurrent system load can materially change the result.
 
-The key insight: JazzyIndex doesn't just optimize for the best case. It adapts to your data's shape and maintains consistent, predictable performance across all distributions. The black X lines curving upward vs the colored lines staying flat - that's the difference between O(log n) and O(1) in action.
+The useful conclusion is narrower: learned position prediction can reduce search work when the indexed distribution is stable. Benchmark the actual workload before choosing it over `std::lower_bound`.
 
 ## How It Works
 
@@ -115,7 +115,9 @@ When you call `build()`, here's what happens:
 
 2. **Analyze each segment**: For every segment, fit linear, quadratic, and cubic models using least-squares regression. Measure the maximum prediction error for each model. If linear error is ≤2 elements, use linear (it's faster). If quadratic reduces error by 30%+, use quadratic. If quadratic error is still high (>6 but <50) and cubic reduces it by another 30%+, use cubic. If all values are identical, use constant.
 
-3. **Detect uniformity**: Check if segments are evenly spaced in value range (±30% tolerance). If so, we can skip segment lookup entirely and use arithmetic: `segment_index = (value - min) × num_segments / (max - min)`. This is the "fast path" you see in uniform data benchmarks.
+3. **Refine poor fits**: Split segments whose measured error exceeds 16 elements, stopping before either child would have fewer than 64 elements. The template segment count is the initial count; the final count can grow.
+
+4. **Detect uniformity**: Check if segments are evenly spaced in value range (±30% tolerance). If so, we can skip segment lookup entirely and use arithmetic: `segment_index = (value - min) × num_segments / (max - min)`. This is the "fast path" you see in uniform data benchmarks.
 
 ### Looking Up a Value
 
@@ -131,12 +133,9 @@ The lookup process has three stages:
 
 **Stage 3: Verify with local search**
 - Check the predicted position first.
-- If miss, check immediate neighbors (±1, ±2 indices).
-- If still missing, exponentially expand search radius (±4, ±8, ±16...) up to `max_error + 2`.
-- Each expansion does a binary search in that range.
-- Fallback: if we still haven't found it, binary search the entire segment.
-
-This exponential search pattern is crucial. When predictions are good (low error), we find elements in 1-3 comparisons. When predictions are off (high error, skewed data), we quickly escalate to larger search ranges without wasting time checking every single nearby position.
+- If the prediction misses, binary-search a window of radius `max(max_error + 2, 4)` within the segment.
+- If the insertion point lands at a window edge, search the remaining part of the segment on that side.
+- Return `end()` if the key is absent.
 
 ```mermaid
 flowchart TD
@@ -150,18 +149,15 @@ flowchart TD
 
     Predict --> Check1{Value at<br/>predicted index?}
     Check1 -->|Found!| Success([Return pointer])
-    Check1 -->|Miss| Check2{Check ±1, ±2?}
-
-    Check2 -->|Found!| Success
-    Check2 -->|Miss| Expand[Exponentially expand:<br/>±4, ±8, ±16...]
-
-    Expand --> Check3{Found in range?}
-    Check3 -->|Found!| Success
-    Check3 -->|Miss & max_error| Fallback[Binary search<br/>entire segment]
-
+    Check1 -->|Miss| Window[Binary search bounded window]
+    Window --> Check2{Found?}
+    Check2 -->|Yes| Success
+    Check2 -->|No| Edge{Insertion at window edge?}
+    Edge -->|Yes| Fallback[Search remaining side of segment]
+    Edge -->|No| NotFound([Return end pointer])
     Fallback --> Final{Found?}
     Final -->|Yes| Success
-    Final -->|No| NotFound([Return end pointer])
+    Final -->|No| NotFound
 
     style Start fill:#e1f5ff
     style Success fill:#d4edda
@@ -172,9 +168,9 @@ flowchart TD
 
 ### Why This Works
 
-**For uniform data:** The arithmetic segment lookup is exact, models predict perfectly, and we find elements in ~1-2 comparisons. This is why you see 5-10ns in the benchmarks - we're barely doing any work.
+**For uniform data:** Arithmetic segment selection and accurate predictions can reduce lookup work. The selected segment and predicted value are still checked.
 
-**For skewed data:** Segment lookup might take a few comparisons (log of 256 ≈ 8), models have higher error, but exponential search contains the damage. Even in the worst case, we're searching within a segment (1/256th of the array), not the whole thing. And because segments are quantiles (equal element count), we never have pathological cases where one segment contains half the data.
+**For skewed data:** Refinement gives poorly fitted regions smaller segments. Lookup uses a bounded window and can fall back to the rest of the selected segment, preserving correctness when a prediction misses.
 
 **Why not one big model?** Fitting a single model to complex distributions requires high-degree polynomials or piecewise functions, which are expensive to evaluate and prone to overfitting. Segmentation gives us locality: simple models that capture local behavior, with automatic adaptation to distribution changes across the array.
 
@@ -214,12 +210,14 @@ JazzyIndex comes with comprehensive technical documentation:
 
 - **[MODEL_SELECTION.md](docs/MODEL_SELECTION.md)** - Deep technical dive into the mathematics: least-squares fitting, Cramer's rule for quadratics, input normalization, and the rationale behind selection thresholds like `MAX_ACCEPTABLE_LINEAR_ERROR = 2` and `QUADRATIC_IMPROVEMENT_THRESHOLD = 0.7`.
 
+- **[DEFERRED_WORK.md](docs/DEFERRED_WORK.md)** - Explicitly deferred work, why it is deferred, when to reopen it, and what completion requires.
+
 ## Features
 
 - **Header-only library** (`include/jazzy_index.hpp`) with minimal dependencies
 - **Adaptive model selection**: Automatically chooses constant/linear/quadratic/cubic per segment
 - **Graceful degradation**: Fast on uniform data, consistent on skewed data
-- **Range query support**: STL-compatible `equal_range`, `find_lower_bound`, `find_upper_bound` functions (work in progress - see below)
+- **Range query support**: Correct STL-backed `equal_range`, `find_lower_bound`, and `find_upper_bound`
 - **Comprehensive testing**: Unit tests + RapidCheck property-based tests for correctness
 - **Extensive benchmarks**: 9 distributions tested (Uniform, Exponential, Clustered, Lognormal, Zipf, Mixed, Quadratic, ExtremePoly, InversePoly)
 - **Configurable segment count**: Template parameter for tuning space vs. speed tradeoff
@@ -227,49 +225,35 @@ JazzyIndex comes with comprehensive technical documentation:
 
 ## Build Cost vs Query Cost
 
-Learned indexes require a one-time `build()` step to analyze the data and fit models. Here's what that costs:
+Learned indexes require a one-time `build()` step to validate the data and fit models. Whether that cost amortizes depends on the distribution, dataset size, compiler, CPU, and query mix.
 
-### Single-Threaded `build()`
+Break-even queries are approximately `build_time / (baseline_query_time - indexed_query_time)`. Measure all three values on representative data; the project does not publish extrapolated break-even numbers as release guarantees.
 
-| Dataset Size | Build Time (S=256) | Break-even Queries |
-|--------------|-------------------:|-------------------:|
-| 1,000        | 0.84 µs            | ~35 queries        |
-| 10,000       | 5.5 µs             | ~225 queries       |
-| 100,000      | ~36 µs             | ~1,500 queries     |
-| 1,000,000    | ~270 µs            | ~11,000 queries    |
+### Multi-Threaded `build_parallel()`
 
-**Break-even** = how many queries you need to amortize the build cost. For a 1M-element array, you save ~24ns per query (27.6ns → 3.2ns), so after ~11,000 lookups you've paid back the 270µs build time and everything after is pure profit.
-
-*Values for 100K and 1M elements are extrapolated from measured 1K/10K timings using observed ~6.5x scaling factor per 10x data increase. Actual times may vary based on data distribution and CPU architecture.*
-
-### Multi-Threaded `parallel_build()`
-
-For very large datasets, use `parallel_build()` to distribute segment analysis across CPU cores:
+For very large datasets, include `jazzy_index_parallel.hpp` and use `build_parallel()` to distribute segment analysis across a bounded number of workers:
 
 ```cpp
-// Use parallel_build() for faster index construction on multi-core systems
+#include "jazzy_index_parallel.hpp"
+
 jazzy::JazzyIndex<int> index;
-index.parallel_build(data.begin(), data.end());  // Automatically uses std::thread::hardware_concurrency()
+index.build_parallel(data.data(), data.data() + data.size());
 ```
 
-**Note:** Based on current benchmarks, `parallel_build()` shows significant overhead for datasets under 100K elements due to thread creation/synchronization costs. The method is designed for very large datasets (1M+ elements) where per-segment work justifies parallelization. For most use cases, the single-threaded `build()` provides excellent performance with sub-microsecond to microsecond build times.
-
-**More segments = slightly slower build**, but not much. Going from S=64 to S=512 on 1M elements only adds ~9µs (409µs → 419µs). The segment count mostly affects query performance, not build time.
-
-**Distribution matters for build time**: Zipf (pathological, heavy-tailed) takes 1.1ms for 1M elements vs 413µs for uniform. The quadratic model fitting works harder on skewed data, but query time stays fast (~4.7ns).
+The convenience method uses at most `std::thread::hardware_concurrency()` workers. For a persistent pool or application-owned scheduler, use `prepare_build_tasks()` and `finalize_build()`; see [DEFERRED_WORK.md](docs/DEFERRED_WORK.md#1-built-in-custom-executor-or-persistent-thread-pool).
 
 ## When Should You Use This?
 
 **JazzyIndex wins when:**
 - You have large, mostly-static sorted arrays (think: database indexes, sorted logs, time-series data)
-- You're doing **many lookups** per dataset - need ~17K queries on 1M elements to break even
+- You perform enough lookups to amortize a measured build cost
 - Your data has some structure (uniform, monotonic, or clustered)
 - You care about consistent, predictable latency
 
 **Stick with `std::lower_bound` when:**
 - Your dataset is small (<1000 elements) - index overhead isn't worth it
 - Data changes frequently - rebuilding the index constantly kills performance
-- You're only doing a handful of lookups (<100 queries) - can't amortize the 2-400µs build cost
+- You only perform a handful of lookups and cannot amortize preprocessing
 - You need the absolute simplest, most portable code
 
 ## Usage
@@ -278,11 +262,10 @@ JazzyIndex is header-only. Just include it and go:
 
 ```cpp
 #include "jazzy_index.hpp"
+#include <iostream>
 #include <vector>
-#include <algorithm>
 
-// Your sorted data
-std::vector<int> data = {1, 5, 10, 15, 20, 25, 30, ...};
+std::vector<int> data{1, 5, 10, 15, 20, 25, 30};
 
 // Build the index (256 segments by default)
 jazzy::JazzyIndex<int> index(data.data(), data.data() + data.size());
@@ -293,15 +276,27 @@ if (result != data.data() + data.size()) {
     std::cout << "Found at offset: " << (result - data.data()) << "\n";
 }
 
-// Customize segment count for your workload
-jazzy::JazzyIndex<int, 512> fine_grained(data.data(), data.data() + data.size());
-jazzy::JazzyIndex<int, 64> coarse_grained(data.data(), data.data() + data.size());
+// Customize segment count with a preset
+jazzy::JazzyIndex<int, jazzy::SegmentCount::XLARGE> fine_grained(
+    data.data(), data.data() + data.size());
 ```
 
 The template parameters are:
-- `T`: Value type (must be arithmetic - int, float, double, etc.)
-- `NumSegments`: Number of segments (default 256, valid range 1-4096)
+
+- `T`: Stored value type
+- `Segments`: A `SegmentCount` preset (default `LARGE`, 256 segments)
 - `Compare`: Comparison functor (default `std::less<>`)
+- `KeyExtractor`: Numeric key projection (default identity)
+
+### Data lifetime and thread safety
+
+Copying an index copies its models and shares the underlying data. Moving transfers the models and leaves the source unbuilt and safe to query or rebuild.
+
+JazzyIndex is non-owning. The indexed range must stay alive, sorted, and at the same addresses for the lifetime of the index; mutating values or reallocating a backing `std::vector` invalidates it. Rebuild the index after any such change.
+
+Building validates the complete sort order and rejects NaN or infinity when the extracted key is floating point. Validation and model-analysis failures in `build()` or `build_parallel()` leave the previous index intact; final state replacement follows the move-assignment guarantees of the stored value, comparator, and key-extractor types.
+
+After a successful build, concurrent read-only queries are safe when the backing data, comparator, and key extractor are also safe for concurrent reads. Do not call `build()`, `build_parallel()`, `prepare_build_tasks()`, or `finalize_build()` concurrently with queries.
 
 ### Iterator Support
 
@@ -329,9 +324,9 @@ int count = std::distance(lower, upper);
 
 **Performance Note:** Iterator support is zero-cost. The implementation uses `std::to_address()` at compile-time to extract pointers from contiguous iterators, resulting in identical performance to the pointer-based API.
 
-## Range Query Functions (Work in Progress)
+## Range Query Functions
 
-JazzyIndex now supports range queries similar to the STL's `std::lower_bound`, `std::upper_bound`, and `std::equal_range`. These functions use the same learned model infrastructure to accelerate range lookups.
+JazzyIndex provides STL-compatible `find_lower_bound`, `find_upper_bound`, and `equal_range`. They currently delegate to the standard-library algorithms over the full indexed range, prioritizing correct behavior for duplicates, missing values, custom comparators, and large integer keys.
 
 ### API
 
@@ -366,45 +361,28 @@ const int* ub = index.find_upper_bound(5);
 std::cout << "Upper bound: " << *ub << "\n";  // "Upper bound: 7"
 ```
 
-### Current Status and Known Issues
-
-These functions are **production-ready** for correctness (fully tested against STL behavior) but have **identified performance optimization opportunities**:
-
-1. **Linear duplicate scanning** (Priority: High)
-   - Current: O(k) backward scan for k consecutive duplicates
-   - Impact: 10µs on 10,000 duplicates (vs optimal ~14ns)
-   - Proposed fix: Exponential search + binary search → O(log k)
-
-2. **equal_range inefficiency** (Priority: Medium)
-   - Current: Calls `find_lower_bound` and `find_upper_bound` independently (2× work)
-   - Impact: 2× latency when finding ranges
-   - Proposed fix: Combined search that finds both bounds in one pass
-
-3. **Code duplication** (Priority: Low)
-   - 90% code overlap between `find_lower_bound` and `find_upper_bound`
-   - Maintenance burden, potential for divergence
-   - Proposed fix: Extract common logic to shared helper
-
-4. **Search radius validation** (Priority: Low)
-   - Binary search window might not contain value if prediction error exceeds max_error
-   - Currently mitigated by fallback to full segment search
-   - Proposed fix: Validate bounds before binary search
-
-**Performance**: On datasets with few duplicates (typical case), these functions perform within 2-3× of the main `find()` operation. Pathological cases with many consecutive duplicates see degraded performance due to issue #1 above.
-
-**Benchmarks**: Comprehensive benchmarks covering 9 distributions × 10 segment counts × 3 scenarios (FoundMiddle, FoundEnd, NotFound) have been completed. Results are available in [docs/images/benchmarks/](docs/images/benchmarks/).
-
-**Testing**: All functions have comprehensive test coverage (24 test cases) verifying correctness against `std::equal_range`, `std::lower_bound`, and `std::upper_bound` across edge cases, duplicates, custom comparators, and various distributions.
+Learned acceleration for these range operations is intentionally deferred until profiles show it matters; the requirements are recorded in [DEFERRED_WORK.md](docs/DEFERRED_WORK.md#2-learned-acceleration-for-range-queries).
 
 ## Building
 
 ```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
 cmake --build build
 ```
 
-Targets are optional and can be toggled with `-DBUILD_TESTS=ON|OFF` and `-DBUILD_BENCHMARKS=ON|OFF`.
-Release builds default to `-O3 -march=native -DNDEBUG`.
+Tests, benchmarks, and examples are off by default for consumers. Enable them with `BUILD_TESTS`, `BUILD_BENCHMARKS`, and `BUILD_EXAMPLES`; compiler optimization policy remains under the parent project’s control.
+
+Install and consume the exported CMake package with:
+
+```bash
+cmake --install build --prefix /your/prefix
+```
+
+```cmake
+find_package(JazzyIndex 0.1 CONFIG REQUIRED)
+target_link_libraries(your_target PRIVATE jazzy::jazzy_index)
+```
 
 ## Running Tests
 
@@ -430,7 +408,7 @@ Generate a coverage report locally:
 
 ```bash
 # Configure with coverage enabled
-cmake -B build -DCMAKE_BUILD_TYPE=Coverage -DENABLE_COVERAGE=ON
+cmake -B build -DCMAKE_BUILD_TYPE=Coverage -DENABLE_COVERAGE=ON -DBUILD_TESTS=ON
 
 # Build and run tests with coverage
 cmake --build build --target jazzy_index_tests
@@ -447,8 +425,13 @@ The test suite achieves excellent coverage of all core functionality.
 ## Running Benchmarks
 
 ```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCHMARKS=ON
 cmake --build build --target jazzy_index_benchmarks
 ./build/jazzy_index_benchmarks --benchmark_format=console
+
+# Competitive learned-index suite: JazzyIndex, PGM-index, RadixSpline, lower_bound
+cmake --build build --target benchmark_competitors
+./build/benchmark_competitors
 ```
 
 Benchmarks are organized by:
@@ -456,6 +439,9 @@ Benchmarks are organized by:
 - **Segment count**: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512
 - **Dataset size**: 100 to 1,000,000 elements
 - **Query pattern**: FoundMiddle, FoundEnd, NotFound
+- **Mixed randomized query pattern**: deterministic 90% hits plus interior/out-of-range misses
+
+Published plots are historical, machine-specific measurements. Re-run the suite on an otherwise idle target machine before using the numbers for capacity planning or release claims.
 
 ### Plotting Benchmarks
 
@@ -475,7 +461,7 @@ cmake --build build --target generate_docs_plots
 # Output: docs/images/benchmarks/*.png and docs/images/index_data/*.png
 ```
 
-**Range Function Benchmarks** (work in progress):
+**Range Function Benchmarks**:
 
 ```bash
 # Run range function benchmarks (equal_range, lower_bound, upper_bound)
@@ -512,7 +498,7 @@ The default of 256 is a good middle ground for most workloads. If you see the be
 
 1. **Alignment matters**: Segment structs are cache-line aligned (64 bytes). The entire segment array fits in L2 cache for typical sizes, making segment lookup very fast.
 
-2. **Build once, query many**: Index construction does least-squares fitting for every segment. On a million-element array with 256 segments, that's 256 × 4000-element regressions. Not free! But once built, queries are 5-30ns. You need dozens of queries to break even.
+2. **Build once, query many**: Index construction validates the range and fits models for every segment. Measure the break-even point for the real query mix.
 
 3. **Profile your distribution**: Run the benchmarks with your actual data distribution. Learned indexes are data-dependent - performance varies dramatically between uniform and skewed data.
 
@@ -522,37 +508,25 @@ The default of 256 is a good middle ground for most workloads. If you see the be
 
 ### Model Fitting Math
 
-The linear model is dead simple: given a segment from index `start` to `end` with values `[v_start, v_end]`, we want `index = slope × value + intercept` such that:
-- `f(v_start) = start`
-- `f(v_end) = end`
+Models predict an array position from a key. For a segment `[start, end)`, let `delta = key - first_key`. The linear model uses `slope = (end - start - 1) / (last_key - first_key)` and predicts `slope × delta + start`. Integer subtraction happens before conversion to `double` to preserve small differences between large keys.
 
-Solving: `slope = (end - start) / (v_end - v_start)` and `intercept = start - slope × v_start`.
-
-The quadratic model uses least-squares fitting of `index = a×value² + b×value + c`, and the cubic model uses `index = a×value³ + b×value² + c×value + d`. We build a system of normal equations from all points in the segment and solve using Cramer's rule. Input values are normalized to [0,1] for numerical stability. This works well for the small segments we're dealing with (hundreds to thousands of points). For really large segments or pathological data, higher-degree models can degrade, but we have linear/quadratic fallbacks.
+Quadratic and cubic fits use normalized input during least-squares fitting. Quadratic coefficients incorporate the scale and evaluate on `delta`; cubic coefficients evaluate on `delta × inv_scale`. Error measurements use the stored float coefficients. Exported metadata includes `key_origin` and `inv_scale` so visualizations use the same coordinates. Non-finite intermediate predictions fall back to the segment start.
 
 ### Why Quantiles?
 
 We partition by element count, not value range. This is crucial. Imagine a dataset that's `[1, 2, 3, ..., 1000, 1000000, 1000001, ...]` - half the values are under 1000, half are in the millions. If we partitioned by value range, we'd have segments covering millions of values with only a few elements (slow, terrible model fit) and segments covering narrow ranges with tons of elements (still slow).
 
-Quantiles guarantee each segment has roughly the same number of elements, so search cost is bounded. Even if a segment covers values `[1, 1000000]`, if it only contains 1000 elements, our search is still fast.
+The initial quantiles have roughly equal element counts; refinement may split them further. Even if a segment covers values `[1, 1000000]`, if it only contains 1000 elements, our search is still fast.
 
 ### Cache-Conscious Design
 
 The implementation is careful about cache behavior:
 - Segment metadata is 64-byte aligned and packed tightly
 - We search segments (metadata) before searching data (values)
-- The exponential search pattern has good locality - we check nearby positions before jumping far away
+- Lookup checks the predicted position, then searches a nearby window
 - Binary search within small ranges (±8, ±16 elements) stays in cache
 
-For a 256-segment index, all segment metadata fits in ~16KB, easily fitting in L1 cache on modern CPUs. This means segment lookup is effectively free - the real cost is the final data access.
-
-## Deep Dive: Why Exponential Search?
-
-After predicting an index, we need to verify it. The naive approach: binary search the whole segment. But if predictions are good (error ≤ 5 elements), that's wasteful - we're doing log₂(4000) ≈ 12 comparisons when we should find it in 1-2.
-
-Exponential search adapts: check the prediction, then check ±1, ±2, ±4, ±8, ±16... This is effectively binary search on the error bound, not the segment size. For small errors (which is most of the time on reasonable data), we find elements in 2-3 comparisons. For large errors, we quickly discover that and escalate to wider searches.
-
-The maximum radius is `max_error + 2`, which we computed during segment analysis. If predictions are consistently off by 50 elements, we'll search ±64 before falling back to full segment search. This adapts to both the quality of the model and the actual data distribution.
+Segment storage depends on the value type and the number of segments after refinement. `size_in_bytes()` reports allocated segment storage; add `sizeof(index)` for the index object itself. Benchmark the actual workload to assess cache behavior and lookup cost.
 
 ## Related Work
 
@@ -571,14 +545,14 @@ JazzyIndex prioritizes simplicity and robustness. No exotic models, no complex o
 include/
   jazzy_index.hpp                 # Core index implementation
   jazzy_index_utility.hpp         # Arithmetic trait & clamp helper
-  dataset_generators.hpp          # Distribution generators (9 distributions)
 benchmarks/
+  dataset_generators.hpp          # Distribution generators (9 distributions)
   fixtures.hpp                    # Data builders shared across benchmarks
   benchmark_main.cpp              # Google Benchmark suite (9 distributions × 10 segment counts)
-  benchmark_range_functions.cpp   # Range query benchmarks (equal_range, lower_bound, upper_bound) [WIP]
+  benchmark_range_functions.cpp   # Range query benchmarks
 scripts/
   plot_benchmarks.py              # Render performance graphs (split into low/medium/high)
-  plot_range_benchmarks.sh        # Generate separate plots for each range function [WIP]
+  plot_range_benchmarks.sh        # Generate separate plots for each range function
   plot_index_structure.py         # Generate index structure visualizations
   generate_docs_plots.sh          # Generate all documentation plots
   requirements.txt                # Python dependencies for plotting
@@ -590,12 +564,13 @@ tests/
   gtest_comparator_tests.cpp      # Custom comparator tests
   gtest_error_recovery_tests.cpp  # Error recovery and fallback tests
   gtest_uniformity_tests.cpp      # Uniform detection tests
-  gtest_equal_range_tests.cpp     # Range query function tests [WIP]
+  gtest_equal_range_tests.cpp     # Range query function tests
   gtest_property_tests.cpp        # RapidCheck property-based tests
 docs/
   BENCHMARKS.md                   # Detailed performance analysis
   VISUALIZATIONS.md               # Guide to reading index structure plots
   MODEL_SELECTION.md              # Mathematical details of model fitting
+  DEFERRED_WORK.md                # Explicitly deferred product work and triggers
   images/
     benchmarks/                   # Performance plots (committed)
     index_data/                   # All index structure plots (270+ plots)
@@ -607,4 +582,4 @@ Contributions, bug reports, and performance data from real-world workloads are w
 
 ## License
 
-See LICENSE file for details.
+MIT. See [LICENSE](LICENSE).

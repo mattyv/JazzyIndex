@@ -89,8 +89,8 @@ ctest --output-on-failure
 
 ### Build Options
 
-- `BUILD_TESTS=ON/OFF` - Enable/disable test building (default: ON)
-- `BUILD_BENCHMARKS=ON/OFF` - Enable/disable benchmarks (default: ON)
+- `BUILD_TESTS=ON/OFF` - Enable/disable test building (default: OFF)
+- `BUILD_BENCHMARKS=ON/OFF` - Enable/disable benchmarks (default: OFF)
 - `CMAKE_BUILD_TYPE=Debug|Release|Coverage` - Build type
 
 ### Running Specific Tests
@@ -113,20 +113,20 @@ ctest --output-on-failure
 
 ```bash
 # Address Sanitizer
-cmake -B build_asan \
+cmake -B build_asan -DBUILD_TESTS=ON \
   -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer"
 cmake --build build_asan
 cd build_asan && ctest
 
 # Undefined Behavior Sanitizer
-cmake -B build_ubsan \
+cmake -B build_ubsan -DBUILD_TESTS=ON \
   -DCMAKE_CXX_FLAGS="-fsanitize=undefined"
 cmake --build build_ubsan
 cd build_ubsan && ctest
 
 # Thread Sanitizer
-cmake -B build_tsan \
+cmake -B build_tsan -DBUILD_TESTS=ON \
   -DCMAKE_CXX_FLAGS="-fsanitize=thread"
 cmake --build build_tsan
 cd build_tsan && ctest
@@ -141,7 +141,7 @@ cd build_tsan && ctest
 ./scripts/run_coverage.sh
 
 # Or manually:
-cmake -B build_coverage -DCMAKE_BUILD_TYPE=Coverage
+cmake -B build_coverage -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Coverage
 cmake --build build_coverage
 cd build_coverage
 ctest
@@ -417,7 +417,7 @@ CLion automatically detects Google Test. Configure:
 ### Xcode
 
 ```bash
-cmake -B build -G Xcode
+cmake -B build -G Xcode -DBUILD_TESTS=ON
 open build/jazzy_index.xcodeproj
 ```
 
@@ -458,3 +458,9 @@ When adding new features to JazzyIndex:
 ## License
 
 Tests are part of the JazzyIndex project and share the same license.
+
+Reporting regressions (requires `scripts/requirements.txt`):
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py'
+```

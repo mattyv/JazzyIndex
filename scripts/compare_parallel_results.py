@@ -26,17 +26,18 @@ def extract_timings(results: Dict) -> Dict[str, float]:
     timings = {}
     for bench in results.get('benchmarks', []):
         name = bench['name']
+        time_ns = bench['cpu_time'] * {'ns': 1, 'us': 1000, 'ms': 1000000, 's': 1000000000}[bench.get('time_unit', 'ns')]
         # Only keep _mean entries (most relevant for comparison)
         # Skip _median, _stddev, _cv, and individual runs
         if '_mean' in name:
             # Remove the _mean suffix for cleaner comparison
             clean_name = name.replace('_mean', '')
-            timings[clean_name] = bench['cpu_time']
+            timings[clean_name] = time_ns
         elif '_median' in name or '_stddev' in name or '_cv' in name:
             continue
         elif 'aggregate' not in bench.get('run_type', ''):
             # Also include non-aggregated single runs (when no repetitions)
-            timings[name] = bench['cpu_time']
+            timings.setdefault(name, time_ns)
     return timings
 
 def compare_timings(baseline: Dict[str, float],
@@ -53,11 +54,13 @@ def compare_timings(baseline: Dict[str, float],
             continue
 
         parallel_time = parallel[name]
+        if baseline_time <= 0:
+            raise ValueError(f"Non-positive baseline timing for {name}")
         degradation_pct = ((parallel_time - baseline_time) / baseline_time) * 100
         differences.append((name, degradation_pct, baseline_time, parallel_time))
 
     if not differences:
-        return 0.0, []
+        raise ValueError("No matching benchmarks; timing safety cannot be assessed")
 
     max_degradation = max(abs(d[1]) for d in differences)
 

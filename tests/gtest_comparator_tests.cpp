@@ -45,7 +45,7 @@ TEST(ComparatorTest, ReverseOrderWithGreater) {
     std::sort(data.begin(), data.end(), std::greater<int>{});
 
     // Build index with std::greater
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::greater<int>> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<8>(), std::greater<int>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -74,7 +74,7 @@ TEST(ComparatorTest, CustomReverseComparator) {
     std::vector<int> data{100, 90, 80, 70, 60, 50, 40, 30, 20, 10};
 
     // Build index with custom reverse comparator
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), ReverseCompare<int>> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), ReverseCompare<int>> index;
     index.build(data.data(), data.data() + data.size(), ReverseCompare<int>{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -109,7 +109,7 @@ TEST(ComparatorTest, AbsoluteValueComparator) {
     std::sort(data.begin(), data.end(), AbsoluteValueCompare{});
     // After sort: 0, -5, 5, -10, 10, -50, 50, -100, 100
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), AbsoluteValueCompare> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), AbsoluteValueCompare> index;
     index.build(data.data(), data.data() + data.size(), AbsoluteValueCompare{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -140,7 +140,7 @@ TEST(ComparatorTest, ExplicitStdLess) {
     std::vector<int> data(100);
     std::iota(data.begin(), data.end(), 0);
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::less<int>> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<8>(), std::less<int>> index;
     index.build(data.data(), data.data() + data.size(), std::less<int>{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -166,7 +166,7 @@ TEST(ComparatorTest, LambdaComparatorViaFunctionObject) {
     // Using std::function to wrap lambda
     auto comp = std::function<bool(int, int)>([](int a, int b) { return a < b; });
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), decltype(comp)> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), decltype(comp)> index;
     index.build(data.data(), data.data() + data.size(), comp);
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -187,7 +187,7 @@ TEST(ComparatorTest, ReverseOrderWithDuplicates) {
 
     std::vector<int> data{50, 50, 50, 40, 40, 30, 30, 20, 10, 10};
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), std::greater<int>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -214,7 +214,7 @@ TEST(ComparatorTest, FloatingPointReverseOrder) {
 
     std::vector<double> data{100.0, 75.5, 50.0, 25.5, 10.0, 5.0, 1.0};
 
-    jazzy::JazzyIndex<double, jazzy::to_segment_count<64>(), std::greater<double>> index;
+    jazzy::JazzyIndex<double, jazzy::to_segment_count<2>(), std::greater<double>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<double>{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -248,7 +248,7 @@ TEST(ComparatorTest, ModuloComparator) {
     std::sort(data.begin(), data.end(), ModuloCompare{});
     // After sort: 1, 11, 21, 2, 12, 22, 3, 13, 23
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), ModuloCompare> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), ModuloCompare> index;
     index.build(data.data(), data.data() + data.size(), ModuloCompare{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -279,7 +279,7 @@ TEST(ComparatorTest, LargeDatasetReverseOrder) {
     std::iota(data.begin(), data.end(), 0);
     std::reverse(data.begin(), data.end());
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<256>(), std::greater<int>> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<8>(), std::greater<int>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -306,7 +306,7 @@ TEST(ComparatorTest, TransparentComparator) {
 
     std::vector<int> data{100, 90, 80, 70, 60, 50, 40, 30, 20, 10};
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<>> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), std::greater<>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<>{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -330,7 +330,7 @@ TEST(ComparatorTest, RebuildWithDifferentComparator) {
     std::vector<int> data1{10, 20, 30, 40, 50};
     std::vector<int> data2{50, 40, 30, 20, 10};
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::less<int>> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), std::less<int>> index;
 
     // Build with ascending order
     index.build(data1.data(), data1.data() + data1.size(), std::less<int>{});
@@ -347,7 +347,7 @@ TEST(ComparatorTest, RebuildWithDifferentComparator) {
 
     // Rebuild with different comparator (note: this requires the index to support it)
     // In practice, you'd create a new index with different comparator template parameter
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index2;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), std::greater<int>> index2;
     index2.build(data2.data(), data2.data() + data2.size(), std::greater<int>{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -368,7 +368,7 @@ TEST(ComparatorTest, NegativeNumbersReverseOrder) {
 
     std::vector<int> data{0, -10, -20, -30, -40, -50};
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), std::greater<int>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -391,7 +391,7 @@ TEST(ComparatorTest, SingleElementCustomComparator) {
 
     std::vector<int> data{42};
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), std::greater<int>> index;
     index.build(data.data(), data.data() + data.size(), std::greater<int>{});
 
 #ifdef JAZZY_DEBUG_LOGGING
@@ -413,7 +413,7 @@ TEST(ComparatorTest, EmptyDatasetCustomComparator) {
 
     std::vector<int> data;
 
-    jazzy::JazzyIndex<int, jazzy::to_segment_count<64>(), std::greater<int>> index;
+    jazzy::JazzyIndex<int, jazzy::to_segment_count<2>(), std::greater<int>> index;
     index.build(data.data(), data.data(), std::greater<int>{});
 
 #ifdef JAZZY_DEBUG_LOGGING

@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <numeric>
 #include <vector>
 
@@ -39,6 +40,17 @@ using IntModelTest = ModelTest<int, 256>;
 using DoubleModelTest = ModelTest<double, 256>;
 
 }  // namespace
+
+TEST(ModelPredictionTest, ClampsNonFinitePredictionsBeforeIntegerConversion) {
+    jazzy::detail::Segment<int> segment{};
+    segment.model_type = jazzy::detail::ModelType::LINEAR;
+    segment.params.linear.slope = std::numeric_limits<float>::infinity();
+    segment.params.linear.intercept = 0.0f;
+    segment.start_idx = 3;
+    segment.end_idx = 8;
+
+    EXPECT_EQ(segment.predict(42), segment.start_idx);
+}
 
 // Test: CONSTANT model - all values are identical
 TEST_F(IntModelTest, ConstantModelAllIdenticalValues) {

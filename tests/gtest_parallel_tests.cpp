@@ -27,17 +27,11 @@ bool indexes_equal(const jazzy::JazzyIndex<T, Segments>& idx1,
         const T* result1 = idx1.find(val);
         const T* result2 = idx2.find(val);
 
-        // Both should return same result (found or not found)
-        if ((result1 == data.data() + data.size()) != (result2 == data.data() + data.size())) {
+        // Agreement is insufficient: both implementations must find the stored key.
+        if (result1 == idx1.end() || result2 == idx2.end()) {
             return false;
         }
-
-        // If found, values should match
-        if (result1 != data.data() + data.size()) {
-            if (*result1 != *result2) {
-                return false;
-            }
-        }
+        if (*result1 != val || *result2 != val) return false;
     }
 
     return true;
@@ -321,6 +315,20 @@ TEST_F(IntParallel, UnsortedDataThrows) {
         EXPECT_NE(build_log.find("JazzyIndex"), std::string::npos);
     }
 #endif
+}
+
+TEST_F(IntParallel, FailedBuildPreservesIndexAndRejectsInternalInversion) {
+    std::vector<int> good{1, 2, 3, 4};
+    std::vector<int> bad{5, 7, 6, 8};
+    IndexType index;
+    index.build_parallel(good.data(), good.data() + good.size());
+
+    EXPECT_THROW(index.build_parallel(bad.data(), bad.data() + bad.size()),
+                 std::runtime_error);
+
+    EXPECT_TRUE(index.is_built());
+    EXPECT_EQ(index.size(), good.size());
+    EXPECT_EQ(index.find(3), good.data() + 2);
 }
 
 // Test: Various segment counts
@@ -759,4 +767,23 @@ TEST_F(IntParallel, LargeSparseDataset) {
 #endif
 
     EXPECT_TRUE(indexes_equal(idx_single, idx_parallel, data));
+}
+
+// Regression: serial and parallel builds must run the same refinement and
+// produce identical segment counts on data that forces splitting.
+TEST(ParallelRefineParity, SplitForcingDataMatchesSerial) {
+    std::vector<std::int64_t> data;
+    data.reserve(4096);
+    for (std::int64_t i = 0; i < 4096; ++i) {
+        data.push_back(i < 2048 ? i : 100000000LL + i * 7);
+    }
+
+    using IndexType = jazzy::JazzyIndex<std::int64_t, jazzy::SegmentCount::SINGLE>;
+    IndexType serial;
+    serial.build(data.data(), data.data() + data.size());
+    IndexType parallel;
+    parallel.build_parallel(data.data(), data.data() + data.size());
+
+    EXPECT_GT(serial.num_segments(), 1u);
+    EXPECT_TRUE(indexes_equal(serial, parallel, data));
 }

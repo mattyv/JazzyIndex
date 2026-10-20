@@ -66,12 +66,13 @@ LOWER_BOUND_COLOR = "#000000"  # black
 LOWER_BOUND_MARKER = "x"
 LOWER_BOUND_LINEWIDTH = 2.5
 
-SCENARIO_ORDER = ["Found", "FoundMiddle", "FoundEnd", "NotFound"]
+SCENARIO_ORDER = ["Found", "FoundMiddle", "FoundEnd", "NotFound", "RandomMixed"]
 SCENARIO_STYLES = {
     "Found": "-",           # Solid line
     "FoundMiddle": "-.",    # Dash-dot line (matches main benchmarks)
     "FoundEnd": ":",        # Dotted line
     "NotFound": "--",       # Dashed line (matches main benchmarks)
+    "RandomMixed": "-",
 }
 SCENARIO_LINE_WIDTHS = {
     "Found": 2.5,
@@ -182,7 +183,7 @@ def parse_benchmark_name(name: str) -> BenchmarkKey:
         scenario = parts[1]  # FoundMiddle, FoundEnd, or NotFound
         size = int(parts[2])
 
-        return "JazzyIndex", distribution, scenario, segments, size
+        return "JazzyIndex", f"{distribution} ({function})", scenario, segments, size
 
     # Parse std:: baseline benchmarks: BM_Std_<Function>/<Distribution>/<Scenario>/<Size>
     elif parts[0].startswith("BM_Std_"):
@@ -196,7 +197,7 @@ def parse_benchmark_name(name: str) -> BenchmarkKey:
         scenario = parts[2]  # FoundMiddle, FoundEnd, or NotFound
         size = int(parts[3])
 
-        return f"Std{function}", distribution, scenario, None, size
+        return f"Std{function}", f"{distribution} ({function})", scenario, None, size
 
     else:
         raise ValueError(f"Unknown benchmark type: {parts[0]}")
@@ -214,10 +215,18 @@ def load_benchmark_data(path: Path):
 
     runs = payload.get("benchmarks", [])
     grouped = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    mean_names = {run.get("run_name", run.get("name", "").removesuffix("_mean"))
+                  for run in runs if run.get("aggregate_name") == "mean"}
 
     for run in runs:
-        name = run.get("name")
+        name = run.get("run_name", run.get("name"))
         if not name:
+            continue
+        if run.get("run_type") == "aggregate":
+            if run.get("aggregate_name") != "mean":
+                continue
+            name = name.removesuffix("_mean")
+        elif name in mean_names:
             continue
 
         try:
@@ -226,7 +235,7 @@ def load_benchmark_data(path: Path):
             # Skip unrelated benchmarks (e.g., warmup lines)
             continue
 
-        time_ns = float(run.get("real_time", 0.0))
+        time_ns = float(run["real_time"]) * {"ns": 1, "us": 1e3, "ms": 1e6, "s": 1e9}[run.get("time_unit", "ns")]
 
         # Use a key that identifies implementation + segments
         if impl == "LowerBound":

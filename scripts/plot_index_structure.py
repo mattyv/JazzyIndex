@@ -20,6 +20,24 @@ def load_index_data(json_file: Path) -> Dict[str, Any]:
         return json.load(f)
 
 
+def predict_segment(segment: Dict[str, Any], values: np.ndarray):
+    """Evaluate exported models; missing coordinates indicate a legacy export."""
+    params = segment['params']
+    x = values - segment.get('key_origin', 0)
+    model = segment['model_type']
+    if model == 'LINEAR':
+        predictions = params['slope'] * x + params['intercept']
+    elif model == 'QUADRATIC':
+        predictions = (params['a'] * x + params['b']) * x + params['c']
+    elif model == 'CUBIC':
+        x = x * segment.get('inv_scale', 1)
+        predictions = ((params['a'] * x + params['b']) * x + params['c']) * x + params['d']
+    else:
+        predictions = np.full_like(values, params.get('constant_idx', segment['start_idx']))
+    predictions = np.where(np.isfinite(predictions), predictions, segment['start_idx'])
+    return np.clip(predictions, segment['start_idx'], segment['end_idx'] - 1)
+
+
 def plot_segment_model(ax, segment: Dict[str, Any], keys: np.ndarray, alpha: float = 0.3):
     """Plot the prediction curve for a single segment."""
     model_type = segment['model_type']
@@ -39,38 +57,11 @@ def plot_segment_model(ax, segment: Dict[str, Any], keys: np.ndarray, alpha: flo
     else:
         values = np.array([min_val])
 
-    # Compute predicted indices based on model type
-    params = segment['params']
-
-    if model_type == 'LINEAR':
-        slope = params['slope']
-        intercept = params['intercept']
-        predictions = slope * values + intercept
-        color = 'red'
-        label = 'L'
-    elif model_type == 'QUADRATIC':
-        a = params['a']
-        b = params['b']
-        c = params['c']
-        predictions = a * values * values + b * values + c
-        color = 'blue'
-        label = 'Q'
-    elif model_type == 'CUBIC':
-        a = params['a']
-        b = params['b']
-        c = params['c']
-        d = params['d']
-        predictions = a * values * values * values + b * values * values + c * values + d
-        color = 'orange'
-        label = 'Cu'
-    elif model_type == 'CONSTANT':
-        predictions = np.full_like(values, params['constant_idx'])
-        color = 'green'
-        label = 'C'
-    else:  # DIRECT
-        predictions = np.full_like(values, start_idx)
-        color = 'purple'
-        label = 'D'
+    predictions = predict_segment(segment, values)
+    color, label = {
+        'LINEAR': ('red', 'L'), 'QUADRATIC': ('blue', 'Q'),
+        'CUBIC': ('orange', 'Cu'), 'CONSTANT': ('green', 'C'),
+    }.get(model_type, ('purple', 'D'))
 
     # Plot the prediction curve
     ax.plot(predictions, values, color=color, linewidth=2, alpha=alpha, zorder=2)
@@ -105,29 +96,7 @@ def plot_error_bands(ax, segment: Dict[str, Any], keys: np.ndarray):
     else:
         values = np.array([min_val])
 
-    # Compute predicted indices based on model type
-    model_type = segment['model_type']
-    params = segment['params']
-
-    if model_type == 'LINEAR':
-        slope = params['slope']
-        intercept = params['intercept']
-        predictions = slope * values + intercept
-    elif model_type == 'QUADRATIC':
-        a = params['a']
-        b = params['b']
-        c = params['c']
-        predictions = a * values * values + b * values + c
-    elif model_type == 'CUBIC':
-        a = params['a']
-        b = params['b']
-        c = params['c']
-        d = params['d']
-        predictions = a * values * values * values + b * values * values + c * values + d
-    elif model_type == 'CONSTANT':
-        predictions = np.full_like(values, params['constant_idx'])
-    else:  # DIRECT
-        predictions = np.full_like(values, start_idx)
+    predictions = predict_segment(segment, values)
 
     # Draw error band as a shaded region around the prediction line
     # fill_betweenx shades horizontally (along x-axis = index positions)

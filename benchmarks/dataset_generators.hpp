@@ -6,6 +6,7 @@
 #include <limits>
 #include <numeric>
 #include <random>
+#include <stdexcept>
 #include <vector>
 
 namespace dataset {
@@ -20,6 +21,16 @@ constexpr double kZipfA = 1.2;
 constexpr std::size_t kZipfMax = 1'000'000;
 constexpr double kMixedRatio = 0.5;
 
+inline std::uint64_t clamp_sample(double value, std::uint64_t min_value,
+                                  std::uint64_t max_value) {
+    if (min_value > max_value || std::isnan(value)) {
+        throw std::invalid_argument("invalid benchmark sample or key range");
+    }
+    if (value <= static_cast<double>(min_value)) return min_value;
+    if (value >= static_cast<double>(max_value)) return max_value;
+    return std::clamp(static_cast<std::uint64_t>(value), min_value, max_value);
+}
+
 inline std::vector<std::uint64_t> finalize_samples(std::vector<double>&& samples,
                                                    std::uint64_t min_value,
                                                    std::uint64_t max_value) {
@@ -30,24 +41,8 @@ inline std::vector<std::uint64_t> finalize_samples(std::vector<double>&& samples
     std::sort(samples.begin(), samples.end());
     std::vector<std::uint64_t> result(samples.size());
 
-    const double min_d = static_cast<double>(min_value);
-    const double max_d = static_cast<double>(max_value);
-
-    double clamped = std::clamp(samples.front(), min_d, max_d);
-    std::uint64_t prev = static_cast<std::uint64_t>(std::llround(clamped));
-    prev = std::clamp(prev, min_value, max_value);
-    result[0] = prev;
-
-    for (std::size_t idx = 1; idx < samples.size(); ++idx) {
-        double value = std::clamp(samples[idx], min_d, max_d);
-        if (value < static_cast<double>(prev)) {
-            value = static_cast<double>(prev);
-        }
-        std::uint64_t current =
-            static_cast<std::uint64_t>(std::llround(value));
-        current = std::clamp(current, prev, max_value);
-        result[idx] = current;
-        prev = current;
+    for (std::size_t idx = 0; idx < samples.size(); ++idx) {
+        result[idx] = clamp_sample(std::round(samples[idx]), min_value, max_value);
     }
     return result;
 }
@@ -103,10 +98,6 @@ inline std::vector<std::uint64_t> generate_clustered(std::size_t size,
         }
     }
 
-    if (samples.empty()) {
-        samples.push_back(min_value);
-    }
-
     return finalize_samples(std::move(samples), min_value, max_value);
 }
 
@@ -156,6 +147,7 @@ inline std::vector<std::uint64_t> generate_mixed(std::size_t size,
                                                  unsigned seed,
                                                  std::uint64_t min_value,
                                                  std::uint64_t max_value) {
+    if (size == 0) return {};
     exponential_ratio = std::clamp(exponential_ratio, 0.0, 1.0);
     const std::size_t exp_size = exponential_ratio <= 0.0
                                      ? 0
@@ -206,9 +198,7 @@ inline std::vector<std::uint64_t> generate_quadratic(std::size_t size,
                                                       unsigned seed,
                                                       std::uint64_t min_value,
                                                       std::uint64_t max_value) {
-    if (size == 0) {
-        return {};
-    }
+    if (size <= 1) return std::vector<std::uint64_t>(size, min_value);
 
     std::vector<std::uint64_t> result;
     result.reserve(size);
@@ -224,7 +214,7 @@ inline std::vector<std::uint64_t> generate_quadratic(std::size_t size,
         // tanh creates smooth S-curve: slow start, fast middle, slow end
         // Map from [-1, 1] to [0, range]
         const double normalized = (std::tanh(t) + 1.0) / 2.0;
-        const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
+        const std::uint64_t value = min_value + clamp_sample(normalized * range, 0, range);
         result.push_back(std::min(value, max_value));
     }
 
@@ -235,9 +225,7 @@ inline std::vector<std::uint64_t> generate_extreme_polynomial(std::size_t size,
                                                                 unsigned seed,
                                                                 std::uint64_t min_value,
                                                                 std::uint64_t max_value) {
-    if (size == 0) {
-        return {};
-    }
+    if (size <= 1) return std::vector<std::uint64_t>(size, min_value);
 
     std::vector<std::uint64_t> result;
     result.reserve(size);
@@ -252,7 +240,7 @@ inline std::vector<std::uint64_t> generate_extreme_polynomial(std::size_t size,
         const double t = static_cast<double>(i) / (size_d - 1.0);
         // Apply x^5 for extreme curvature - very slow start, explosive end
         const double normalized = std::pow(t, 5.0);
-        const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
+        const std::uint64_t value = min_value + clamp_sample(normalized * range, 0, range);
         result.push_back(std::min(value, max_value));
     }
 
@@ -263,9 +251,7 @@ inline std::vector<std::uint64_t> generate_inverse_polynomial(std::size_t size,
                                                                 unsigned seed,
                                                                 std::uint64_t min_value,
                                                                 std::uint64_t max_value) {
-    if (size == 0) {
-        return {};
-    }
+    if (size <= 1) return std::vector<std::uint64_t>(size, min_value);
 
     std::vector<std::uint64_t> result;
     result.reserve(size);
@@ -280,7 +266,7 @@ inline std::vector<std::uint64_t> generate_inverse_polynomial(std::size_t size,
         const double t = static_cast<double>(i) / (size_d - 1.0);
         // Apply 1 - (1-t)^5 for inverse curvature - fast start, slow end
         const double normalized = 1.0 - std::pow(1.0 - t, 5.0);
-        const std::uint64_t value = min_value + static_cast<std::uint64_t>(normalized * range);
+        const std::uint64_t value = min_value + clamp_sample(normalized * range, 0, range);
         result.push_back(std::min(value, max_value));
     }
 
