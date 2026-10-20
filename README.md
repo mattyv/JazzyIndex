@@ -43,6 +43,8 @@ That's a learned index. Build a lightweight model of your data's distribution, u
 
 ## Performance
 
+For current routing and batch measurements, see [Measured routing and batch results](docs/BENCHMARKS.md#measured-routing-and-batch-results-2026-10-20).
+
 The following is a historical fixed-query snapshot comparing JazzyIndex with `std::lower_bound` (black X markers):
 
 ![JazzyIndex vs std::lower_bound Benchmark Results](docs/images/benchmarks/jazzy_benchmarks_medium.png)
@@ -125,7 +127,18 @@ The lookup process has three stages:
 
 **Stage 1: Find the segment** (O(log segments) or O(1))
 - Fast path: If data is uniform, compute segment index arithmetically.
-- Slow path: Binary search through segment metadata (min/max values).
+- For eligible unsigned keys up to 64 bits with identity extraction and `std::less<>` or
+  `std::less<T>`, a contiguous, duplicate-free range returns its exact integer offset,
+  skipping model prediction and local search.
+- For nonuniform indexes with unsigned keys up to 64 bits, identity extraction, and
+  `std::less<>` or `std::less<T>`, a logarithmic radix directory keeps more buckets near
+  dense low-key tails and narrows the segment search. Its heap storage depends on key span,
+  up to about 1.625 MiB for the full `uint64_t` range. The default `uint64_t` index adds
+  32 bytes to its object, subject to implementation layout.
+- Newly built uniform indexes and indexes with a custom extractor or comparator use
+  the existing segment search and allocate no routing storage.
+- Duplicate keys use interval search within the directory bucket. Unique keys
+  use lower-bound search over the candidate segments' maximum keys.
 
 **Stage 2: Predict within segment**
 - Use the segment's model (constant/linear/quadratic) to predict the index.
@@ -139,10 +152,14 @@ The lookup process has three stages:
 
 ```mermaid
 flowchart TD
-    Start([Search for value X]) --> Uniform{Data uniform?}
+    Start([Search for value X]) --> Bounds{Nonempty index and<br/>X in range?}
+    Bounds -->|No| NotFound
+    Bounds -->|Yes| Dense{Eligible contiguous<br/>unique integers?}
+    Dense -->|Yes| Offset[Return exact offset]
+    Dense -->|No| Uniform{Data uniform?}
 
     Uniform -->|Yes| ArithSeg[Compute segment: <br/>idx = X - min × scale]
-    Uniform -->|No| BinSeg[Binary search segments]
+    Uniform -->|No| BinSeg[Narrow and search segments]
 
     ArithSeg --> Predict
     BinSeg --> Predict[Use segment's model<br/>to predict index]
@@ -262,6 +279,7 @@ JazzyIndex is header-only. Just include it and go:
 
 ```cpp
 #include "jazzy_index.hpp"
+#include <array>
 #include <iostream>
 #include <vector>
 
@@ -276,6 +294,11 @@ if (result != data.data() + data.size()) {
     std::cout << "Found at offset: " << (result - data.data()) << "\n";
 }
 
+// Look up independent keys together.
+std::array<int, 4> keys{1, 15, 16, 30};
+std::array<const int*, 4> results;
+index.find_batch(keys, results);
+
 // Customize segment count with a preset
 jazzy::JazzyIndex<int, jazzy::SegmentCount::XLARGE> fine_grained(
     data.data(), data.data() + data.size());
@@ -287,6 +310,9 @@ The template parameters are:
 - `Segments`: A `SegmentCount` preset (default `LARGE`, 256 segments)
 - `Compare`: Comparison functor (default `std::less<>`)
 - `KeyExtractor`: Numeric key projection (default identity)
+
+`find_batch` accepts matching `std::array` inputs and outputs. It is intended for
+independent lookups; each result is either a matching element or `end()`.
 
 ### Data lifetime and thread safety
 
@@ -526,7 +552,10 @@ The implementation is careful about cache behavior:
 - Lookup checks the predicted position, then searches a nearby window
 - Binary search within small ranges (±8, ±16 elements) stays in cache
 
-Segment storage depends on the value type and the number of segments after refinement. `size_in_bytes()` reports allocated segment storage; add `sizeof(index)` for the index object itself. Benchmark the actual workload to assess cache behavior and lookup cost.
+Storage depends on the value type, the number of segments after refinement, and, when eligible,
+the allocated routing directory. `size_in_bytes()` reports allocated segment and routing-directory
+capacities; add `sizeof(index)` for the index object itself. Benchmark the actual workload to assess
+cache behavior and lookup cost.
 
 ## Related Work
 

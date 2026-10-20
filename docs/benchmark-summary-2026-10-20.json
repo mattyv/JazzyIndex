@@ -1,0 +1,5463 @@
+{
+  "methodology": {
+    "hardware": "Apple M2, 8 GiB",
+    "operating_system": "macOS 27.0.1",
+    "compiler": "Apple Clang 21, Xcode 26.5 SDK",
+    "build": "-O3 -DNDEBUG -std=c++20",
+    "cpu_affinity": "none",
+    "queries_per_case": 262144,
+    "target_hit_ratio": 0.9,
+    "query_stream": "deterministic",
+    "execution_order": "randomized interleaving",
+    "minimum_time_seconds": 0.1,
+    "repetitions": 7,
+    "baseline_commit": "40e0e9c",
+    "baseline_header_sha1": "511cb02267222b6c6da9722101d2ae505d141452",
+    "unique_encoding_caveat": "Unique encodes each occurrence as key * (N + 1) + occurrence; it changes the key distribution and removes duplicates.",
+    "source_sha256": {
+      "include/jazzy_index.hpp": "bc61f39a663394989bd1ee5de655118715aebaf693c1066126a6146ebfccc76f",
+      "include/jazzy_index_parallel.hpp": "2f3feb3a6048a9c0fe0f57a0faa4a8792a5e8ab685c3d560a9e4cc263f25376c",
+      "benchmarks/benchmark_competitors.cpp": "b33afdc00d3b3b6fdf83d741cef7592096e7aa932e74c1ef7efd08eb824954ed",
+      "benchmarks/fixtures.hpp": "05fa5cd9da9f5dbde728a257d6c03197ea1b2648c8565798b14d570e37de13ab"
+    }
+  },
+  "sources": {
+    "broad": "build-review/ilp-stage2/broad/final_summary.json",
+    "final_batch": "build-review/ilp-stage2/final-batch/results.json",
+    "competitors": "build-review/ilp-stage2/final_competitors/results.json"
+  },
+  "broad_cases": [
+    {
+      "distribution": "Clustered",
+      "encoding": "Original",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          38.35805239992005,
+          38.842169569450675,
+          38.54083133127325,
+          38.442031908920384,
+          38.622615297554326,
+          38.41870426753194,
+          38.34707468632377
+        ],
+        "cpu_ns_per_lookup_median": 38.442031908920384,
+        "cpu_ns_per_lookup_cv_percent": 0.45788196385201435,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          25.332460803945903,
+          25.40486837195558,
+          25.698683000940022,
+          25.45398908392153,
+          25.394680372437115,
+          25.54822807947332,
+          25.31590530472638
+        ],
+        "cpu_ns_per_lookup_median": 25.40486837195558,
+        "cpu_ns_per_lookup_cv_percent": 0.528150236680764,
+        "index_bytes": 56512,
+        "backing_bytes": 80000,
+        "total_bytes": 136512
+      }
+    },
+    {
+      "distribution": "Clustered",
+      "encoding": "Original",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          57.66726881884202,
+          58.0290562887556,
+          58.39332458703538,
+          58.06668218562868,
+          58.14276092215821,
+          59.107389684796715,
+          58.89238455982398
+        ],
+        "cpu_ns_per_lookup_median": 58.14276092215821,
+        "cpu_ns_per_lookup_cv_percent": 0.8738489299454002,
+        "index_bytes": 116248,
+        "backing_bytes": 8000000,
+        "total_bytes": 8116248
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          35.2171008280151,
+          36.375939288957355,
+          35.59649446327165,
+          35.9481767440269,
+          35.982941897855085,
+          35.783923988258074,
+          36.31043972377528
+        ],
+        "cpu_ns_per_lookup_median": 35.9481767440269,
+        "cpu_ns_per_lookup_cv_percent": 1.1233077437718417,
+        "index_bytes": 375396,
+        "backing_bytes": 8000000,
+        "total_bytes": 8375396
+      }
+    },
+    {
+      "distribution": "Clustered",
+      "encoding": "Unique",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          45.5294134143519,
+          45.584849203240616,
+          45.54539196526798,
+          46.11996761245616,
+          45.927898908598685,
+          47.53031930036227,
+          45.936377323369356
+        ],
+        "cpu_ns_per_lookup_median": 45.927898908598685,
+        "cpu_ns_per_lookup_cv_percent": 1.5265059955036175,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          32.302018551435516,
+          32.29052390747964,
+          32.51443957173739,
+          32.387768595345605,
+          32.43282759965336,
+          32.45535710180519,
+          32.378342987303675
+        ],
+        "cpu_ns_per_lookup_median": 32.387768595345605,
+        "cpu_ns_per_lookup_cv_percent": 0.24960496580526811,
+        "index_bytes": 491328,
+        "backing_bytes": 80000,
+        "total_bytes": 571328
+      }
+    },
+    {
+      "distribution": "Clustered",
+      "encoding": "Unique",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          58.55787190969129,
+          58.90344900058824,
+          60.06520275448175,
+          60.589798747033484,
+          61.528921105828566,
+          60.951574764065,
+          60.26955843804388
+        ],
+        "cpu_ns_per_lookup_median": 60.26955843804388,
+        "cpu_ns_per_lookup_cv_percent": 1.7762129599040988,
+        "index_bytes": 116184,
+        "backing_bytes": 8000000,
+        "total_bytes": 8116184
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          38.42910148252993,
+          39.48765128404082,
+          39.33053431266572,
+          39.961949983744226,
+          39.649779490899526,
+          39.56046158784946,
+          39.39420648117817
+        ],
+        "cpu_ns_per_lookup_median": 39.48765128404082,
+        "cpu_ns_per_lookup_cv_percent": 1.2078967980636865,
+        "index_bytes": 1027796,
+        "backing_bytes": 8000000,
+        "total_bytes": 9027796
+      }
+    },
+    {
+      "distribution": "Exponential",
+      "encoding": "Original",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          14.193136692168006,
+          14.16473250072752,
+          14.246585439502047,
+          13.639916705471334,
+          14.180105378531083,
+          14.301357679628945,
+          14.396852774865527
+        ],
+        "cpu_ns_per_lookup_median": 14.193136692168006,
+        "cpu_ns_per_lookup_cv_percent": 1.7191874095313726,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          8.122192764807009,
+          8.100802097839104,
+          8.148047066887525,
+          8.091758889039411,
+          8.186248827136664,
+          8.148336913323291,
+          8.142887800328497
+        ],
+        "cpu_ns_per_lookup_median": 8.142887800328497,
+        "cpu_ns_per_lookup_cv_percent": 0.39635714968029945,
+        "index_bytes": 16548,
+        "backing_bytes": 80000,
+        "total_bytes": 96548
+      }
+    },
+    {
+      "distribution": "Exponential",
+      "encoding": "Original",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          11.414113519132263,
+          11.385893333158853,
+          11.339135547015218,
+          11.388872590328905,
+          11.256543917684898,
+          11.09475370191283,
+          11.201344902892144
+        ],
+        "cpu_ns_per_lookup_median": 11.339135547015218,
+        "cpu_ns_per_lookup_cv_percent": 1.0443740629917961,
+        "index_bytes": 19032,
+        "backing_bytes": 8000000,
+        "total_bytes": 8019032
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          6.419103834747575,
+          6.628807658853683,
+          6.424429063205543,
+          6.489204040397934,
+          6.421215563274252,
+          6.484246069074728,
+          6.487551383289873
+        ],
+        "cpu_ns_per_lookup_median": 6.484246069074728,
+        "cpu_ns_per_lookup_cv_percent": 1.136804787199317,
+        "index_bytes": 19124,
+        "backing_bytes": 8000000,
+        "total_bytes": 8019124
+      }
+    },
+    {
+      "distribution": "Exponential",
+      "encoding": "Unique",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          35.97125816865372,
+          36.07282395306831,
+          36.02782645364397,
+          35.83369438469801,
+          35.96328718304092,
+          39.80067393397734,
+          36.06048178179764
+        ],
+        "cpu_ns_per_lookup_median": 36.02782645364397,
+        "cpu_ns_per_lookup_cv_percent": 3.9504356714316575,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          13.748312702631099,
+          13.762203345512408,
+          13.914413488635994,
+          13.877241345713816,
+          13.738628381185183,
+          13.700086738261286,
+          13.949531381554202
+        ],
+        "cpu_ns_per_lookup_median": 13.762203345512408,
+        "cpu_ns_per_lookup_cv_percent": 0.7123910709777365,
+        "index_bytes": 159820,
+        "backing_bytes": 80000,
+        "total_bytes": 239820
+      }
+    },
+    {
+      "distribution": "Exponential",
+      "encoding": "Unique",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          37.968946655543306,
+          38.1043117176844,
+          37.845565623048266,
+          38.13345469887164,
+          37.96377173365107,
+          38.05419668461681,
+          38.53954988529587
+        ],
+        "cpu_ns_per_lookup_median": 38.05419668461681,
+        "cpu_ns_per_lookup_cv_percent": 0.58291713207584,
+        "index_bytes": 19032,
+        "backing_bytes": 8000000,
+        "total_bytes": 8019032
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          14.322897680841171,
+          14.798416099290728,
+          14.28241876741664,
+          14.575129189758421,
+          14.709623644038325,
+          14.85608766949118,
+          14.377087193972878
+        ],
+        "cpu_ns_per_lookup_median": 14.575129189758421,
+        "cpu_ns_per_lookup_cv_percent": 1.6200663494756906,
+        "index_bytes": 397532,
+        "backing_bytes": 8000000,
+        "total_bytes": 8397532
+      }
+    },
+    {
+      "distribution": "ExtremePoly",
+      "encoding": "Original",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          34.000164283077766,
+          34.00486515427246,
+          34.38786244953866,
+          33.93583657198705,
+          33.940784857455434,
+          34.08106875048851,
+          34.37499690732122
+        ],
+        "cpu_ns_per_lookup_median": 34.00486515427246,
+        "cpu_ns_per_lookup_cv_percent": 0.5741870251118781,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          16.48306157340453,
+          16.517747000927958,
+          16.665872782167494,
+          16.591275355849252,
+          16.637126640178042,
+          16.69034263857169,
+          16.63071221180058
+        ],
+        "cpu_ns_per_lookup_median": 16.63071221180058,
+        "cpu_ns_per_lookup_cv_percent": 0.4620126156762292,
+        "index_bytes": 56512,
+        "backing_bytes": 80000,
+        "total_bytes": 136512
+      }
+    },
+    {
+      "distribution": "ExtremePoly",
+      "encoding": "Original",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          39.274139011796244,
+          40.86049121186138,
+          41.67291497531469,
+          41.08485576605336,
+          41.12794754982954,
+          40.62003905839494,
+          40.63009380794377
+        ],
+        "cpu_ns_per_lookup_median": 40.86049121186138,
+        "cpu_ns_per_lookup_cv_percent": 1.8275889326173145,
+        "index_bytes": 99736,
+        "backing_bytes": 8000000,
+        "total_bytes": 8099736
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          16.450289181646596,
+          16.883011591686813,
+          16.886308291761914,
+          16.72293848797037,
+          16.64906798625915,
+          16.708164387630212,
+          16.680203486982705
+        ],
+        "cpu_ns_per_lookup_median": 16.708164387630212,
+        "cpu_ns_per_lookup_cv_percent": 0.8916671461262873,
+        "index_bytes": 358884,
+        "backing_bytes": 8000000,
+        "total_bytes": 8358884
+      }
+    },
+    {
+      "distribution": "ExtremePoly",
+      "encoding": "Unique",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          42.71854244706127,
+          42.80141889351392,
+          43.25145018546616,
+          43.41659369273733,
+          42.79593442279308,
+          43.12865897987633,
+          42.77034022609404
+        ],
+        "cpu_ns_per_lookup_median": 42.80141889351392,
+        "cpu_ns_per_lookup_cv_percent": 0.6472568599608678,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          27.211761595801075,
+          27.064440754259508,
+          27.141227346734105,
+          27.500541706940666,
+          27.225243211272858,
+          27.587879128916743,
+          28.596069503395693
+        ],
+        "cpu_ns_per_lookup_median": 27.225243211272858,
+        "cpu_ns_per_lookup_cv_percent": 1.9269584462561828,
+        "index_bytes": 491328,
+        "backing_bytes": 80000,
+        "total_bytes": 571328
+      }
+    },
+    {
+      "distribution": "ExtremePoly",
+      "encoding": "Unique",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          51.29407284526754,
+          53.622032578591366,
+          53.00623018240206,
+          54.94279649090671,
+          54.227256774110465,
+          53.798084061182635,
+          53.908777375346624
+        ],
+        "cpu_ns_per_lookup_median": 53.798084061182635,
+        "cpu_ns_per_lookup_cv_percent": 2.153700945034606,
+        "index_bytes": 99736,
+        "backing_bytes": 8000000,
+        "total_bytes": 8099736
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          37.10474389887053,
+          38.02325320131582,
+          37.46992782135764,
+          37.488065199272484,
+          37.625043008595135,
+          37.49564499899803,
+          37.55005713274062
+        ],
+        "cpu_ns_per_lookup_median": 37.49564499899803,
+        "cpu_ns_per_lookup_cv_percent": 0.7212773206348561,
+        "index_bytes": 1011348,
+        "backing_bytes": 8000000,
+        "total_bytes": 9011348
+      }
+    },
+    {
+      "distribution": "InversePoly",
+      "encoding": "Original",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          33.969540947027745,
+          33.991407091239374,
+          34.18261437451076,
+          34.0587062239805,
+          34.29971972462301,
+          34.536359996422156,
+          34.22416004851493
+        ],
+        "cpu_ns_per_lookup_median": 34.18261437451076,
+        "cpu_ns_per_lookup_cv_percent": 0.5825092089969524,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          16.154737701361867,
+          15.974133930077851,
+          15.828748444479592,
+          15.863746615880563,
+          16.216809929883908,
+          15.839423987328612,
+          15.868479073019024
+        ],
+        "cpu_ns_per_lookup_median": 15.868479073019024,
+        "cpu_ns_per_lookup_cv_percent": 1.0015642440511652,
+        "index_bytes": 56512,
+        "backing_bytes": 80000,
+        "total_bytes": 136512
+      }
+    },
+    {
+      "distribution": "InversePoly",
+      "encoding": "Original",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          39.37732808306121,
+          39.25800371774456,
+          41.05016942622268,
+          39.768366966990754,
+          39.84686227236563,
+          39.94203423602855,
+          39.95612313699485
+        ],
+        "cpu_ns_per_lookup_median": 39.84686227236563,
+        "cpu_ns_per_lookup_cv_percent": 1.4589946081779512,
+        "index_bytes": 99864,
+        "backing_bytes": 8000000,
+        "total_bytes": 8099864
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          20.543054263864512,
+          20.845279800311992,
+          21.00279246155846,
+          21.022368604926562,
+          20.837298757245637,
+          21.07161013478088,
+          20.829016542743624
+        ],
+        "cpu_ns_per_lookup_median": 20.845279800311992,
+        "cpu_ns_per_lookup_cv_percent": 0.8550199088557274,
+        "index_bytes": 359012,
+        "backing_bytes": 8000000,
+        "total_bytes": 8359012
+      }
+    },
+    {
+      "distribution": "InversePoly",
+      "encoding": "Unique",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          42.585811603097945,
+          42.76060115403804,
+          43.428034901783434,
+          42.77859868197198,
+          43.41644327362118,
+          42.96711516099534,
+          42.923494033969256
+        ],
+        "cpu_ns_per_lookup_median": 42.923494033969256,
+        "cpu_ns_per_lookup_cv_percent": 0.7590888382567113,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          31.62759292140048,
+          32.165863530941664,
+          31.711938610849586,
+          31.700828560357667,
+          32.093761570606446,
+          31.689945245591908,
+          31.673847009160585
+        ],
+        "cpu_ns_per_lookup_median": 31.700828560357667,
+        "cpu_ns_per_lookup_cv_percent": 0.6969774155786967,
+        "index_bytes": 491328,
+        "backing_bytes": 80000,
+        "total_bytes": 571328
+      }
+    },
+    {
+      "distribution": "InversePoly",
+      "encoding": "Unique",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          52.11030699877938,
+          54.03252076456206,
+          53.27556934605605,
+          53.38402693650934,
+          53.054901307344394,
+          53.838498016235754,
+          53.31497435296532
+        ],
+        "cpu_ns_per_lookup_median": 53.31497435296532,
+        "cpu_ns_per_lookup_cv_percent": 1.1640989218941962,
+        "index_bytes": 99864,
+        "backing_bytes": 8000000,
+        "total_bytes": 8099864
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          39.54185132014234,
+          40.1133489359434,
+          39.92609470711747,
+          40.003687820288356,
+          40.05350775272626,
+          40.01542699976805,
+          40.51076310965651
+        ],
+        "cpu_ns_per_lookup_median": 40.01542699976805,
+        "cpu_ns_per_lookup_cv_percent": 0.7127964709141719,
+        "index_bytes": 1011476,
+        "backing_bytes": 8000000,
+        "total_bytes": 9011476
+      }
+    },
+    {
+      "distribution": "Lognormal",
+      "encoding": "Original",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          16.128711630062398,
+          16.049425699833574,
+          15.243811704418816,
+          15.247488733067227,
+          16.053332542771514,
+          16.045174135459906,
+          16.675554734352563
+        ],
+        "cpu_ns_per_lookup_median": 16.049425699833574,
+        "cpu_ns_per_lookup_cv_percent": 3.2172641445159966,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          9.70085496189981,
+          10.085896016286425,
+          9.703839776275007,
+          9.706338690635649,
+          9.792967721800775,
+          9.739449305912794,
+          9.716820248091784
+        ],
+        "cpu_ns_per_lookup_median": 9.716820248091784,
+        "cpu_ns_per_lookup_cv_percent": 1.4271453540622292,
+        "index_bytes": 16664,
+        "backing_bytes": 80000,
+        "total_bytes": 96664
+      }
+    },
+    {
+      "distribution": "Lognormal",
+      "encoding": "Original",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          14.957094346228644,
+          14.891003809931176,
+          14.894227738531303,
+          14.917332560163773,
+          14.75441670158428,
+          15.11818331193548,
+          14.89089634564593
+        ],
+        "cpu_ns_per_lookup_median": 14.894227738531303,
+        "cpu_ns_per_lookup_cv_percent": 0.7260693537940855,
+        "index_bytes": 21336,
+        "backing_bytes": 8000000,
+        "total_bytes": 8021336
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          8.534378164597545,
+          8.604625480884659,
+          8.568770079863008,
+          8.454862105188333,
+          8.560720908205917,
+          8.464252805456455,
+          8.460106262481235
+        ],
+        "cpu_ns_per_lookup_median": 8.534378164597545,
+        "cpu_ns_per_lookup_cv_percent": 0.7160039512961772,
+        "index_bytes": 21596,
+        "backing_bytes": 8000000,
+        "total_bytes": 8021596
+      }
+    },
+    {
+      "distribution": "Lognormal",
+      "encoding": "Unique",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          35.7111353892103,
+          36.43445002647534,
+          36.01002362214231,
+          35.60579582379763,
+          35.65411907103955,
+          35.55108061263662,
+          35.95403001819858
+        ],
+        "cpu_ns_per_lookup_median": 35.7111353892103,
+        "cpu_ns_per_lookup_cv_percent": 0.8707416309453005,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          14.539053358684937,
+          14.571567353207374,
+          14.689885052122591,
+          14.532612886926637,
+          14.746083362142631,
+          14.780986563929387,
+          14.529808165354165
+        ],
+        "cpu_ns_per_lookup_median": 14.571567353207374,
+        "cpu_ns_per_lookup_cv_percent": 0.7437442529653099,
+        "index_bytes": 227856,
+        "backing_bytes": 80000,
+        "total_bytes": 307856
+      }
+    },
+    {
+      "distribution": "Lognormal",
+      "encoding": "Unique",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          38.710633850527735,
+          38.531656389452486,
+          38.267031526494335,
+          37.84932260303222,
+          38.825873710203766,
+          37.818591973786354,
+          37.77647963000311
+        ],
+        "cpu_ns_per_lookup_median": 38.267031526494335,
+        "cpu_ns_per_lookup_cv_percent": 1.1662212910892809,
+        "index_bytes": 21336,
+        "backing_bytes": 8000000,
+        "total_bytes": 8021336
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          14.737414698419053,
+          14.934188947730133,
+          15.086961197195349,
+          15.054520947309042,
+          14.975833697585312,
+          14.996263197513274,
+          15.21211994675754
+        ],
+        "cpu_ns_per_lookup_median": 14.996263197513274,
+        "cpu_ns_per_lookup_cv_percent": 0.9790977482028544,
+        "index_bytes": 468300,
+        "backing_bytes": 8000000,
+        "total_bytes": 8468300
+      }
+    },
+    {
+      "distribution": "Mixed",
+      "encoding": "Original",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          10.617699041986707,
+          10.658376143105349,
+          10.875871049086395,
+          10.790839396748073,
+          10.878347699153984,
+          10.75076269564596,
+          11.031449703365427
+        ],
+        "cpu_ns_per_lookup_median": 10.790839396748073,
+        "cpu_ns_per_lookup_cv_percent": 1.316262661065099,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          6.532446172290748,
+          6.540567622132198,
+          6.616741220642706,
+          6.580148021358295,
+          6.519703897540027,
+          6.606892795835234,
+          6.574266971473193
+        ],
+        "cpu_ns_per_lookup_median": 6.574266971473193,
+        "cpu_ns_per_lookup_cv_percent": 0.5704366964568669,
+        "index_bytes": 16540,
+        "backing_bytes": 80000,
+        "total_bytes": 96540
+      }
+    },
+    {
+      "distribution": "Mixed",
+      "encoding": "Original",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          10.587337459930245,
+          10.603796231096608,
+          10.567850895955166,
+          10.636170323438535,
+          10.567540353103201,
+          10.612724338097882,
+          10.570412874485937
+        ],
+        "cpu_ns_per_lookup_median": 10.587337459930245,
+        "cpu_ns_per_lookup_cv_percent": 0.2494358698688289,
+        "index_bytes": 18840,
+        "backing_bytes": 8000000,
+        "total_bytes": 8018840
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          6.399170003526454,
+          6.387599590727558,
+          6.493882750193024,
+          6.384032427888103,
+          6.39930720209709,
+          6.380739662190571,
+          6.441610094741879
+        ],
+        "cpu_ns_per_lookup_median": 6.399170003526454,
+        "cpu_ns_per_lookup_cv_percent": 0.6449236637749335,
+        "index_bytes": 18928,
+        "backing_bytes": 8000000,
+        "total_bytes": 8018928
+      }
+    },
+    {
+      "distribution": "Mixed",
+      "encoding": "Unique",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          35.69834037873861,
+          35.784406768199524,
+          36.134563775321915,
+          35.67810453121571,
+          36.03799523714666,
+          35.79772656656446,
+          35.757511021495745
+        ],
+        "cpu_ns_per_lookup_median": 35.784406768199524,
+        "cpu_ns_per_lookup_cv_percent": 0.4884887963753814,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          13.62645086625833,
+          13.66691929366892,
+          13.684764407443929,
+          14.45610238531641,
+          13.665651607991947,
+          13.630936523272448,
+          13.862727973766468
+        ],
+        "cpu_ns_per_lookup_median": 13.66691929366892,
+        "cpu_ns_per_lookup_cv_percent": 2.178362072340244,
+        "index_bytes": 149820,
+        "backing_bytes": 80000,
+        "total_bytes": 229820
+      }
+    },
+    {
+      "distribution": "Mixed",
+      "encoding": "Unique",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          37.00630013845881,
+          37.163185365745726,
+          37.35623396746061,
+          37.897089140855954,
+          37.46312864774877,
+          37.33575911576059,
+          37.20998502677288
+        ],
+        "cpu_ns_per_lookup_median": 37.33575911576059,
+        "cpu_ns_per_lookup_cv_percent": 0.7612101124148942,
+        "index_bytes": 18840,
+        "backing_bytes": 8000000,
+        "total_bytes": 8018840
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          13.308204141780058,
+          13.667700585758961,
+          13.726529159708518,
+          13.743722017588222,
+          13.790536305308756,
+          13.836418450131974,
+          13.618504155078954
+        ],
+        "cpu_ns_per_lookup_median": 13.726529159708518,
+        "cpu_ns_per_lookup_cv_percent": 1.2824424813298656,
+        "index_bytes": 393432,
+        "backing_bytes": 8000000,
+        "total_bytes": 8393432
+      }
+    },
+    {
+      "distribution": "Quadratic",
+      "encoding": "Original",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          37.62252461018023,
+          37.535079324210095,
+          37.630351503061625,
+          37.89970457527784,
+          37.7418172533847,
+          37.74802478912067,
+          37.75882050344143
+        ],
+        "cpu_ns_per_lookup_median": 37.7418172533847,
+        "cpu_ns_per_lookup_cv_percent": 0.31615298042957696,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          15.154420450992372,
+          15.151488829435785,
+          15.139110871756149,
+          15.149534415065112,
+          15.324345922657638,
+          15.162889579931823,
+          15.355399395435109
+        ],
+        "cpu_ns_per_lookup_median": 15.154420450992372,
+        "cpu_ns_per_lookup_cv_percent": 0.609157531250056,
+        "index_bytes": 56316,
+        "backing_bytes": 80000,
+        "total_bytes": 136316
+      }
+    },
+    {
+      "distribution": "Quadratic",
+      "encoding": "Original",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          38.911805741386495,
+          39.27337028079799,
+          39.01474925260753,
+          39.30674978443679,
+          39.1266687648082,
+          39.54685781060625,
+          41.14514698481845
+        ],
+        "cpu_ns_per_lookup_median": 39.27337028079799,
+        "cpu_ns_per_lookup_cv_percent": 1.9386283242914126,
+        "index_bytes": 22488,
+        "backing_bytes": 8000000,
+        "total_bytes": 8022488
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          14.70616706973482,
+          14.93049914518069,
+          14.978269671566101,
+          15.038140661682728,
+          14.953858301254453,
+          14.832117113969662,
+          14.975849578819858
+        ],
+        "cpu_ns_per_lookup_median": 14.953858301254453,
+        "cpu_ns_per_lookup_cv_percent": 0.7499637501391941,
+        "index_bytes": 281324,
+        "backing_bytes": 8000000,
+        "total_bytes": 8281324
+      }
+    },
+    {
+      "distribution": "Quadratic",
+      "encoding": "Unique",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          45.459683313032656,
+          45.437596427122116,
+          46.08103938286621,
+          45.93617539585959,
+          45.9582622817707,
+          45.53666260657835,
+          45.94656922451835
+        ],
+        "cpu_ns_per_lookup_median": 45.93617539585959,
+        "cpu_ns_per_lookup_cv_percent": 0.599766535991941,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          32.387928123203885,
+          32.30658061805113,
+          32.33052002670956,
+          32.40652183866846,
+          32.22081710547369,
+          32.445103798255516,
+          32.852771009795106
+        ],
+        "cpu_ns_per_lookup_median": 32.387928123203885,
+        "cpu_ns_per_lookup_cv_percent": 0.6291682999020036,
+        "index_bytes": 491088,
+        "backing_bytes": 80000,
+        "total_bytes": 571088
+      }
+    },
+    {
+      "distribution": "Quadratic",
+      "encoding": "Unique",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          47.190204291804974,
+          47.860618820728256,
+          47.88941378533416,
+          47.937857078734496,
+          49.06594216277286,
+          48.18888141725656,
+          48.50325467790947
+        ],
+        "cpu_ns_per_lookup_median": 47.937857078734496,
+        "cpu_ns_per_lookup_cv_percent": 1.2180142300515622,
+        "index_bytes": 22488,
+        "backing_bytes": 8000000,
+        "total_bytes": 8022488
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          36.365464128371784,
+          36.95662723979444,
+          37.16994726195695,
+          37.47579484373534,
+          37.514725747780496,
+          37.08915230356361,
+          36.99609144389082
+        ],
+        "cpu_ns_per_lookup_median": 37.08915230356361,
+        "cpu_ns_per_lookup_cv_percent": 1.036674613029654,
+        "index_bytes": 933804,
+        "backing_bytes": 8000000,
+        "total_bytes": 8933804
+      }
+    },
+    {
+      "distribution": "Uniform",
+      "encoding": "Original",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          7.581102827348406,
+          7.6269745079979545,
+          7.691474828911399,
+          7.7164565892650945,
+          7.71004962917429,
+          7.6008621076284255,
+          7.7095650691671205
+        ],
+        "cpu_ns_per_lookup_median": 7.691474828911399,
+        "cpu_ns_per_lookup_cv_percent": 0.7518597398869757,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          3.4130041743445916,
+          3.430196437389204,
+          3.387385759779615,
+          3.4223287915890106,
+          3.391343865537058,
+          3.382844865444482,
+          3.393480756988875
+        ],
+        "cpu_ns_per_lookup_median": 3.393480756988875,
+        "cpu_ns_per_lookup_cv_percent": 0.5484344341444405,
+        "index_bytes": 16504,
+        "backing_bytes": 80000,
+        "total_bytes": 96504
+      }
+    },
+    {
+      "distribution": "Uniform",
+      "encoding": "Original",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          7.976070436889344,
+          8.013977161114198,
+          8.034366810697179,
+          8.00389498632042,
+          7.974211711927946,
+          8.11660130901557,
+          7.978154461846968
+        ],
+        "cpu_ns_per_lookup_median": 8.00389498632042,
+        "cpu_ns_per_lookup_cv_percent": 0.6311642505411508,
+        "index_bytes": 16472,
+        "backing_bytes": 8000000,
+        "total_bytes": 8016472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          3.4106519220599334,
+          3.404135405692912,
+          3.44045217106393,
+          3.40747908637566,
+          3.4028906778475507,
+          3.454315022361547,
+          3.444430418883845
+        ],
+        "cpu_ns_per_lookup_median": 3.4106519220599334,
+        "cpu_ns_per_lookup_cv_percent": 0.6417902434604837,
+        "index_bytes": 16504,
+        "backing_bytes": 8000000,
+        "total_bytes": 8016504
+      }
+    },
+    {
+      "distribution": "Uniform",
+      "encoding": "Unique",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          11.219868458541166,
+          11.398922146557721,
+          11.239130173074088,
+          11.349885031641305,
+          11.365775946131128,
+          11.279258745018218,
+          11.212484801304624
+        ],
+        "cpu_ns_per_lookup_median": 11.279258745018218,
+        "cpu_ns_per_lookup_cv_percent": 0.6727460891544033,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          11.474299074303541,
+          11.563974320976424,
+          11.392888827323715,
+          11.317098780135428,
+          11.359746178553005,
+          11.405286326864179,
+          11.545130121675847
+        ],
+        "cpu_ns_per_lookup_median": 11.405286326864179,
+        "cpu_ns_per_lookup_cv_percent": 0.8179041400105298,
+        "index_bytes": 16504,
+        "backing_bytes": 80000,
+        "total_bytes": 96504
+      }
+    },
+    {
+      "distribution": "Uniform",
+      "encoding": "Unique",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          11.922777756953487,
+          12.177610487658153,
+          11.874198227974798,
+          12.31430451737463,
+          12.132947158712964,
+          12.054250186625518,
+          11.864687456467433
+        ],
+        "cpu_ns_per_lookup_median": 12.054250186625518,
+        "cpu_ns_per_lookup_cv_percent": 1.415248496059891,
+        "index_bytes": 16472,
+        "backing_bytes": 8000000,
+        "total_bytes": 8016472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          12.17256641298604,
+          12.376297413771391,
+          12.304409337442994,
+          12.2913212807088,
+          12.415946526820182,
+          12.359841107140557,
+          12.27294025985444
+        ],
+        "cpu_ns_per_lookup_median": 12.304409337442994,
+        "cpu_ns_per_lookup_cv_percent": 0.6519656380105334,
+        "index_bytes": 16504,
+        "backing_bytes": 8000000,
+        "total_bytes": 8016504
+      }
+    },
+    {
+      "distribution": "Zipf",
+      "encoding": "Original",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          30.348127907069784,
+          30.551626835675286,
+          30.551194778502346,
+          30.38269248093055,
+          30.602609582121143,
+          30.241625813860676,
+          30.24961887156426
+        ],
+        "cpu_ns_per_lookup_median": 30.38269248093055,
+        "cpu_ns_per_lookup_cv_percent": 0.4936114511783178,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          21.044211731241393,
+          21.2229545692512,
+          21.122477825991353,
+          21.018677040097135,
+          21.073523743560973,
+          21.427081005558637,
+          21.07155953654946
+        ],
+        "cpu_ns_per_lookup_median": 21.073523743560973,
+        "cpu_ns_per_lookup_cv_percent": 0.6761863355806611,
+        "index_bytes": 56508,
+        "backing_bytes": 80000,
+        "total_bytes": 136508
+      }
+    },
+    {
+      "distribution": "Zipf",
+      "encoding": "Original",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          36.47539584483738,
+          36.43708764941181,
+          36.37975565625664,
+          36.27994586817502,
+          36.69873001817032,
+          36.409724652677674,
+          36.442299648789295
+        ],
+        "cpu_ns_per_lookup_median": 36.43708764941181,
+        "cpu_ns_per_lookup_cv_percent": 0.3508525128865364,
+        "index_bytes": 143320,
+        "backing_bytes": 8000000,
+        "total_bytes": 8143320
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          20.043511164292163,
+          20.17859862150073,
+          20.244480846620842,
+          20.144068244738634,
+          20.232200168693467,
+          20.179032057192757,
+          20.31253025019903
+        ],
+        "cpu_ns_per_lookup_median": 20.179032057192757,
+        "cpu_ns_per_lookup_cv_percent": 0.4220972239875245,
+        "index_bytes": 402460,
+        "backing_bytes": 8000000,
+        "total_bytes": 8402460
+      }
+    },
+    {
+      "distribution": "Zipf",
+      "encoding": "Unique",
+      "n": 10000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          42.34231178738523,
+          42.29809985597766,
+          42.380770111280356,
+          42.50613819075232,
+          42.50159586903094,
+          42.40166479119307,
+          42.508560762332316
+        ],
+        "cpu_ns_per_lookup_median": 42.40166479119307,
+        "cpu_ns_per_lookup_cv_percent": 0.20345307003492188,
+        "index_bytes": 16472,
+        "backing_bytes": 80000,
+        "total_bytes": 96472
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          31.15908542599452,
+          31.041339965515093,
+          31.051096651504913,
+          31.030474565206998,
+          31.02271356498535,
+          31.07593185220913,
+          31.022270079259616
+        ],
+        "cpu_ns_per_lookup_median": 31.041339965515093,
+        "cpu_ns_per_lookup_cv_percent": 0.1563251940556866,
+        "index_bytes": 491324,
+        "backing_bytes": 80000,
+        "total_bytes": 571324
+      }
+    },
+    {
+      "distribution": "Zipf",
+      "encoding": "Unique",
+      "n": 1000000,
+      "original_baseline": {
+        "cpu_ns_per_lookup_samples": [
+          53.81545283456333,
+          53.86576284095217,
+          54.12505287388182,
+          54.35918790361566,
+          54.09680187029514,
+          53.68464681794987,
+          54.13821087555128
+        ],
+        "cpu_ns_per_lookup_median": 54.09680187029514,
+        "cpu_ns_per_lookup_cv_percent": 0.42998021187441776,
+        "index_bytes": 143256,
+        "backing_bytes": 8000000,
+        "total_bytes": 8143256
+      },
+      "production": {
+        "cpu_ns_per_lookup_samples": [
+          32.47176108368549,
+          32.52371398610228,
+          32.840698515151345,
+          32.49187188461978,
+          32.458832711654296,
+          32.52323515750806,
+          32.32930957705119
+        ],
+        "cpu_ns_per_lookup_median": 32.49187188461978,
+        "cpu_ns_per_lookup_cv_percent": 0.47983446499258464,
+        "index_bytes": 1054860,
+        "backing_bytes": 8000000,
+        "total_bytes": 9054860
+      }
+    }
+  ],
+  "final_batch_cases": [
+    {
+      "benchmark_name": "FinalBatch/Clustered/Original/N1000000/Batch4",
+      "distribution": "Clustered",
+      "encoding": "Original",
+      "n": 1000000,
+      "mode": "Batch4",
+      "cpu_ns_per_lookup_samples": [
+        32.44801156441332,
+        32.8369989516918,
+        32.5956805179829,
+        32.83157341505913,
+        32.69404785606399,
+        32.54590711669999,
+        32.3418597607293
+      ],
+      "cpu_ns_per_lookup_median": 32.5956805179829,
+      "cpu_ns_per_lookup_cv_percent": 0.5737150516604156
+    },
+    {
+      "benchmark_name": "FinalBatch/Clustered/Original/N1000000/Scalar",
+      "distribution": "Clustered",
+      "encoding": "Original",
+      "n": 1000000,
+      "mode": "Scalar",
+      "cpu_ns_per_lookup_samples": [
+        34.19913173854692,
+        34.36248371113938,
+        34.19814322434058,
+        34.625675618569005,
+        33.78148448638176,
+        34.48530660127292,
+        34.50853668512133
+      ],
+      "cpu_ns_per_lookup_median": 34.36248371113938,
+      "cpu_ns_per_lookup_cv_percent": 0.8215453836263936
+    },
+    {
+      "benchmark_name": "FinalBatch/Clustered/Unique/N1000000/Batch4",
+      "distribution": "Clustered",
+      "encoding": "Unique",
+      "n": 1000000,
+      "mode": "Batch4",
+      "cpu_ns_per_lookup_samples": [
+        33.88845255815168,
+        35.318336898763384,
+        34.77650128171474,
+        34.81281734183877,
+        34.96147108127898,
+        35.38927426953876,
+        35.32850539559843
+      ],
+      "cpu_ns_per_lookup_median": 34.96147108127898,
+      "cpu_ns_per_lookup_cv_percent": 1.4985435086096532
+    },
+    {
+      "benchmark_name": "FinalBatch/Clustered/Unique/N1000000/Scalar",
+      "distribution": "Clustered",
+      "encoding": "Unique",
+      "n": 1000000,
+      "mode": "Scalar",
+      "cpu_ns_per_lookup_samples": [
+        36.6490845396259,
+        38.33617555687753,
+        38.58153215678453,
+        38.244960010575426,
+        38.3486020226057,
+        37.78993985061823,
+        37.591380791856636
+      ],
+      "cpu_ns_per_lookup_median": 38.244960010575426,
+      "cpu_ns_per_lookup_cv_percent": 1.7482011707439924
+    },
+    {
+      "benchmark_name": "FinalBatch/Uniform/Original/N1000000/Batch4",
+      "distribution": "Uniform",
+      "encoding": "Original",
+      "n": 1000000,
+      "mode": "Batch4",
+      "cpu_ns_per_lookup_samples": [
+        2.692287350944369,
+        2.689347018702976,
+        2.6928446688202086,
+        2.6943436617275762,
+        2.6882131650935595,
+        2.685945457874692,
+        2.6871369650574777
+      ],
+      "cpu_ns_per_lookup_median": 2.689347018702976,
+      "cpu_ns_per_lookup_cv_percent": 0.11799114244137497
+    },
+    {
+      "benchmark_name": "FinalBatch/Uniform/Original/N1000000/Scalar",
+      "distribution": "Uniform",
+      "encoding": "Original",
+      "n": 1000000,
+      "mode": "Scalar",
+      "cpu_ns_per_lookup_samples": [
+        2.610971217676224,
+        2.670858957622932,
+        2.67921191761549,
+        2.668304592625262,
+        2.6624127726304776,
+        2.650666422640913,
+        2.630231502659092
+      ],
+      "cpu_ns_per_lookup_median": 2.6624127726304776,
+      "cpu_ns_per_lookup_cv_percent": 0.9256045886593043
+    },
+    {
+      "benchmark_name": "FinalBatch/Uniform/Unique/N1000000/Batch4",
+      "distribution": "Uniform",
+      "encoding": "Unique",
+      "n": 1000000,
+      "mode": "Batch4",
+      "cpu_ns_per_lookup_samples": [
+        11.538470433268321,
+        11.716957438324075,
+        11.626185935058855,
+        11.691931264084438,
+        11.744957019404039,
+        11.728355497878821,
+        11.70258597192914
+      ],
+      "cpu_ns_per_lookup_median": 11.70258597192914,
+      "cpu_ns_per_lookup_cv_percent": 0.6202986926478908
+    },
+    {
+      "benchmark_name": "FinalBatch/Uniform/Unique/N1000000/Scalar",
+      "distribution": "Uniform",
+      "encoding": "Unique",
+      "n": 1000000,
+      "mode": "Scalar",
+      "cpu_ns_per_lookup_samples": [
+        11.679691275383824,
+        11.755624072901899,
+        11.815285556666074,
+        12.191037315813018,
+        11.734373559310884,
+        11.831823613268396,
+        11.655506590460087
+      ],
+      "cpu_ns_per_lookup_median": 11.755624072901899,
+      "cpu_ns_per_lookup_cv_percent": 1.5274348574816516
+    },
+    {
+      "benchmark_name": "FinalBatch/Zipf/Original/N1000000/Batch4",
+      "distribution": "Zipf",
+      "encoding": "Original",
+      "n": 1000000,
+      "mode": "Batch4",
+      "cpu_ns_per_lookup_samples": [
+        21.35082497269376,
+        21.106998102430133,
+        21.037527034944702,
+        21.093586117601046,
+        21.21474607043915,
+        21.09162706363724,
+        21.099161886575178
+      ],
+      "cpu_ns_per_lookup_median": 21.099161886575178,
+      "cpu_ns_per_lookup_cv_percent": 0.5026327820688561
+    },
+    {
+      "benchmark_name": "FinalBatch/Zipf/Original/N1000000/Scalar",
+      "distribution": "Zipf",
+      "encoding": "Original",
+      "n": 1000000,
+      "mode": "Scalar",
+      "cpu_ns_per_lookup_samples": [
+        19.749360157125107,
+        19.786265297713072,
+        19.797620725586313,
+        19.829273980782958,
+        19.773916269901285,
+        19.745527700218016,
+        19.7544700996678
+      ],
+      "cpu_ns_per_lookup_median": 19.773916269901285,
+      "cpu_ns_per_lookup_cv_percent": 0.15329065196780398
+    },
+    {
+      "benchmark_name": "FinalBatch/Zipf/Unique/N1000000/Batch4",
+      "distribution": "Zipf",
+      "encoding": "Unique",
+      "n": 1000000,
+      "mode": "Batch4",
+      "cpu_ns_per_lookup_samples": [
+        26.108790347789665,
+        26.67632862008625,
+        26.795682162328614,
+        26.75975431032739,
+        26.619493599970518,
+        26.220836530303487,
+        26.296548896385918
+      ],
+      "cpu_ns_per_lookup_median": 26.619493599970518,
+      "cpu_ns_per_lookup_cv_percent": 1.059164218526929
+    },
+    {
+      "benchmark_name": "FinalBatch/Zipf/Unique/N1000000/Scalar",
+      "distribution": "Zipf",
+      "encoding": "Unique",
+      "n": 1000000,
+      "mode": "Scalar",
+      "cpu_ns_per_lookup_samples": [
+        30.674261851327433,
+        31.151977055282533,
+        31.231558788082733,
+        30.86444870429017,
+        31.08431010168733,
+        31.37341210276333,
+        31.018666412485025
+      ],
+      "cpu_ns_per_lookup_median": 31.08431010168733,
+      "cpu_ns_per_lookup_cv_percent": 0.7498359192876701
+    }
+  ],
+  "competitor_cases": [
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Batch4/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256",
+        "Batch4"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 4,
+      "cpu_ns_per_lookup_samples": [
+        35.8303249097475,
+        35.89443735141385,
+        35.9816632913625,
+        36.280212644183514,
+        35.983589416220426,
+        35.82647266003265,
+        35.606619265650146
+      ],
+      "cpu_ns_per_lookup_median": 35.89443735141385,
+      "cpu_ns_per_lookup_cv_percent": 0.5718214508675754,
+      "index_bytes": 1027796,
+      "backing_bytes": 8000000,
+      "total_bytes": 9027796
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Batch4/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256",
+        "Batch4"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 4,
+      "cpu_ns_per_lookup_samples": [
+        12.53765283249925,
+        12.559953728316945,
+        12.58252223488489,
+        12.793221098575685,
+        12.448716859977132,
+        12.79928694223683,
+        12.495191926861263
+      ],
+      "cpu_ns_per_lookup_median": 12.559953728316945,
+      "cpu_ns_per_lookup_cv_percent": 1.1065404508530865,
+      "index_bytes": 397532,
+      "backing_bytes": 8000000,
+      "total_bytes": 8397532
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Batch4/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256",
+        "Batch4"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 4,
+      "cpu_ns_per_lookup_samples": [
+        29.098388960766243,
+        29.77567924710774,
+        29.032547688881284,
+        30.46194788870359,
+        29.92025378817378,
+        29.29453149100695,
+        29.266215139810043
+      ],
+      "cpu_ns_per_lookup_median": 29.29453149100695,
+      "cpu_ns_per_lookup_cv_percent": 1.7677278435612231,
+      "index_bytes": 1011348,
+      "backing_bytes": 8000000,
+      "total_bytes": 9011348
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Batch4/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256",
+        "Batch4"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 4,
+      "cpu_ns_per_lookup_samples": [
+        31.63596809880725,
+        32.00877819424764,
+        32.31502427264705,
+        32.33747027839522,
+        31.82946814834235,
+        32.48659431657211,
+        31.894742165056353
+      ],
+      "cpu_ns_per_lookup_median": 32.00877819424764,
+      "cpu_ns_per_lookup_cv_percent": 0.9742251652518593,
+      "index_bytes": 1011476,
+      "backing_bytes": 8000000,
+      "total_bytes": 9011476
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Batch4/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256",
+        "Batch4"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 4,
+      "cpu_ns_per_lookup_samples": [
+        12.922127959168991,
+        13.024316418340732,
+        12.968694851956384,
+        12.864288921699229,
+        12.933769682365591,
+        12.907344818601224,
+        12.949569163846437
+      ],
+      "cpu_ns_per_lookup_median": 12.933769682365591,
+      "cpu_ns_per_lookup_cv_percent": 0.38858629512370013,
+      "index_bytes": 468300,
+      "backing_bytes": 8000000,
+      "total_bytes": 8468300
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Batch4/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256",
+        "Batch4"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 4,
+      "cpu_ns_per_lookup_samples": [
+        11.813633785014062,
+        11.867690434339693,
+        11.98125196221506,
+        11.90063519542492,
+        11.877565349808693,
+        12.02892396791755,
+        12.010365937126405
+      ],
+      "cpu_ns_per_lookup_median": 11.90063519542492,
+      "cpu_ns_per_lookup_cv_percent": 0.6827547081542192,
+      "index_bytes": 393432,
+      "backing_bytes": 8000000,
+      "total_bytes": 8393432
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Batch4/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256",
+        "Batch4"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 4,
+      "cpu_ns_per_lookup_samples": [
+        26.01102275253961,
+        26.458436911066524,
+        26.83131674257672,
+        25.926911389095963,
+        25.908798298454414,
+        26.025180110742276,
+        26.354963278311317
+      ],
+      "cpu_ns_per_lookup_median": 26.025180110742276,
+      "cpu_ns_per_lookup_cv_percent": 1.3149626158942391,
+      "index_bytes": 933804,
+      "backing_bytes": 8000000,
+      "total_bytes": 8933804
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Batch4/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256",
+        "Batch4"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 4,
+      "cpu_ns_per_lookup_samples": [
+        11.944375721589834,
+        12.253972180988615,
+        12.055620842265853,
+        11.81904241574468,
+        12.066616498982988,
+        12.207584254220222,
+        12.089380944525677
+      ],
+      "cpu_ns_per_lookup_median": 12.066616498982988,
+      "cpu_ns_per_lookup_cv_percent": 1.2283497687273564,
+      "index_bytes": 16504,
+      "backing_bytes": 8000000,
+      "total_bytes": 8016504
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Batch4/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256",
+        "Batch4"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 4,
+      "cpu_ns_per_lookup_samples": [
+        26.796746507284592,
+        26.70694452066583,
+        26.613608659572932,
+        26.585545538757245,
+        26.958681108157368,
+        26.64167178038862,
+        28.85533232555632
+      ],
+      "cpu_ns_per_lookup_median": 26.70694452066583,
+      "cpu_ns_per_lookup_cv_percent": 3.0279554061723504,
+      "index_bytes": 1054860,
+      "backing_bytes": 8000000,
+      "total_bytes": 9054860
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        39.60537476517717,
+        40.2963963325676,
+        39.856368485171046,
+        40.066916360000434,
+        39.21870101140398,
+        40.38015652254438,
+        40.35835592515677
+      ],
+      "cpu_ns_per_lookup_median": 40.066916360000434,
+      "cpu_ns_per_lookup_cv_percent": 1.0930960438994175,
+      "index_bytes": 1027796,
+      "backing_bytes": 8000000,
+      "total_bytes": 9027796
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        14.700514036815429,
+        15.15866513614296,
+        14.889519528145195,
+        14.748911066825054,
+        14.630992206179014,
+        14.74466375241274,
+        14.794737353899698
+      ],
+      "cpu_ns_per_lookup_median": 14.748911066825054,
+      "cpu_ns_per_lookup_cv_percent": 1.1700395800819092,
+      "index_bytes": 397532,
+      "backing_bytes": 8000000,
+      "total_bytes": 8397532
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        38.02227400301777,
+        38.26728465675761,
+        38.77842757231496,
+        38.01438860266845,
+        38.13041663639638,
+        37.980312408295816,
+        37.914976233970265
+      ],
+      "cpu_ns_per_lookup_median": 38.02227400301777,
+      "cpu_ns_per_lookup_cv_percent": 0.776908020256105,
+      "index_bytes": 1011348,
+      "backing_bytes": 8000000,
+      "total_bytes": 9011348
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        39.88946722384212,
+        40.426179464019015,
+        40.49499610855042,
+        40.44575909509812,
+        40.5295483986893,
+        40.30639819154084,
+        40.567555917837566
+      ],
+      "cpu_ns_per_lookup_median": 40.44575909509812,
+      "cpu_ns_per_lookup_cv_percent": 0.5748252785657758,
+      "index_bytes": 1011476,
+      "backing_bytes": 8000000,
+      "total_bytes": 9011476
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        15.03330150949354,
+        15.288951754529371,
+        15.219476643533365,
+        15.295990082767462,
+        15.281232297753832,
+        15.51962728646236,
+        15.082683328583071
+      ],
+      "cpu_ns_per_lookup_median": 15.281232297753832,
+      "cpu_ns_per_lookup_cv_percent": 1.0476625297907738,
+      "index_bytes": 468300,
+      "backing_bytes": 8000000,
+      "total_bytes": 8468300
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        13.958462879699233,
+        13.686654090576447,
+        13.87399367371603,
+        13.916766608844691,
+        13.900910280489365,
+        13.967369829575615,
+        14.05174115698933
+      ],
+      "cpu_ns_per_lookup_median": 13.916766608844691,
+      "cpu_ns_per_lookup_cv_percent": 0.8145818213661757,
+      "index_bytes": 393432,
+      "backing_bytes": 8000000,
+      "total_bytes": 8393432
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        36.881680004296214,
+        37.57237230785823,
+        37.269724474998284,
+        37.43702669316373,
+        37.43541543584619,
+        37.43971212202375,
+        37.96498200762254
+      ],
+      "cpu_ns_per_lookup_median": 37.43702669316373,
+      "cpu_ns_per_lookup_cv_percent": 0.8677898672335075,
+      "index_bytes": 933804,
+      "backing_bytes": 8000000,
+      "total_bytes": 8933804
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        12.71165046610911,
+        12.777239378082118,
+        12.820612690839123,
+        12.52623195836077,
+        12.775219778152955,
+        12.942269543692372,
+        12.745502807773347
+      ],
+      "cpu_ns_per_lookup_median": 12.775219778152955,
+      "cpu_ns_per_lookup_cv_percent": 0.9840582591155013,
+      "index_bytes": 16504,
+      "backing_bytes": 8000000,
+      "total_bytes": 8016504
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S256/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S256"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        34.73074565215977,
+        33.419763163913295,
+        33.25125972400418,
+        33.26720966792762,
+        32.93637695994896,
+        33.808735990094426,
+        33.31171515664238
+      ],
+      "cpu_ns_per_lookup_median": 33.31171515664238,
+      "cpu_ns_per_lookup_cv_percent": 1.7551946576788109,
+      "index_bytes": 1054860,
+      "backing_bytes": 8000000,
+      "total_bytes": 9054860
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S512/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S512"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        40.189328818131806,
+        39.52603083469228,
+        40.044882393165686,
+        40.11363889144806,
+        40.37364245638625,
+        40.89653851476285,
+        40.323952886188124
+      ],
+      "cpu_ns_per_lookup_median": 40.189328818131806,
+      "cpu_ns_per_lookup_cv_percent": 1.023331899737934,
+      "index_bytes": 1030996,
+      "backing_bytes": 8000000,
+      "total_bytes": 9030996
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S512/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S512"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        15.164802346717488,
+        15.0546970595368,
+        15.534792699070136,
+        15.207220894530243,
+        14.921381623553273,
+        15.145479611999061,
+        14.998901233844807
+      ],
+      "cpu_ns_per_lookup_median": 15.145479611999061,
+      "cpu_ns_per_lookup_cv_percent": 1.3084918928382727,
+      "index_bytes": 413468,
+      "backing_bytes": 8000000,
+      "total_bytes": 8413468
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S512/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S512"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        38.31269873120368,
+        40.347944228975,
+        38.12988901070091,
+        38.322163731522735,
+        38.24617330037118,
+        39.01256789785525,
+        37.79104199918246
+      ],
+      "cpu_ns_per_lookup_median": 38.31269873120368,
+      "cpu_ns_per_lookup_cv_percent": 2.2152112837217266,
+      "index_bytes": 1024212,
+      "backing_bytes": 8000000,
+      "total_bytes": 9024212
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S512/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S512"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        39.937585719446766,
+        40.79964548873204,
+        40.51046624171178,
+        40.645397336034065,
+        40.50815972727449,
+        40.55400170163086,
+        40.82069243293005
+      ],
+      "cpu_ns_per_lookup_median": 40.55400170163086,
+      "cpu_ns_per_lookup_cv_percent": 0.7277880222222556,
+      "index_bytes": 1024276,
+      "backing_bytes": 8000000,
+      "total_bytes": 9024276
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S512/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S512"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        16.025915301064387,
+        16.316698170152275,
+        15.96898637015572,
+        15.815771721004408,
+        15.975244941840934,
+        16.236901381158553,
+        15.909409581992726
+      ],
+      "cpu_ns_per_lookup_median": 15.975244941840934,
+      "cpu_ns_per_lookup_cv_percent": 1.1154407457580655,
+      "index_bytes": 483980,
+      "backing_bytes": 8000000,
+      "total_bytes": 8483980
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S512/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S512"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        14.183371519032942,
+        14.461136308478364,
+        14.16878747598039,
+        14.160326504437412,
+        14.284791848966535,
+        14.393559864713517,
+        14.65740858254224
+      ],
+      "cpu_ns_per_lookup_median": 14.284791848966535,
+      "cpu_ns_per_lookup_cv_percent": 1.2954153932462698,
+      "index_bytes": 409432,
+      "backing_bytes": 8000000,
+      "total_bytes": 8409432
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S512/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S512"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        39.140576039514436,
+        39.48202026586876,
+        39.92044948550928,
+        39.45206901793946,
+        39.418694770253815,
+        40.002601479819575,
+        39.545916261442756
+      ],
+      "cpu_ns_per_lookup_median": 39.48202026586876,
+      "cpu_ns_per_lookup_cv_percent": 0.7577875620032368,
+      "index_bytes": 951852,
+      "backing_bytes": 8000000,
+      "total_bytes": 8951852
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S512/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S512"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        12.800459304374133,
+        12.866317191360313,
+        13.17454396874378,
+        12.91981436382198,
+        12.797492732890484,
+        12.76644261800476,
+        12.95917087886965
+      ],
+      "cpu_ns_per_lookup_median": 12.866317191360313,
+      "cpu_ns_per_lookup_cv_percent": 1.0901621268275514,
+      "index_bytes": 32888,
+      "backing_bytes": 8000000,
+      "total_bytes": 8032888
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S512/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S512"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        33.26297179146166,
+        33.87700115948576,
+        33.478315163085234,
+        33.573836189376934,
+        33.455938701006076,
+        33.7545321358467,
+        33.65299593157651
+      ],
+      "cpu_ns_per_lookup_median": 33.573836189376934,
+      "cpu_ns_per_lookup_cv_percent": 0.6082169873150342,
+      "index_bytes": 1062540,
+      "backing_bytes": 8000000,
+      "total_bytes": 9062540
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S64/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S64"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        39.02286656573835,
+        39.19677177895796,
+        39.59016900885066,
+        39.71004541796652,
+        39.77279762273721,
+        39.27021718453033,
+        39.937979435281875
+      ],
+      "cpu_ns_per_lookup_median": 39.59016900885066,
+      "cpu_ns_per_lookup_cv_percent": 0.8590784848171332,
+      "index_bytes": 1025492,
+      "backing_bytes": 8000000,
+      "total_bytes": 9025492
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S64/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S64"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        14.321065207001235,
+        14.386269437945748,
+        14.377852551924384,
+        14.179150116122221,
+        14.170307058655577,
+        14.140261971849318,
+        13.904589163269303
+      ],
+      "cpu_ns_per_lookup_median": 14.179150116122221,
+      "cpu_ns_per_lookup_cv_percent": 1.192199133185432,
+      "index_bytes": 385948,
+      "backing_bytes": 8000000,
+      "total_bytes": 8385948
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S64/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S64"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        40.2145429576385,
+        40.63523259670782,
+        40.57275682795985,
+        40.37190015087763,
+        40.411020492050376,
+        41.03607012234068,
+        41.04307675060163
+      ],
+      "cpu_ns_per_lookup_median": 40.57275682795985,
+      "cpu_ns_per_lookup_cv_percent": 0.7939189304869863,
+      "index_bytes": 1001876,
+      "backing_bytes": 8000000,
+      "total_bytes": 9001876
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S64/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S64"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        43.18713559685171,
+        43.81170523899548,
+        43.87045188850068,
+        43.4632448495411,
+        44.114095887517166,
+        44.23004322207073,
+        43.29689907357129
+      ],
+      "cpu_ns_per_lookup_median": 43.81170523899548,
+      "cpu_ns_per_lookup_cv_percent": 0.9221164978453433,
+      "index_bytes": 1002132,
+      "backing_bytes": 8000000,
+      "total_bytes": 9002132
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S64/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S64"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        14.655638686300392,
+        15.046129196033714,
+        14.767064284999364,
+        14.840976969855252,
+        14.738901771043446,
+        15.113140395253417,
+        15.053587253088994
+      ],
+      "cpu_ns_per_lookup_median": 14.840976969855252,
+      "cpu_ns_per_lookup_cv_percent": 1.2145280372409148,
+      "index_bytes": 457036,
+      "backing_bytes": 8000000,
+      "total_bytes": 8457036
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S64/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S64"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        13.385378783778368,
+        13.747988309168903,
+        13.656498199289784,
+        13.553635289959086,
+        13.688687283453016,
+        13.526624891262031,
+        13.812366477497527
+      ],
+      "cpu_ns_per_lookup_median": 13.656498199289784,
+      "cpu_ns_per_lookup_cv_percent": 1.0698053034248733,
+      "index_bytes": 381720,
+      "backing_bytes": 8000000,
+      "total_bytes": 8381720
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S64/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S64"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        40.410912689488484,
+        40.491111274203746,
+        40.3037839527082,
+        40.47335512998664,
+        40.36800200762472,
+        40.86251062409436,
+        40.390789059372196
+      ],
+      "cpu_ns_per_lookup_median": 40.410912689488484,
+      "cpu_ns_per_lookup_cv_percent": 0.4537077747292739,
+      "index_bytes": 921900,
+      "backing_bytes": 8000000,
+      "total_bytes": 8921900
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S64/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S64"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        12.47230661110162,
+        12.709500893495722,
+        12.964867318492887,
+        12.459203539856954,
+        12.664835679835278,
+        12.721551893327842,
+        12.71409175057223
+      ],
+      "cpu_ns_per_lookup_median": 12.709500893495722,
+      "cpu_ns_per_lookup_cv_percent": 1.3538840341014415,
+      "index_bytes": 4216,
+      "backing_bytes": 8000000,
+      "total_bytes": 8004216
+    },
+    {
+      "benchmark_name": "Lookup/JazzyIndex/S64/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "JazzyIndex",
+        "S64"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        32.54778918333343,
+        32.94180354036456,
+        33.203620337985,
+        32.76624330632324,
+        32.75968030692325,
+        32.714208096770484,
+        32.91766107827009
+      ],
+      "cpu_ns_per_lookup_median": 32.76624330632324,
+      "cpu_ns_per_lookup_cv_percent": 0.6359051250652946,
+      "index_bytes": 1050252,
+      "backing_bytes": 8000000,
+      "total_bytes": 9050252
+    },
+    {
+      "benchmark_name": "Lookup/LowerBound/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "LowerBound"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        51.29650093702616,
+        52.10181520403598,
+        53.19219971500439,
+        53.10854975925085,
+        53.52129625145666,
+        52.69360195240464,
+        53.099377614971495
+      ],
+      "cpu_ns_per_lookup_median": 53.099377614971495,
+      "cpu_ns_per_lookup_cv_percent": 1.4630403086040844,
+      "index_bytes": 0,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000000
+    },
+    {
+      "benchmark_name": "Lookup/LowerBound/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "LowerBound"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        49.615420093237645,
+        51.50177744034262,
+        50.41863864389278,
+        50.52223396933173,
+        50.64818034100649,
+        49.552624296658216,
+        50.40693095300351
+      ],
+      "cpu_ns_per_lookup_median": 50.41863864389278,
+      "cpu_ns_per_lookup_cv_percent": 1.3120961193530498,
+      "index_bytes": 0,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000000
+    },
+    {
+      "benchmark_name": "Lookup/LowerBound/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "LowerBound"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        52.284697530189824,
+        53.09620007389487,
+        53.74054057288231,
+        53.49746377407385,
+        53.06703085804274,
+        53.18258582854715,
+        53.15005093393488
+      ],
+      "cpu_ns_per_lookup_median": 53.15005093393488,
+      "cpu_ns_per_lookup_cv_percent": 0.8515673606184884,
+      "index_bytes": 0,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000000
+    },
+    {
+      "benchmark_name": "Lookup/LowerBound/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "LowerBound"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        52.47823178514635,
+        52.99880606620256,
+        52.126641658974776,
+        52.77864806049404,
+        53.537051892863296,
+        53.47814674082639,
+        53.1663175922771
+      ],
+      "cpu_ns_per_lookup_median": 52.99880606620256,
+      "cpu_ns_per_lookup_cv_percent": 0.9759483766731823,
+      "index_bytes": 0,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000000
+    },
+    {
+      "benchmark_name": "Lookup/LowerBound/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "LowerBound"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        49.71230774067923,
+        50.3465026739799,
+        51.55165169371607,
+        51.90215604840072,
+        52.179772647366974,
+        50.23824291917409,
+        51.239734974403675
+      ],
+      "cpu_ns_per_lookup_median": 51.239734974403675,
+      "cpu_ns_per_lookup_cv_percent": 1.829579504315109,
+      "index_bytes": 0,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000000
+    },
+    {
+      "benchmark_name": "Lookup/LowerBound/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "LowerBound"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        49.340915850281704,
+        48.61306632298839,
+        50.76885640383087,
+        51.4159539280975,
+        49.991257874677174,
+        51.84603044422561,
+        50.775705904080674
+      ],
+      "cpu_ns_per_lookup_median": 50.76885640383087,
+      "cpu_ns_per_lookup_cv_percent": 2.2744102752353212,
+      "index_bytes": 0,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000000
+    },
+    {
+      "benchmark_name": "Lookup/LowerBound/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "LowerBound"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        52.1691235808459,
+        52.54421636646029,
+        51.62435492129797,
+        52.423449281021696,
+        53.51373904302094,
+        54.273706371961545,
+        53.1299931640578
+      ],
+      "cpu_ns_per_lookup_median": 52.54421636646029,
+      "cpu_ns_per_lookup_cv_percent": 1.6894991795200134,
+      "index_bytes": 0,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000000
+    },
+    {
+      "benchmark_name": "Lookup/LowerBound/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "LowerBound"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        51.03224883861177,
+        53.07502338783787,
+        53.34610764847585,
+        52.79083975354426,
+        52.092206491251375,
+        54.59273137587729,
+        53.1023137496497
+      ],
+      "cpu_ns_per_lookup_median": 53.07502338783787,
+      "cpu_ns_per_lookup_cv_percent": 2.0835615881367766,
+      "index_bytes": 0,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000000
+    },
+    {
+      "benchmark_name": "Lookup/LowerBound/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "LowerBound"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        51.76918737020672,
+        53.0463386571637,
+        51.516376164157634,
+        53.03142461478885,
+        53.52795309860647,
+        52.071469546068926,
+        52.85973124895946
+      ],
+      "cpu_ns_per_lookup_median": 52.85973124895946,
+      "cpu_ns_per_lookup_cv_percent": 1.4404485278431958,
+      "index_bytes": 0,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000000
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E16/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E16"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        46.818547919314426,
+        46.60780179493299,
+        46.29301223690129,
+        46.777329434422015,
+        46.69522487176786,
+        46.656000829685546,
+        46.18630954617011
+      ],
+      "cpu_ns_per_lookup_median": 46.656000829685546,
+      "cpu_ns_per_lookup_cv_percent": 0.5207184421829981,
+      "index_bytes": 15424,
+      "backing_bytes": 8000000,
+      "total_bytes": 8015424
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E16/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E16"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        30.28731168015658,
+        30.244412113705064,
+        30.842828401080084,
+        30.795791312987483,
+        30.320629617555113,
+        30.104389670920472,
+        30.399024764369926
+      ],
+      "cpu_ns_per_lookup_median": 30.320629617555113,
+      "cpu_ns_per_lookup_cv_percent": 0.9275596656121885,
+      "index_bytes": 328,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000328
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E16/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E16"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        44.23351562227555,
+        44.625853786744855,
+        45.25378484415882,
+        44.22528253730973,
+        44.4868413136211,
+        45.09228971592001,
+        44.787982229199166
+      ],
+      "cpu_ns_per_lookup_median": 44.625853786744855,
+      "cpu_ns_per_lookup_cv_percent": 0.8939206309629029,
+      "index_bytes": 29184,
+      "backing_bytes": 8000000,
+      "total_bytes": 8029184
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E16/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E16"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        47.966380711006785,
+        48.103938045290235,
+        48.447831380974286,
+        49.11280703712881,
+        48.356241698599334,
+        48.32548139018948,
+        48.3586610487034
+      ],
+      "cpu_ns_per_lookup_median": 48.356241698599334,
+      "cpu_ns_per_lookup_cv_percent": 0.7513556034814004,
+      "index_bytes": 29216,
+      "backing_bytes": 8000000,
+      "total_bytes": 8029216
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E16/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E16"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        30.56251863841747,
+        30.779998744129898,
+        30.580897238898853,
+        30.99769764270467,
+        30.672790241313546,
+        30.737115343002266,
+        32.46536016696367
+      ],
+      "cpu_ns_per_lookup_median": 30.737115343002266,
+      "cpu_ns_per_lookup_cv_percent": 2.1791554130507507,
+      "index_bytes": 568,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000568
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E16/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E16"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        29.301725190349334,
+        29.247349502588786,
+        29.407937623257574,
+        28.918979590496757,
+        29.03344358691481,
+        29.270411564715662,
+        29.346368264745582
+      ],
+      "cpu_ns_per_lookup_median": 29.270411564715662,
+      "cpu_ns_per_lookup_cv_percent": 0.6036486510820189,
+      "index_bytes": 312,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000312
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E16/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E16"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        47.12978907318794,
+        47.47452747357226,
+        47.648428088185774,
+        47.38842795205877,
+        47.467040558657196,
+        47.43607195605181,
+        47.4592133294287
+      ],
+      "cpu_ns_per_lookup_median": 47.4592133294287,
+      "cpu_ns_per_lookup_cv_percent": 0.32641203540277597,
+      "index_bytes": 4960,
+      "backing_bytes": 8000000,
+      "total_bytes": 8004960
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E16/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E16"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        18.654820544882188,
+        18.924703880224907,
+        19.655172138458585,
+        18.85976153917727,
+        18.899951266628463,
+        18.93228935858679,
+        19.0971737039957
+      ],
+      "cpu_ns_per_lookup_median": 18.924703880224907,
+      "cpu_ns_per_lookup_cv_percent": 1.6608536813658905,
+      "index_bytes": 112,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000112
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E16/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E16"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        42.71837928779156,
+        43.61296648304565,
+        43.17641038604656,
+        43.09541895273529,
+        43.37888896932911,
+        43.14941324160656,
+        43.116280382528245
+      ],
+      "cpu_ns_per_lookup_median": 43.14941324160656,
+      "cpu_ns_per_lookup_cv_percent": 0.6358422846472948,
+      "index_bytes": 25856,
+      "backing_bytes": 8000000,
+      "total_bytes": 8025856
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E256/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E256"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        41.18039830885328,
+        41.80203131351535,
+        42.713348820349616,
+        42.6807703201062,
+        42.58098031936364,
+        42.38492231788352,
+        42.73095882048936
+      ],
+      "cpu_ns_per_lookup_median": 42.58098031936364,
+      "cpu_ns_per_lookup_cv_percent": 1.3950947118911756,
+      "index_bytes": 1224,
+      "backing_bytes": 8000000,
+      "total_bytes": 8001224
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E256/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E256"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        39.04909538541415,
+        38.601162863641065,
+        39.257378505179695,
+        39.48767305108158,
+        39.252701077128826,
+        39.34019649600273,
+        39.6475310333554
+      ],
+      "cpu_ns_per_lookup_median": 39.257378505179695,
+      "cpu_ns_per_lookup_cv_percent": 0.859453553117865,
+      "index_bytes": 280,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000280
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E256/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E256"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        50.9783139767062,
+        51.24455147143362,
+        52.14772771376403,
+        54.16409587887346,
+        52.2326045172597,
+        51.8299837827282,
+        55.1046324235933
+      ],
+      "cpu_ns_per_lookup_median": 52.14772771376403,
+      "cpu_ns_per_lookup_cv_percent": 2.9166538354049765,
+      "index_bytes": 1792,
+      "backing_bytes": 8000000,
+      "total_bytes": 8001792
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E256/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E256"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        53.10800441561361,
+        53.75431170920396,
+        54.035676616413376,
+        54.37868464174688,
+        54.29019084028695,
+        54.208504254323095,
+        53.90898677244669
+      ],
+      "cpu_ns_per_lookup_median": 54.035676616413376,
+      "cpu_ns_per_lookup_cv_percent": 0.8016280152737518,
+      "index_bytes": 1824,
+      "backing_bytes": 8000000,
+      "total_bytes": 8001824
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E256/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E256"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        40.77667161563189,
+        39.92959465062153,
+        40.68245591238121,
+        40.53781896121366,
+        40.708963082709346,
+        41.55258259072634,
+        40.94983258704736
+      ],
+      "cpu_ns_per_lookup_median": 40.708963082709346,
+      "cpu_ns_per_lookup_cv_percent": 1.1889510271379917,
+      "index_bytes": 392,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000392
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E256/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E256"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        38.202301524721285,
+        39.60438598022918,
+        38.8266441717073,
+        38.57088935246037,
+        38.82207712135798,
+        39.296244407044504,
+        39.0848168411339
+      ],
+      "cpu_ns_per_lookup_median": 38.8266441717073,
+      "cpu_ns_per_lookup_cv_percent": 1.1925414454208174,
+      "index_bytes": 264,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000264
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E256/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E256"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        51.080744395188134,
+        53.21069598319844,
+        53.18175940960395,
+        53.35940799433513,
+        52.968214822193055,
+        53.11839197629285,
+        52.39571020790681
+      ],
+      "cpu_ns_per_lookup_median": 53.11839197629285,
+      "cpu_ns_per_lookup_cv_percent": 1.521189719864968,
+      "index_bytes": 960,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000960
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E256/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E256"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        29.822085503508934,
+        29.94042455584756,
+        31.05229619641751,
+        30.509568818455165,
+        30.7883421214193,
+        31.134768421644466,
+        30.274823656556293
+      ],
+      "cpu_ns_per_lookup_median": 30.509568818455165,
+      "cpu_ns_per_lookup_cv_percent": 1.7005953221922423,
+      "index_bytes": 112,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000112
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E256/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E256"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        51.59410492257569,
+        51.204056795730764,
+        51.9970685503163,
+        51.408859738403194,
+        52.248367296179076,
+        50.68965084604008,
+        50.84832699981136
+      ],
+      "cpu_ns_per_lookup_median": 51.408859738403194,
+      "cpu_ns_per_lookup_cv_percent": 1.1102729690007502,
+      "index_bytes": 2912,
+      "backing_bytes": 8000000,
+      "total_bytes": 8002912
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E64/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E64"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        46.88632747933149,
+        47.51062522769664,
+        47.47996030892963,
+        48.0875923405663,
+        47.498292597318866,
+        47.425963386753146,
+        47.58295443826473
+      ],
+      "cpu_ns_per_lookup_median": 47.498292597318866,
+      "cpu_ns_per_lookup_cv_percent": 0.7367166273961733,
+      "index_bytes": 2560,
+      "backing_bytes": 8000000,
+      "total_bytes": 8002560
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E64/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E64"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        32.652700087788936,
+        32.860452182547235,
+        32.97719782871518,
+        33.50462156485248,
+        32.87470066691884,
+        32.40610938239911,
+        32.90365726419567
+      ],
+      "cpu_ns_per_lookup_median": 32.87470066691884,
+      "cpu_ns_per_lookup_cv_percent": 1.0213414849583113,
+      "index_bytes": 296,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000296
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E64/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E64"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        45.798877696415815,
+        45.80175621800668,
+        46.36690595709985,
+        46.88919770805599,
+        46.093766241661,
+        46.73055918480208,
+        46.09408607739256
+      ],
+      "cpu_ns_per_lookup_median": 46.09408607739256,
+      "cpu_ns_per_lookup_cv_percent": 0.9283323258761658,
+      "index_bytes": 6400,
+      "backing_bytes": 8000000,
+      "total_bytes": 8006400
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E64/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E64"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        47.592953141291254,
+        48.93321950742185,
+        50.161122152524484,
+        49.17009437877615,
+        48.86607121767796,
+        50.96082791479224,
+        49.78488927280332
+      ],
+      "cpu_ns_per_lookup_median": 49.17009437877615,
+      "cpu_ns_per_lookup_cv_percent": 2.183763740864933,
+      "index_bytes": 6448,
+      "backing_bytes": 8000000,
+      "total_bytes": 8006448
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E64/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E64"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        38.94916507645642,
+        39.096730609861126,
+        40.482612235368585,
+        40.10500157384549,
+        40.00232289470861,
+        40.0045672374243,
+        40.08760791781689
+      ],
+      "cpu_ns_per_lookup_median": 40.0045672374243,
+      "cpu_ns_per_lookup_cv_percent": 1.4282879093776493,
+      "index_bytes": 560,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000560
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E64/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E64"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        31.776350653679817,
+        31.306510563207308,
+        32.05110694689503,
+        32.12076347193468,
+        32.278970285346126,
+        32.458574854816824,
+        32.215232288579145
+      ],
+      "cpu_ns_per_lookup_median": 32.12076347193468,
+      "cpu_ns_per_lookup_cv_percent": 1.1932492596104056,
+      "index_bytes": 296,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000296
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E64/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E64"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        47.20382724973927,
+        48.131332281462306,
+        47.49994006838644,
+        47.79402702966576,
+        47.53539257233092,
+        47.60832343758293,
+        47.86864610938217
+      ],
+      "cpu_ns_per_lookup_median": 47.60832343758293,
+      "cpu_ns_per_lookup_cv_percent": 0.6267870390311185,
+      "index_bytes": 1744,
+      "backing_bytes": 8000000,
+      "total_bytes": 8001744
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E64/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E64"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        21.601211971899872,
+        22.678907892900956,
+        22.20015888119331,
+        24.054348932769944,
+        22.962354961206863,
+        22.54755437344484,
+        22.690063514767367
+      ],
+      "cpu_ns_per_lookup_median": 22.678907892900956,
+      "cpu_ns_per_lookup_cv_percent": 3.3099262779416265,
+      "index_bytes": 112,
+      "backing_bytes": 8000000,
+      "total_bytes": 8000112
+    },
+    {
+      "benchmark_name": "Lookup/PGM/E64/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "PGM",
+        "E64"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        44.26900533837029,
+        45.29401380211528,
+        45.598353531744245,
+        45.471841152091294,
+        44.95933692021364,
+        44.7892552261383,
+        45.801999734712574
+      ],
+      "cpu_ns_per_lookup_median": 45.29401380211528,
+      "cpu_ns_per_lookup_cv_percent": 1.1751522802007133,
+      "index_bytes": 8384,
+      "backing_bytes": 8000000,
+      "total_bytes": 8008384
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E16/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E16"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        26.672098591359507,
+        27.688947188979053,
+        27.715336326670737,
+        28.021411799604373,
+        27.643295906987674,
+        27.500178174838247,
+        27.62846405587547
+      ],
+      "cpu_ns_per_lookup_median": 27.643295906987674,
+      "cpu_ns_per_lookup_cv_percent": 1.5232425570290808,
+      "index_bytes": 61564,
+      "backing_bytes": 8000000,
+      "total_bytes": 8061564
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E16/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E16"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        17.40696338044922,
+        17.380184008995563,
+        17.540612280575047,
+        17.624421794936644,
+        17.850434730861007,
+        17.59689855205296,
+        17.60272554491842
+      ],
+      "cpu_ns_per_lookup_median": 17.59689855205296,
+      "cpu_ns_per_lookup_cv_percent": 0.8903300325324879,
+      "index_bytes": 13180,
+      "backing_bytes": 8000000,
+      "total_bytes": 8013180
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E16/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E16"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        29.556282126675676,
+        30.0748133920569,
+        30.194793804941092,
+        30.097854613214583,
+        30.148296205482854,
+        30.823549290466776,
+        30.293186046652878
+      ],
+      "cpu_ns_per_lookup_median": 30.148296205482854,
+      "cpu_ns_per_lookup_cv_percent": 1.2359851640489414,
+      "index_bytes": 104220,
+      "backing_bytes": 8000000,
+      "total_bytes": 8104220
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E16/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E16"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        31.92126624537864,
+        32.53459981253955,
+        32.434915801623326,
+        32.70604708131137,
+        32.70650858136238,
+        32.62274632218874,
+        32.56690481607572
+      ],
+      "cpu_ns_per_lookup_median": 32.56690481607572,
+      "cpu_ns_per_lookup_cv_percent": 0.8379842200913725,
+      "index_bytes": 104524,
+      "backing_bytes": 8000000,
+      "total_bytes": 8104524
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E16/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E16"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        18.173495680711177,
+        19.305930857550624,
+        18.345944434798852,
+        18.582687290410266,
+        18.388633635809153,
+        18.377831185554513,
+        18.41206063636626
+      ],
+      "cpu_ns_per_lookup_median": 18.388633635809153,
+      "cpu_ns_per_lookup_cv_percent": 1.9977996790527628,
+      "index_bytes": 14408,
+      "backing_bytes": 8000000,
+      "total_bytes": 8014408
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E16/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E16"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        18.635296840941347,
+        17.72660926820174,
+        17.781007066569074,
+        17.71130586866065,
+        17.504388474867916,
+        17.603024671909253,
+        17.585406472438418
+      ],
+      "cpu_ns_per_lookup_median": 17.71130586866065,
+      "cpu_ns_per_lookup_cv_percent": 2.156309255456054,
+      "index_bytes": 12172,
+      "backing_bytes": 8000000,
+      "total_bytes": 8012172
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E16/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E16"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        26.174486701505707,
+        27.41836365951469,
+        27.407299474302263,
+        27.44518024401463,
+        27.02886683427952,
+        27.129382144017022,
+        27.153198271504113
+      ],
+      "cpu_ns_per_lookup_median": 27.153198271504113,
+      "cpu_ns_per_lookup_cv_percent": 1.6358004106087052,
+      "index_bytes": 94432,
+      "backing_bytes": 8000000,
+      "total_bytes": 8094432
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E16/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E16"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        15.083972672747736,
+        15.379691876413505,
+        15.15953643979599,
+        15.027099184954109,
+        15.293693658985367,
+        15.999567027642671,
+        15.237852149800727
+      ],
+      "cpu_ns_per_lookup_median": 15.237852149800727,
+      "cpu_ns_per_lookup_cv_percent": 2.132298064881551,
+      "index_bytes": 15036,
+      "backing_bytes": 8000000,
+      "total_bytes": 8015036
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E16/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E16"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        36.72149824245732,
+        38.42695306015936,
+        37.847988317333005,
+        38.43388038796086,
+        40.313850579137984,
+        38.400309491683764,
+        37.216002873241344
+      ],
+      "cpu_ns_per_lookup_median": 38.400309491683764,
+      "cpu_ns_per_lookup_cv_percent": 3.0028616394937844,
+      "index_bytes": 82680,
+      "backing_bytes": 8000000,
+      "total_bytes": 8082680
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E256/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E256"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        35.084115288557314,
+        36.37420659641549,
+        36.69441835216511,
+        37.18744687745988,
+        36.74911370419062,
+        36.54086050939177,
+        36.22578446744529
+      ],
+      "cpu_ns_per_lookup_median": 36.54086050939177,
+      "cpu_ns_per_lookup_cv_percent": 1.8117476031745092,
+      "index_bytes": 16508,
+      "backing_bytes": 8000000,
+      "total_bytes": 8016508
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E256/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E256"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        32.929385368955195,
+        33.81183682390595,
+        32.81589297474679,
+        33.923886518186535,
+        33.741865877476954,
+        33.176808406321456,
+        33.708924229163195
+      ],
+      "cpu_ns_per_lookup_median": 33.708924229163195,
+      "cpu_ns_per_lookup_cv_percent": 1.3676304336263454,
+      "index_bytes": 13084,
+      "backing_bytes": 8000000,
+      "total_bytes": 8013084
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E256/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E256"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        38.78652007650925,
+        39.94455390504926,
+        40.36590879078295,
+        39.72806276138965,
+        40.180147208438385,
+        39.807239829279254,
+        40.155785033699196
+      ],
+      "cpu_ns_per_lookup_median": 39.94455390504926,
+      "cpu_ns_per_lookup_cv_percent": 1.3059509695163112,
+      "index_bytes": 18828,
+      "backing_bytes": 8000000,
+      "total_bytes": 8018828
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E256/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E256"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        38.635786718932216,
+        38.905513033102714,
+        40.24940767488311,
+        40.3279849688869,
+        40.37507561671597,
+        40.585450996052884,
+        40.358914329289945
+      ],
+      "cpu_ns_per_lookup_median": 40.3279849688869,
+      "cpu_ns_per_lookup_cv_percent": 1.9924840771260266,
+      "index_bytes": 18924,
+      "backing_bytes": 8000000,
+      "total_bytes": 8018924
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E256/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E256"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        34.37741370858852,
+        33.655140872396494,
+        33.49458173737151,
+        34.9705094225123,
+        34.72967071997568,
+        35.09117204519324,
+        34.727481277223966
+      ],
+      "cpu_ns_per_lookup_median": 34.727481277223966,
+      "cpu_ns_per_lookup_cv_percent": 1.8311357332220433,
+      "index_bytes": 14040,
+      "backing_bytes": 8000000,
+      "total_bytes": 8014040
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E256/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E256"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        33.21711415557247,
+        34.29525301036845,
+        33.70198012239161,
+        32.91490317624844,
+        34.38871543254439,
+        33.721906121035104,
+        33.76958618918848
+      ],
+      "cpu_ns_per_lookup_median": 33.721906121035104,
+      "cpu_ns_per_lookup_cv_percent": 1.5703029565177595,
+      "index_bytes": 12092,
+      "backing_bytes": 8000000,
+      "total_bytes": 8012092
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E256/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E256"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        35.04178826357745,
+        36.35497203009212,
+        36.39168685772396,
+        36.498310740721735,
+        37.43805944532982,
+        36.38263388652766,
+        36.68037605035539
+      ],
+      "cpu_ns_per_lookup_median": 36.39168685772396,
+      "cpu_ns_per_lookup_cv_percent": 1.946885328745191,
+      "index_bytes": 16016,
+      "backing_bytes": 8000000,
+      "total_bytes": 8016016
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E256/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E256"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        29.577868004785724,
+        29.957420202279657,
+        29.966919802217518,
+        30.686298597474295,
+        30.142662401057258,
+        29.942307202379208,
+        30.42505959919226
+      ],
+      "cpu_ns_per_lookup_median": 29.966919802217518,
+      "cpu_ns_per_lookup_cv_percent": 1.2030437163272925,
+      "index_bytes": 15036,
+      "backing_bytes": 8000000,
+      "total_bytes": 8015036
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E256/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E256"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        48.422928842967664,
+        50.567910615129435,
+        49.148437383549876,
+        49.96233803013855,
+        50.86220433274422,
+        50.800503176400305,
+        50.461493452227536
+      ],
+      "cpu_ns_per_lookup_median": 50.461493452227536,
+      "cpu_ns_per_lookup_cv_percent": 1.8474375266942962,
+      "index_bytes": 21736,
+      "backing_bytes": 8000000,
+      "total_bytes": 8021736
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E64/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E64"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        28.100021723861857,
+        28.192807002789472,
+        27.613100716605864,
+        28.108896837496268,
+        28.683963859730767,
+        27.670788955242433,
+        28.37736902500384
+      ],
+      "cpu_ns_per_lookup_median": 28.108896837496268,
+      "cpu_ns_per_lookup_cv_percent": 1.3372556731473255,
+      "index_bytes": 19308,
+      "backing_bytes": 8000000,
+      "total_bytes": 8019308
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E64/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E64"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        24.326244824640103,
+        23.85063884203394,
+        24.57440195842242,
+        24.709433667770618,
+        24.76060538018583,
+        24.386144822451158,
+        24.19463597230915
+      ],
+      "cpu_ns_per_lookup_median": 24.386144822451158,
+      "cpu_ns_per_lookup_cv_percent": 1.30225344488648,
+      "index_bytes": 13116,
+      "backing_bytes": 8000000,
+      "total_bytes": 8013116
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E64/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E64"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        33.17685771498612,
+        33.190887492834655,
+        33.28719359500177,
+        33.21371560593941,
+        33.4362897087282,
+        33.754456535156365,
+        33.23535475483133
+      ],
+      "cpu_ns_per_lookup_median": 33.23535475483133,
+      "cpu_ns_per_lookup_cv_percent": 0.6228525345791197,
+      "index_bytes": 32924,
+      "backing_bytes": 8000000,
+      "total_bytes": 8032924
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E64/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E64"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        33.96098016320186,
+        35.03720326948206,
+        34.750696869661134,
+        34.731726157280505,
+        34.93626935104087,
+        34.64052080928946,
+        34.159199786170404
+      ],
+      "cpu_ns_per_lookup_median": 34.731726157280505,
+      "cpu_ns_per_lookup_cv_percent": 1.1490689354568069,
+      "index_bytes": 33116,
+      "backing_bytes": 8000000,
+      "total_bytes": 8033116
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E64/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E64"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        24.752233858203088,
+        25.471228431738066,
+        25.229224502457804,
+        25.598797789254615,
+        25.39241971721853,
+        25.311092002695418,
+        25.144658073637444
+      ],
+      "cpu_ns_per_lookup_median": 25.311092002695418,
+      "cpu_ns_per_lookup_cv_percent": 1.0845454130408236,
+      "index_bytes": 14216,
+      "backing_bytes": 8000000,
+      "total_bytes": 8014216
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E64/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E64"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        23.50100239660741,
+        23.345645106545618,
+        24.419796423545797,
+        24.613200396886782,
+        24.309327544896266,
+        24.214210836693567,
+        24.35822087034216
+      ],
+      "cpu_ns_per_lookup_median": 24.309327544896266,
+      "cpu_ns_per_lookup_cv_percent": 2.01537962755412,
+      "index_bytes": 12124,
+      "backing_bytes": 8000000,
+      "total_bytes": 8012124
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E64/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E64"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        27.612572393845987,
+        28.08800508244552,
+        28.012852829362973,
+        27.755899900390073,
+        27.97936323117052,
+        27.592040080669037,
+        27.466055401765157
+      ],
+      "cpu_ns_per_lookup_median": 27.755899900390073,
+      "cpu_ns_per_lookup_cv_percent": 0.8704738678871893,
+      "index_bytes": 17136,
+      "backing_bytes": 8000000,
+      "total_bytes": 8017136
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E64/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E64"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        21.602336819149528,
+        22.25523771877196,
+        22.26898973380132,
+        22.67707278445788,
+        22.124273761682883,
+        22.132908747865432,
+        21.46705536897088
+      ],
+      "cpu_ns_per_lookup_median": 22.132908747865432,
+      "cpu_ns_per_lookup_cv_percent": 1.8781420175345953,
+      "index_bytes": 15036,
+      "backing_bytes": 8000000,
+      "total_bytes": 8015036
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R12/E64/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R12",
+        "E64"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        43.243425923934765,
+        43.139580254574824,
+        43.960821302494836,
+        43.83823425493732,
+        44.16206069134431,
+        43.98232780205996,
+        43.875102539919844
+      ],
+      "cpu_ns_per_lookup_median": 43.875102539919844,
+      "cpu_ns_per_lookup_cv_percent": 0.8954426584393804,
+      "index_bytes": 35928,
+      "backing_bytes": 8000000,
+      "total_bytes": 8035928
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E16/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E16"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        25.038005430794342,
+        24.777054756364837,
+        25.228055604408233,
+        25.435600706795714,
+        25.337076634234247,
+        25.097119874330566,
+        25.846086982944847
+      ],
+      "cpu_ns_per_lookup_median": 25.228055604408233,
+      "cpu_ns_per_lookup_cv_percent": 1.3427831925223244,
+      "index_bytes": 1000336,
+      "backing_bytes": 8000000,
+      "total_bytes": 9000336
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E16/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E16"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        18.799685759363612,
+        18.931799757673357,
+        18.51897756295748,
+        18.93207215767015,
+        18.944602557509096,
+        18.908509557969303,
+        19.17927515450119
+      ],
+      "cpu_ns_per_lookup_median": 18.931799757673357,
+      "cpu_ns_per_lookup_cv_percent": 1.0506953598066484,
+      "index_bytes": 812988,
+      "backing_bytes": 8000000,
+      "total_bytes": 8812988
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E16/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E16"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        25.17783634268767,
+        25.516091806643857,
+        25.05328349018006,
+        25.337975724484664,
+        25.353934631947673,
+        25.442167212297143,
+        25.561216993262324
+      ],
+      "cpu_ns_per_lookup_median": 25.353934631947673,
+      "cpu_ns_per_lookup_cv_percent": 0.7175868862606037,
+      "index_bytes": 1042992,
+      "backing_bytes": 8000000,
+      "total_bytes": 9042992
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E16/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E16"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        27.660648174313486,
+        27.677422975205676,
+        28.111570798346484,
+        27.788655881134506,
+        27.79324898137907,
+        27.846568884216943,
+        27.346320357556674
+      ],
+      "cpu_ns_per_lookup_median": 27.788655881134506,
+      "cpu_ns_per_lookup_cv_percent": 0.8317261439070998,
+      "index_bytes": 1043296,
+      "backing_bytes": 8000000,
+      "total_bytes": 9043296
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E16/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E16"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        18.091153355454583,
+        18.570447172909006,
+        18.531191232132596,
+        18.348041048984964,
+        18.35082609883598,
+        18.308917729628817,
+        18.2991037444293
+      ],
+      "cpu_ns_per_lookup_median": 18.348041048984964,
+      "cpu_ns_per_lookup_cv_percent": 0.8680691093647898,
+      "index_bytes": 860356,
+      "backing_bytes": 8000000,
+      "total_bytes": 8860356
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E16/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E16"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        18.095424388915422,
+        18.51120772511676,
+        18.79345962774313,
+        18.846951448314595,
+        19.01878566699233,
+        18.870197276513423,
+        19.126165543844085
+      ],
+      "cpu_ns_per_lookup_median": 18.846951448314595,
+      "cpu_ns_per_lookup_cv_percent": 1.8536908304949438,
+      "index_bytes": 750456,
+      "backing_bytes": 8000000,
+      "total_bytes": 8750456
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E16/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E16"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        25.067438968547084,
+        25.50129814136881,
+        25.574361545210593,
+        25.997912267487845,
+        25.178842574408996,
+        25.261852728771352,
+        25.414309286796296
+      ],
+      "cpu_ns_per_lookup_median": 25.414309286796296,
+      "cpu_ns_per_lookup_cv_percent": 1.2136933796610245,
+      "index_bytes": 1028564,
+      "backing_bytes": 8000000,
+      "total_bytes": 9028564
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E16/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E16"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        15.26252702654771,
+        15.50120587561709,
+        15.373655022788284,
+        15.417011364178192,
+        15.243695484327311,
+        15.53788358865891,
+        15.479746676340413
+      ],
+      "cpu_ns_per_lookup_median": 15.417011364178192,
+      "cpu_ns_per_lookup_cv_percent": 0.7491903661996613,
+      "index_bytes": 953808,
+      "backing_bytes": 8000000,
+      "total_bytes": 8953808
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E16/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E16"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        26.184119018924545,
+        26.465221554447627,
+        26.649851030441855,
+        26.505880698309987,
+        26.341950422827885,
+        26.498672940987394,
+        26.22828963430362
+      ],
+      "cpu_ns_per_lookup_median": 26.465221554447627,
+      "cpu_ns_per_lookup_cv_percent": 0.6303721637197407,
+      "index_bytes": 1021340,
+      "backing_bytes": 8000000,
+      "total_bytes": 9021340
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E256/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E256"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        36.591137590178526,
+        38.77002257678073,
+        39.03896884320613,
+        37.2677055416602,
+        38.060624270509514,
+        39.9209234942446,
+        38.22556397296829
+      ],
+      "cpu_ns_per_lookup_median": 38.22556397296829,
+      "cpu_ns_per_lookup_cv_percent": 2.9090773294731966,
+      "index_bytes": 955280,
+      "backing_bytes": 8000000,
+      "total_bytes": 8955280
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E256/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E256"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        34.89735220652828,
+        35.940970029261315,
+        36.1855449354867,
+        36.258966518776255,
+        36.628775563727515,
+        35.985170313518324,
+        36.04852405428718
+      ],
+      "cpu_ns_per_lookup_median": 36.04852405428718,
+      "cpu_ns_per_lookup_cv_percent": 1.4868504835181022,
+      "index_bytes": 812892,
+      "backing_bytes": 8000000,
+      "total_bytes": 8812892
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E256/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E256"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        36.9023613982353,
+        38.455149435646305,
+        38.77201251238153,
+        38.822350292131354,
+        39.19405505522356,
+        38.946870063091026,
+        38.58523285594202
+      ],
+      "cpu_ns_per_lookup_median": 38.77201251238153,
+      "cpu_ns_per_lookup_cv_percent": 1.9586992719309062,
+      "index_bytes": 957600,
+      "backing_bytes": 8000000,
+      "total_bytes": 8957600
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E256/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E256"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        38.629953428838924,
+        40.87240235083459,
+        39.627152937069134,
+        39.57020978966076,
+        40.18186252424046,
+        38.76411703955742,
+        39.89686901576827
+      ],
+      "cpu_ns_per_lookup_median": 39.627152937069134,
+      "cpu_ns_per_lookup_cv_percent": 1.9726083185758785,
+      "index_bytes": 957696,
+      "backing_bytes": 8000000,
+      "total_bytes": 8957696
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E256/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E256"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        34.08664654790496,
+        34.28438884044532,
+        35.674407974135676,
+        34.8307884021607,
+        34.85990383173593,
+        35.52130934028397,
+        35.15906487063592
+      ],
+      "cpu_ns_per_lookup_median": 34.85990383173593,
+      "cpu_ns_per_lookup_cv_percent": 1.6934670111283885,
+      "index_bytes": 859988,
+      "backing_bytes": 8000000,
+      "total_bytes": 8859988
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E256/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E256"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        34.588216983879114,
+        36.74600260207195,
+        34.55863103059498,
+        35.897954815037366,
+        36.26889802766245,
+        36.475502457750004,
+        36.374313525078435
+      ],
+      "cpu_ns_per_lookup_median": 36.26889802766245,
+      "cpu_ns_per_lookup_cv_percent": 2.522784257949017,
+      "index_bytes": 750376,
+      "backing_bytes": 8000000,
+      "total_bytes": 8750376
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E256/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E256"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        37.4236612210015,
+        37.60012204535661,
+        38.32772078687212,
+        38.15985470586383,
+        38.45744769426896,
+        37.89878937668511,
+        37.439507779050494
+      ],
+      "cpu_ns_per_lookup_median": 37.89878937668511,
+      "cpu_ns_per_lookup_cv_percent": 1.1246173022820252,
+      "index_bytes": 950148,
+      "backing_bytes": 8000000,
+      "total_bytes": 8950148
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E256/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E256"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        29.01922547722558,
+        29.69715877925678,
+        30.377573081479486,
+        30.278539823878244,
+        30.596934848313296,
+        30.51030659166587,
+        30.641799601757977
+      ],
+      "cpu_ns_per_lookup_median": 30.377573081479486,
+      "cpu_ns_per_lookup_cv_percent": 1.9721403464173122,
+      "index_bytes": 953808,
+      "backing_bytes": 8000000,
+      "total_bytes": 8953808
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E256/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E256"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        39.43637148773653,
+        41.33311647612169,
+        41.947702654764015,
+        41.72045594417628,
+        41.45269018169796,
+        41.30194797466741,
+        40.86898915449744
+      ],
+      "cpu_ns_per_lookup_median": 41.33311647612169,
+      "cpu_ns_per_lookup_cv_percent": 2.014994427462452,
+      "index_bytes": 960396,
+      "backing_bytes": 8000000,
+      "total_bytes": 8960396
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E64/Clustered/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E64"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        30.02978935748709,
+        29.407431569805464,
+        29.629285595473256,
+        30.21643188735438,
+        29.735568147206802,
+        29.545901317083867,
+        29.913137776319456
+      ],
+      "cpu_ns_per_lookup_median": 29.735568147206802,
+      "cpu_ns_per_lookup_cv_percent": 0.9584068233008306,
+      "index_bytes": 958080,
+      "backing_bytes": 8000000,
+      "total_bytes": 8958080
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E64/Exponential/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E64"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        25.393050475319992,
+        26.318801574455907,
+        26.336565739957987,
+        26.401395787254128,
+        26.330339125243206,
+        26.64093731794394,
+        26.349751512287813
+      ],
+      "cpu_ns_per_lookup_median": 26.336565739957987,
+      "cpu_ns_per_lookup_cv_percent": 1.5066271164023834,
+      "index_bytes": 812924,
+      "backing_bytes": 8000000,
+      "total_bytes": 8812924
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E64/ExtremePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E64"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        29.368605478330178,
+        30.658125213234463,
+        30.60962791987108,
+        31.14669838262465,
+        30.3169499310969,
+        30.763379164331962,
+        30.534658304807632
+      ],
+      "cpu_ns_per_lookup_median": 30.60962791987108,
+      "cpu_ns_per_lookup_cv_percent": 1.8154793147395636,
+      "index_bytes": 971696,
+      "backing_bytes": 8000000,
+      "total_bytes": 8971696
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E64/InversePoly/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E64"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        31.509488912267354,
+        31.948124505941728,
+        31.834721157332556,
+        31.83115501429343,
+        31.755790524758165,
+        31.839476014718063,
+        31.758881182060097
+      ],
+      "cpu_ns_per_lookup_median": 31.83115501429343,
+      "cpu_ns_per_lookup_cv_percent": 0.42906798783959266,
+      "index_bytes": 971888,
+      "backing_bytes": 8000000,
+      "total_bytes": 8971888
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E64/Lognormal/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E64"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        25.260006580685253,
+        25.319881547668246,
+        25.470032393657284,
+        25.549556730603694,
+        25.67783374964876,
+        25.39773754188303,
+        25.893606076472352
+      ],
+      "cpu_ns_per_lookup_median": 25.470032393657284,
+      "cpu_ns_per_lookup_cv_percent": 0.8614153872945449,
+      "index_bytes": 860164,
+      "backing_bytes": 8000000,
+      "total_bytes": 8860164
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E64/Mixed/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E64"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        25.243471790683998,
+        26.384857433953936,
+        26.268355866128577,
+        25.86682844997566,
+        26.676294532082636,
+        26.033337766250437,
+        26.483041145203675
+      ],
+      "cpu_ns_per_lookup_median": 26.268355866128577,
+      "cpu_ns_per_lookup_cv_percent": 1.8291844993573751,
+      "index_bytes": 750408,
+      "backing_bytes": 8000000,
+      "total_bytes": 8750408
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E64/Quadratic/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E64"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        28.744958022712563,
+        29.060193185084636,
+        29.362370062408797,
+        29.024895008326514,
+        29.40725791724739,
+        29.1436437879426,
+        29.45500227193776
+      ],
+      "cpu_ns_per_lookup_median": 29.1436437879426,
+      "cpu_ns_per_lookup_cv_percent": 0.8728410554589786,
+      "index_bytes": 951268,
+      "backing_bytes": 8000000,
+      "total_bytes": 8951268
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E64/Uniform/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E64"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        21.652610997516245,
+        22.272473566364045,
+        22.067601119517352,
+        21.384178725290703,
+        21.430460151537694,
+        21.8883377285276,
+        22.095832789521573
+      ],
+      "cpu_ns_per_lookup_median": 21.8883377285276,
+      "cpu_ns_per_lookup_cv_percent": 1.5827574339082333,
+      "index_bytes": 953808,
+      "backing_bytes": 8000000,
+      "total_bytes": 8953808
+    },
+    {
+      "benchmark_name": "Lookup/RadixSpline/R18/E64/Zipf/N1000000/RandomMixed",
+      "category": "Lookup",
+      "configuration": [
+        "RadixSpline",
+        "R18",
+        "E64"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        31.71266046319777,
+        32.98154149286578,
+        32.94613617160601,
+        32.97605937861191,
+        33.51033709749646,
+        32.95024775730006,
+        33.34975683396573
+      ],
+      "cpu_ns_per_lookup_median": 32.97605937861191,
+      "cpu_ns_per_lookup_cv_percent": 1.7536184021257002,
+      "index_bytes": 974588,
+      "backing_bytes": 8000000,
+      "total_bytes": 8974588
+    },
+    {
+      "benchmark_name": "Membership/stdset/Clustered/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdset"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        151.51201404058187,
+        152.54611800654092,
+        153.25193499918305,
+        152.4387934191021,
+        156.22293210773162,
+        156.57520928295622,
+        152.90092046616033
+      ],
+      "cpu_ns_per_lookup_median": 152.90092046616033,
+      "cpu_ns_per_lookup_cv_percent": 1.2785637367503044,
+      "index_bytes": 40000040,
+      "backing_bytes": 0,
+      "total_bytes": 40000040
+    },
+    {
+      "benchmark_name": "Membership/stdset/Exponential/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdset"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        166.94670152111863,
+        179.84489003369458,
+        174.52103833605997,
+        175.21251392200904,
+        178.32160248829499,
+        182.4321824474875,
+        177.5918533459166
+      ],
+      "cpu_ns_per_lookup_median": 177.5918533459166,
+      "cpu_ns_per_lookup_cv_percent": 2.812227481735853,
+      "index_bytes": 40000040,
+      "backing_bytes": 0,
+      "total_bytes": 40000040
+    },
+    {
+      "benchmark_name": "Membership/stdset/ExtremePoly/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdset"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        154.2170476216476,
+        155.30407766806437,
+        157.5849420230833,
+        159.40892147868894,
+        155.84996611930725,
+        159.9987183488612,
+        151.64306490256632
+      ],
+      "cpu_ns_per_lookup_median": 155.84996611930725,
+      "cpu_ns_per_lookup_cv_percent": 1.8875726648504572,
+      "index_bytes": 40000040,
+      "backing_bytes": 0,
+      "total_bytes": 40000040
+    },
+    {
+      "benchmark_name": "Membership/stdset/InversePoly/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdset"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        149.28977819708672,
+        154.4834706765764,
+        152.48830336169357,
+        152.2307847818487,
+        152.17302360507003,
+        154.3198140090482,
+        150.39566406095398
+      ],
+      "cpu_ns_per_lookup_median": 152.2307847818487,
+      "cpu_ns_per_lookup_cv_percent": 1.2442697879160902,
+      "index_bytes": 40000040,
+      "backing_bytes": 0,
+      "total_bytes": 40000040
+    },
+    {
+      "benchmark_name": "Membership/stdset/Lognormal/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdset"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        189.54832655707185,
+        189.15906773251197,
+        195.8652720445526,
+        194.06846515098562,
+        193.10049834009365,
+        192.25537747005777,
+        189.4151201152318
+      ],
+      "cpu_ns_per_lookup_median": 192.25537747005777,
+      "cpu_ns_per_lookup_cv_percent": 1.3655553468070232,
+      "index_bytes": 40000040,
+      "backing_bytes": 0,
+      "total_bytes": 40000040
+    },
+    {
+      "benchmark_name": "Membership/stdset/Mixed/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdset"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        187.37088758514818,
+        179.14310672504993,
+        191.0730938580669,
+        184.72814089927306,
+        180.81197691026486,
+        185.6370922998753,
+        186.65523591418426
+      ],
+      "cpu_ns_per_lookup_median": 185.6370922998753,
+      "cpu_ns_per_lookup_cv_percent": 2.178738263390259,
+      "index_bytes": 40000040,
+      "backing_bytes": 0,
+      "total_bytes": 40000040
+    },
+    {
+      "benchmark_name": "Membership/stdset/Quadratic/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdset"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        148.04409241589485,
+        146.98632587613653,
+        148.01407633928324,
+        156.3333321326856,
+        162.737562238336,
+        152.73740615473355,
+        155.60454179255967
+      ],
+      "cpu_ns_per_lookup_median": 152.73740615473355,
+      "cpu_ns_per_lookup_cv_percent": 3.7596152314579205,
+      "index_bytes": 40000040,
+      "backing_bytes": 0,
+      "total_bytes": 40000040
+    },
+    {
+      "benchmark_name": "Membership/stdset/Uniform/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdset"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        146.62274422569996,
+        155.95722043105692,
+        153.27775237210963,
+        157.74851147046977,
+        153.149064369285,
+        158.57923848873838,
+        151.4818653325869
+      ],
+      "cpu_ns_per_lookup_median": 153.27775237210963,
+      "cpu_ns_per_lookup_cv_percent": 2.6626463891619885,
+      "index_bytes": 40000040,
+      "backing_bytes": 0,
+      "total_bytes": 40000040
+    },
+    {
+      "benchmark_name": "Membership/stdset/Zipf/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdset"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        161.6898479606403,
+        162.34645778991614,
+        164.46979723785364,
+        157.30513910066927,
+        162.88051765105502,
+        168.8790160914429,
+        162.56833773220336
+      ],
+      "cpu_ns_per_lookup_median": 162.56833773220336,
+      "cpu_ns_per_lookup_cv_percent": 2.1178351608500607,
+      "index_bytes": 40000040,
+      "backing_bytes": 0,
+      "total_bytes": 40000040
+    },
+    {
+      "benchmark_name": "Membership/stdunordered_set/Clustered/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdunordered_set"
+      ],
+      "distribution": "Clustered",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        45.715729476372196,
+        48.12051367828203,
+        47.00016005051689,
+        47.90476423753249,
+        46.55591081327922,
+        45.45770254024203,
+        47.40783589889435
+      ],
+      "cpu_ns_per_lookup_median": 47.00016005051689,
+      "cpu_ns_per_lookup_cv_percent": 2.1971080067312214,
+      "index_bytes": 32000096,
+      "backing_bytes": 0,
+      "total_bytes": 32000096
+    },
+    {
+      "benchmark_name": "Membership/stdunordered_set/Exponential/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdunordered_set"
+      ],
+      "distribution": "Exponential",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        30.23357790028503,
+        30.78119308564983,
+        30.017816617311404,
+        30.97783058441995,
+        31.162768826971053,
+        30.616053584391715,
+        31.138020400350815
+      ],
+      "cpu_ns_per_lookup_median": 30.78119308564983,
+      "cpu_ns_per_lookup_cv_percent": 1.4441423288736466,
+      "index_bytes": 32000096,
+      "backing_bytes": 0,
+      "total_bytes": 32000096
+    },
+    {
+      "benchmark_name": "Membership/stdunordered_set/ExtremePoly/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdunordered_set"
+      ],
+      "distribution": "ExtremePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        96.63937463605635,
+        101.26343279631297,
+        100.04587884455854,
+        100.35203190344667,
+        97.33902701556914,
+        106.84300612302664,
+        102.96624375782903
+      ],
+      "cpu_ns_per_lookup_median": 100.35203190344667,
+      "cpu_ns_per_lookup_cv_percent": 3.424922635943523,
+      "index_bytes": 32000096,
+      "backing_bytes": 0,
+      "total_bytes": 32000096
+    },
+    {
+      "benchmark_name": "Membership/stdunordered_set/InversePoly/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdunordered_set"
+      ],
+      "distribution": "InversePoly",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        153.58512035342213,
+        165.11270873096905,
+        157.98270987893252,
+        154.0543984095037,
+        160.7163807056152,
+        160.87280672430754,
+        163.9950195973991
+      ],
+      "cpu_ns_per_lookup_median": 160.7163807056152,
+      "cpu_ns_per_lookup_cv_percent": 2.8276869022217292,
+      "index_bytes": 32000096,
+      "backing_bytes": 0,
+      "total_bytes": 32000096
+    },
+    {
+      "benchmark_name": "Membership/stdunordered_set/Lognormal/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdunordered_set"
+      ],
+      "distribution": "Lognormal",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        43.721677313963845,
+        48.81272119298929,
+        45.205711826301616,
+        43.0851261719474,
+        49.38135079224443,
+        47.79458068004399,
+        44.771218741154335
+      ],
+      "cpu_ns_per_lookup_median": 45.205711826301616,
+      "cpu_ns_per_lookup_cv_percent": 5.479895818926592,
+      "index_bytes": 32000096,
+      "backing_bytes": 0,
+      "total_bytes": 32000096
+    },
+    {
+      "benchmark_name": "Membership/stdunordered_set/Mixed/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdunordered_set"
+      ],
+      "distribution": "Mixed",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        24.191784180106684,
+        24.940701365997658,
+        25.145614988823613,
+        25.35127715456344,
+        25.55020243407443,
+        24.77246634597674,
+        25.52138353186439
+      ],
+      "cpu_ns_per_lookup_median": 25.145614988823613,
+      "cpu_ns_per_lookup_cv_percent": 1.923970457327808,
+      "index_bytes": 32000096,
+      "backing_bytes": 0,
+      "total_bytes": 32000096
+    },
+    {
+      "benchmark_name": "Membership/stdunordered_set/Quadratic/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdunordered_set"
+      ],
+      "distribution": "Quadratic",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        39.58186927523103,
+        39.982341644771346,
+        39.11109365389344,
+        40.51602017561038,
+        41.39039908053706,
+        39.133294680772856,
+        40.662888507294404
+      ],
+      "cpu_ns_per_lookup_median": 39.982341644771346,
+      "cpu_ns_per_lookup_cv_percent": 2.1221317488432976,
+      "index_bytes": 32000096,
+      "backing_bytes": 0,
+      "total_bytes": 32000096
+    },
+    {
+      "benchmark_name": "Membership/stdunordered_set/Uniform/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdunordered_set"
+      ],
+      "distribution": "Uniform",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        13.623520367303662,
+        15.095077163772029,
+        14.785055564515682,
+        14.581124565005199,
+        14.866163164321833,
+        14.548588565083278,
+        14.595184764969396
+      ],
+      "cpu_ns_per_lookup_median": 14.595184764969396,
+      "cpu_ns_per_lookup_cv_percent": 3.1977751286586296,
+      "index_bytes": 32000096,
+      "backing_bytes": 0,
+      "total_bytes": 32000096
+    },
+    {
+      "benchmark_name": "Membership/stdunordered_set/Zipf/N1000000/RandomMixed",
+      "category": "Membership",
+      "configuration": [
+        "stdunordered_set"
+      ],
+      "distribution": "Zipf",
+      "n": 1000000,
+      "query_pattern": "RandomMixed",
+      "batch_width": 1,
+      "cpu_ns_per_lookup_samples": [
+        303.93037340578235,
+        311.70401927955095,
+        318.4171096930146,
+        300.6426514789144,
+        314.6103925409224,
+        306.8638246789094,
+        318.10345605691117
+      ],
+      "cpu_ns_per_lookup_median": 311.70401927955095,
+      "cpu_ns_per_lookup_cv_percent": 2.247111252843411,
+      "index_bytes": 32000096,
+      "backing_bytes": 0,
+      "total_bytes": 32000096
+    }
+  ],
+  "cpu_counter_profiles": {
+    "workload": "Scalar lookup, Clustered, Unique encoding, N1000000; Instruments CPU Counters; separate from benchmark timing",
+    "original_baseline": {
+      "source": "build-review/ilp-experiment/clustered-counter-metrics.xml",
+      "filter": {
+        "thread": "profile-driver main thread",
+        "startup_excluded_before_timestamp_ns": 2000000000,
+        "bucket": [
+          "timestamp",
+          "duration",
+          "thread",
+          "process",
+          "core"
+        ]
+      },
+      "interpretation": "discarded, delivery, processing, and useful are fractions of sustainable instruction bandwidth from Instruments; they are not literal branch-miss rates or wall-time shares.",
+      "matched_samples": 22980,
+      "matched_cycle_samples": 22980,
+      "matched_fraction_samples_per_metric": 22980,
+      "matched_metric_rows": 114900,
+      "total_cycles": 36806839543,
+      "total_duration_ns": 10923890707,
+      "cycle_weighted_percent": {
+        "discarded": 57.08932012313304,
+        "delivery": 22.66508309653012,
+        "processing": 1.3413835472630622,
+        "useful": 18.904213033429723
+      },
+      "duration_weighted_percent": {
+        "discarded": 57.08789245211708,
+        "delivery": 22.664060916732975,
+        "processing": 1.3454356963372762,
+        "useful": 18.902610735164632
+      },
+      "core_types_by_cycles": {
+        "Efficiency": 1652411,
+        "Performance": 36805187132
+      }
+    },
+    "production": {
+      "source": "build-review/ilp-stage2/profile-final/counter-metrics.xml",
+      "filter": {
+        "thread": "profile-driver main thread",
+        "startup_excluded_before_timestamp_ns": 2000000000,
+        "bucket": [
+          "timestamp",
+          "duration",
+          "thread",
+          "process",
+          "core"
+        ]
+      },
+      "interpretation": "discarded, delivery, processing, and useful are fractions of sustainable instruction bandwidth from Instruments; they are not literal branch-miss rates or wall-time shares.",
+      "matched_samples": 23201,
+      "matched_cycle_samples": 23201,
+      "matched_fraction_samples_per_metric": 23201,
+      "matched_metric_rows": 116005,
+      "total_cycles": 36984165657,
+      "total_duration_ns": 10978191460,
+      "cycle_weighted_percent": {
+        "discarded": 36.671966217662636,
+        "delivery": 2.4648476597733957,
+        "processing": 37.59876748071981,
+        "useful": 23.264418441591484
+      },
+      "duration_weighted_percent": {
+        "discarded": 36.669071906530405,
+        "delivery": 2.4647733918174315,
+        "processing": 37.60394513083426,
+        "useful": 23.262209370564808
+      },
+      "core_types_by_cycles": {
+        "Efficiency": 3312978,
+        "Performance": 36980852679
+      },
+      "excluded": {
+        "bucket_count": 1,
+        "metric_row_count": 5,
+        "core_types_by_bucket": {
+          "Efficiency": 1
+        },
+        "missing_or_sentinel_metrics": {
+          "delivery": 1
+        },
+        "buckets": [
+          {
+            "timestamp_ns": 11455811791,
+            "duration_ns": 8500,
+            "thread": "Main Thread (0xd7e753) (profile-driver-final, pid: 4582)",
+            "process": "profile-driver-final (4582)",
+            "core": "Efficiency",
+            "absent_metrics": [],
+            "sentinel_metrics": [
+              "delivery"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

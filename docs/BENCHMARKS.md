@@ -5,6 +5,7 @@ RadixSpline across multiple data distributions and index configurations.
 
 ## Table of Contents
 - [Overview](#overview)
+- [Measured routing and batch results](#measured-routing-and-batch-results-2026-10-20)
 - [Benchmark Setup](#benchmark-setup)
 - [Performance by Segment Group](#performance-by-segment-group)
 - [Distribution Analysis](#distribution-analysis)
@@ -21,23 +22,36 @@ JazzyIndex is benchmarked against `std::lower_bound` (binary search) across 9 di
 - **Distribution sensitivity:** Which data patterns benefit most
 - **Query scenarios:** Found (middle/end) vs. Not Found cases
 
-All benchmarks use Google Benchmark on sorted `uint64_t` arrays with datasets from 100 to 10,000 elements.
+All benchmarks use Google Benchmark on sorted `uint64_t` arrays. The historical
+plots cover 100 to 10,000 elements; the competitive suite extends to one million.
 
 The committed plots are historical, hardware-specific results and were not regenerated for the current correctness release. Re-run the suite on an otherwise idle target machine before using these figures for capacity planning or release claims.
 
-### Competitive learned-index suite
+### Competitive container suite
 
 `benchmark_competitors` runs identical deterministic query streams generated
-with a 90% target hit probability against:
+with 262,144 queries and a 90% target hit probability against:
 
 - JazzyIndex with 64, 256, and 512 segments
 - PGM-index with epsilon 16, 64, and 256
 - RadixSpline with maximum error 16, 64, and 256, using both 12- and 18-bit radix tables
 - `std::lower_bound`
+- `std::set` and `std::unordered_set` membership
+- Four independent JazzyIndex queries through `find_batch` (256 initial segments)
 
-Each lookup reports logical `index_bytes`, excluding the shared source array,
-allocator overhead, and unused container capacity; construction is benchmarked
-separately with destruction outside the timed region.
+Each lookup reports `index_bytes`, `backing_bytes`, and their sum, `total_bytes`.
+JazzyIndex counts its object and allocated metadata capacity. PGM and RadixSpline
+use their library-reported metadata sizes, which may exclude spare capacity.
+Sorted-array implementations count the backing vector's allocated capacity;
+the standard containers own their keys and report live node/bucket allocations
+with zero separate backing bytes. Query storage and allocator bookkeeping are
+excluded. Construction is benchmarked separately for the learned indexes, with
+destruction outside the timed region.
+
+Batch4 timing is **per batch of four queries**: divide its nanoseconds by four
+for throughput per query. It does not measure individual query latency.
+Every implementation validates its results against `std::lower_bound` before
+timing; batch validation checks every lane.
 PGM-index and RadixSpline are fetched only when `BUILD_BENCHMARKS=ON` and are
 pinned to exact upstream revisions.
 Build measurements are serial for all three indexes; PGM-index's optional
@@ -64,6 +78,126 @@ cmake --build build --target benchmark_competitors
 
 These synthetic distributions make implementations directly comparable but do
 not replace validation on real application data or SOSD datasets.
+The unique-key transform can also interact poorly with integer hashing: on the
+tested libc++ implementation, the one-million-key Zipf fixture causes heavy
+bucket collisions. Its hash-table result should not be generalized to other
+key encodings or hash functions.
+
+## Measured routing and batch results (2026-10-20)
+
+These measurements use an Apple M2 with 8 GiB RAM, macOS 27.0.1, Apple Clang
+21.0.0, the Xcode 26.5 SDK, C++20, `-O3`, and `-DNDEBUG`. Each case uses
+262,144 deterministic queries with a 90% target hit probability, seven randomly
+interleaved repetitions, and a minimum 0.1-second timing interval. Numbers are
+median CPU nanoseconds per query. Builds, tests, and profiling ran separately
+from timing. CPU affinity was unavailable; the OS scheduled execution.
+
+The changes add a logarithmic radix directory for eligible unsigned keys,
+direct offsets for contiguous unique integers, and a four-query throughput API.
+Model evaluation stays inline. Against commit `40e0e9c`, the scalar path improved
+34 of 36 measured cases across nine distributions, original and uniquely encoded
+keys, and 10K and 1M elements. The two regressions were noncontiguous uniform
+keys: approximately 1% at 10K and 2% at 1M.
+
+All repetition samples, medians, variation, and memory measurements are retained
+in the [machine-readable summary](benchmark-summary-2026-10-20.json).
+
+At one million elements, the original key distributions measured:
+
+| Distribution | Previous scalar ns | New scalar ns | Lookup time reduction |
+|---|---:|---:|---:|
+| Uniform, contiguous | 8.00 | 3.41 | 57% |
+| Exponential | 11.34 | 6.48 | 43% |
+| Clustered | 58.14 | 35.95 | 38% |
+| Lognormal | 14.89 | 8.53 | 43% |
+| Zipf | 36.44 | 20.18 | 45% |
+| Mixed | 10.59 | 6.40 | 40% |
+| Quadratic | 39.27 | 14.95 | 62% |
+| ExtremePoly | 40.86 | 16.71 | 59% |
+| InversePoly | 39.85 | 20.85 | 48% |
+
+### Comparison with other containers
+
+The table below uses one million **uniquely encoded** keys and identical query
+streams. JazzyIndex uses the default 256 initial segments. PGM and RadixSpline
+columns show their fastest tested configuration for each distribution, chosen
+from all three PGM settings and all six RadixSpline settings. Batch4 reports
+throughput per query, not the latency of an isolated lookup. Standard containers
+answer membership; sorted-array implementations return an exact position.
+
+| Distribution | Jazzy scalar | Jazzy Batch4 / query | Best PGM | Best RadixSpline | Binary search | Hash set | Tree set |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Uniform | 12.78 | 12.07 | 18.92 | 15.24 | 53.08 | 14.60 | 153.28 |
+| Exponential | 14.75 | 12.56 | 30.32 | 17.60 | 50.42 | 30.78 | 177.59 |
+| Clustered | 40.07 | 35.89 | 42.58 | 25.23 | 53.10 | 47.00 | 152.90 |
+| Lognormal | 15.28 | 12.93 | 30.74 | 18.35 | 51.24 | 45.21 | 192.26 |
+| Zipf | 33.31 | 26.71 | 43.15 | 26.47 | 52.86 | 311.70 | 162.57 |
+| Mixed | 13.92 | 11.90 | 29.27 | 17.71 | 50.77 | 25.15 | 185.64 |
+| Quadratic | 37.44 | 26.03 | 47.46 | 25.41 | 52.54 | 39.98 | 152.74 |
+| ExtremePoly | 38.02 | 29.29 | 44.63 | 25.35 | 53.15 | 100.35 | 155.85 |
+| InversePoly | 40.45 | 32.01 | 48.36 | 27.79 | 53.00 | 160.72 | 152.23 |
+
+PGM's winner is E16 except for Clustered, where E256 wins. RadixSpline's winner
+is R12/E16 for Uniform, Exponential, and Mixed, and R18/E16 elsewhere.
+JazzyIndex scalar measured faster than PGM, binary search, and both standard
+containers on all nine fixtures, and faster than RadixSpline on four. RadixSpline
+retains a substantial Clustered lead. Batch4 reduces JazzyIndex time per query by
+approximately 6–30%, bringing Zipf and Quadratic within about 1% and 2.5% of
+RadixSpline respectively; those close results do not establish a win.
+
+Counting the backing array, default JazzyIndex retains 8.02–9.05 MB here, the
+winning PGM settings 8.00–8.03 MB, and the winning RadixSpline settings
+8.01–9.04 MB. The hash set retains 32.00 MB and the tree set 40.00 MB.
+PGM and RadixSpline figures use upstream logical size reports; JazzyIndex and
+the standard containers count allocated capacity. These are retained storage
+figures, not peak construction memory or process RSS. The uniquely encoded Zipf
+fixture causes hash collisions on this libc++ implementation; its hash timing
+does not establish general superiority over hashing.
+
+Batching is optional. In a separate scalar-versus-batch run on original,
+duplicate-heavy Zipf keys, Batch4 was about 7% slower per query (21.10 versus
+19.77 ns). It should be selected using representative measurements.
+
+Reproduce the competitive lookup run with:
+
+```bash
+./build/benchmark_competitors --full-benchmarks \
+  --benchmark_filter='^(Lookup|Membership)/.*/N1000000/RandomMixed$' \
+  --benchmark_min_time=0.1s --benchmark_repetitions=7 \
+  --benchmark_enable_random_interleaving=true \
+  --benchmark_display_aggregates_only=true \
+  --benchmark_out=competitors.json --benchmark_out_format=json
+```
+
+### Hardware-counter evidence
+
+Instruments CPU Counters profiled the scalar lookup loop on one million uniquely
+encoded Clustered keys. Both profiles exclude the first two seconds and aggregate
+main-thread samples weighted by cycle count.
+
+| Fraction of sustainable instruction bandwidth | Previous | New |
+|---|---:|---:|
+| Discarded | 57.09% | 36.67% |
+| Instruction delivery | 22.67% | 2.46% |
+| Instruction processing | 1.34% | 37.60% |
+| Useful | 18.90% | 23.26% |
+
+These categories are **not branch-miss rates or wall-time shares**. The new
+profile contains 23,201 complete samples; one Efficiency-core sample with a
+missing delivery counter was excluded as a whole. The changed balance supports
+investigating local search and dependent loads next, particularly on Clustered
+data where RadixSpline still leads. The timing results, rather than these
+fractions alone, establish the lookup improvement.
+
+Larger flat directories, prefetching, and more aggressive segment refinement were
+also tried. They did not provide enough consistent speed benefit for their memory
+or complexity costs. The retained batch API exposes independent lookups so the
+processor can overlap their work without adding persistent index memory.
+
+These are repeated-stream lookup measurements on synthetic fixtures, not a
+cold-cache test or a guarantee for other hardware. The unique-key encoding used
+by the competitive suite changes spacing and duplicates, so its timings must
+be compared within that suite.
 
 ## Benchmark Setup
 
@@ -268,15 +402,27 @@ For clarity, performance plots are split into three groups:
 
 ### Memory Footprint
 
-Per index:
-- **Segment metadata:** Approximately S × 64 bytes for `uint64_t` keys
-- **Original array:** Not owned by JazzyIndex; the caller retains N × 8 bytes
-- **Application working set:** Approximately `(N × 8) + (S × 64)` bytes when counting both
+Use `sizeof(index) + index.size_in_bytes()` for retained index storage, then add
+the backing array's allocated capacity. The template segment count is an initial
+split: refinement can increase the count, and vector capacity can exceed it.
+On this build, a `uint64_t` segment occupies 64 bytes and the default index object
+occupies 120 bytes, up from 88.
 
-Examples:
-- 10K elements, 256 segments: ~80KB source + 16KB index = **96KB**
-- 100K elements, 512 segments: ~800KB source + 32KB index = **832KB**
-- 1M elements, 1024 segments: ~8MB source + 64KB index = **~8.06MB**
+Eligible nonuniform unsigned indexes also retain a routing directory whose size
+depends on key span. It uses at most 1,703,940 bytes for the full `uint64_t` span.
+Fresh uniform indexes and indexes using custom comparators or extractors allocate
+no directory. `find_batch<4>` adds 256 bytes of lane state on this target's stack,
+plus its input/output arrays; it adds no persistent index storage.
+
+For the measured one-million-key original fixtures, total retained index storage
+ranges from 16,504 to 402,460 bytes, plus the 8,000,000-byte backing array.
+Unique encoding widens the key span: those indexes use 16,504 to 1,054,860 bytes
+plus the same backing array. This is a deliberate speed-for-memory tradeoff.
+At 10K uniquely encoded keys, index storage reaches 491,328 bytes for an
+80,000-byte array, compared with 16,472 bytes before this change.
+
+Directory construction also adds a duplicate scan and table initialization to
+eligible builds. Lookup gains do not imply faster construction.
 
 ---
 

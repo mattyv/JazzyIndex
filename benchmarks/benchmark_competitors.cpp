@@ -1,12 +1,16 @@
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <limits>
 #include <memory>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
+#include <unordered_set>
 #include <vector>
 
 #include <benchmark/benchmark.h>
@@ -19,8 +23,60 @@ namespace {
 
 using Key = std::uint64_t;
 using Data = std::vector<Key>;
+constexpr std::size_t kQueryCount = 262'144;
 
 bool use_full_benchmarks = false;
+
+struct AllocationCounter {
+    std::size_t live_bytes = 0;
+};
+
+template <class T>
+struct CountingAllocator {
+    using value_type = T;
+
+    std::shared_ptr<AllocationCounter> counter = std::make_shared<AllocationCounter>();
+
+    CountingAllocator() = default;
+    explicit CountingAllocator(std::shared_ptr<AllocationCounter> value)
+        : counter(std::move(value)) {}
+    template <class U>
+    CountingAllocator(const CountingAllocator<U>& other) : counter(other.counter) {}
+
+    T* allocate(std::size_t count) {
+        T* result = std::allocator<T>{}.allocate(count);
+        counter->live_bytes += count * sizeof(T);
+        return result;
+    }
+    void deallocate(T* pointer, std::size_t count) noexcept {
+        counter->live_bytes -= count * sizeof(T);
+        std::allocator<T>{}.deallocate(pointer, count);
+    }
+    template <class U>
+    bool operator==(const CountingAllocator<U>& other) const noexcept {
+        return counter == other.counter;
+    }
+    template <class U>
+    bool operator!=(const CountingAllocator<U>& other) const noexcept {
+        return !(*this == other);
+    }
+    template <class>
+    friend struct CountingAllocator;
+};
+
+void verify_counting_allocator() {
+    auto counter = std::make_shared<AllocationCounter>();
+    {
+        std::vector<Key, CountingAllocator<Key>> values{CountingAllocator<Key>{counter}};
+        values.resize(3);
+        if (counter->live_bytes != values.capacity() * sizeof(Key)) {
+            throw std::logic_error("counting allocator did not report live allocation bytes");
+        }
+    }
+    if (counter->live_bytes != 0) {
+        throw std::logic_error("counting allocator retained deallocated bytes");
+    }
+}
 
 Data make_unique_keys(Data values) {
     if (values.size() >= std::numeric_limits<Key>::max()) {
@@ -64,6 +120,7 @@ template <typename Lookup>
 void register_lookup(const std::string& implementation, const std::string& configuration,
                      const std::string& distribution, std::shared_ptr<const Data> data,
                      std::shared_ptr<const Data> queries, std::size_t index_bytes,
+                     std::size_t backing_bytes,
                      Lookup lookup) {
     for (const Key query : *queries) {
         const std::size_t expected = exact_lower_bound(*data, query);
@@ -80,18 +137,53 @@ void register_lookup(const std::string& implementation, const std::string& confi
         name += "/" + configuration;
     }
     name += "/" + distribution + "/N" + std::to_string(data->size()) + "/RandomMixed";
+    const std::size_t size = data->size();
 
     benchmark::RegisterBenchmark(
         name.c_str(),
-        [data = std::move(data), queries = std::move(queries), index_bytes,
+        [queries = std::move(queries), index_bytes, backing_bytes, size,
          lookup = std::move(lookup)](benchmark::State& state) {
-            std::size_t i = 0;
+            std::size_t checksum = 0, cursor = 0;
             for (auto _ : state) {
-                auto result = lookup((*queries)[i++ % queries->size()]);
-                benchmark::DoNotOptimize(result);
+                checksum += lookup((*queries)[cursor]);
+                if (++cursor == queries->size()) cursor = 0;
             }
+            benchmark::DoNotOptimize(checksum);
             state.counters["index_bytes"] = static_cast<double>(index_bytes);
-            state.counters["size"] = static_cast<double>(data->size());
+            state.counters["backing_bytes"] = static_cast<double>(backing_bytes);
+            state.counters["total_bytes"] = static_cast<double>(index_bytes + backing_bytes);
+            state.counters["size"] = static_cast<double>(size);
+        })->Unit(benchmark::kNanosecond);
+}
+
+template <typename Contains>
+void register_contains(const std::string& implementation, const std::string& distribution,
+                       std::shared_ptr<const Data> data, std::shared_ptr<const Data> queries,
+                       std::size_t index_bytes, Contains contains) {
+    for (const Key query : *queries) {
+        const bool expected = exact_lower_bound(*data, query) != data->size();
+        if (expected != contains(query)) {
+            throw std::logic_error(implementation + " returned incorrect membership for key " +
+                                   std::to_string(query));
+        }
+    }
+    const std::string name = "Membership/" + implementation + "/" + distribution + "/N" +
+                             std::to_string(data->size()) + "/RandomMixed";
+    const std::size_t size = data->size();
+    benchmark::RegisterBenchmark(
+        name.c_str(),
+        [queries = std::move(queries), index_bytes, size,
+         contains = std::move(contains)](benchmark::State& state) {
+            std::size_t checksum = 0, cursor = 0;
+            for (auto _ : state) {
+                checksum += contains((*queries)[cursor]);
+                if (++cursor == queries->size()) cursor = 0;
+            }
+            benchmark::DoNotOptimize(checksum);
+            state.counters["index_bytes"] = static_cast<double>(index_bytes);
+            state.counters["backing_bytes"] = 0;
+            state.counters["total_bytes"] = static_cast<double>(index_bytes);
+            state.counters["size"] = static_cast<double>(size);
         })->Unit(benchmark::kNanosecond);
 }
 
@@ -125,13 +217,63 @@ void register_jazzy(const std::string& distribution, std::shared_ptr<const Data>
     const std::string config = "S" + std::to_string(Segments);
 
     register_lookup("JazzyIndex", config, distribution, data, queries,
-                    sizeof(Index) + index->size_in_bytes(),
+                    sizeof(Index) + index->size_in_bytes(), data->capacity() * sizeof(Key),
                     [index, data](Key key) {
                         const auto* result = index->find(key);
                         return result == index->end()
                             ? data->size()
                             : static_cast<std::size_t>(result - data->data());
                     });
+    if constexpr (Segments == 256) {
+        constexpr std::size_t kBatchWidth = 4;
+        static_assert(kQueryCount % kBatchWidth == 0,
+                      "Batch4 requires the deterministic query fixture to divide evenly");
+        using BatchKeys = std::array<Key, kBatchWidth>;
+        using BatchResults = std::array<typename Index::const_iterator, kBatchWidth>;
+        for (std::size_t offset = 0; offset < queries->size(); offset += kBatchWidth) {
+            BatchKeys keys{};
+            BatchResults results{};
+            for (std::size_t lane = 0; lane < kBatchWidth; ++lane) keys[lane] = (*queries)[offset + lane];
+            index->find_batch(keys, results);
+            for (std::size_t lane = 0; lane < kBatchWidth; ++lane) {
+                const std::size_t expected = exact_lower_bound(*data, keys[lane]);
+                const std::size_t actual = results[lane] == index->end()
+                    ? data->size() : static_cast<std::size_t>(results[lane] - data->data());
+                if (expected != actual) {
+                    throw std::logic_error("JazzyIndex/S256/Batch4 returned an incorrect exact result");
+                }
+            }
+        }
+        const std::string batch_name = "Lookup/JazzyIndex/S256/Batch4/" + distribution + "/N" +
+                                       std::to_string(data->size()) + "/RandomMixed";
+        const std::size_t index_bytes = sizeof(Index) + index->size_in_bytes();
+        const std::size_t backing_bytes = data->capacity() * sizeof(Key);
+        benchmark::RegisterBenchmark(batch_name.c_str(),
+            [index, data, queries, index_bytes, backing_bytes](benchmark::State& state) {
+                std::size_t cursor = 0, checksum = 0;
+                BatchKeys keys{};
+                BatchResults results{};
+                for (auto _ : state) {
+                    for (std::size_t lane = 0; lane < kBatchWidth; ++lane) {
+                        keys[lane] = (*queries)[cursor + lane];
+                    }
+                    index->find_batch(keys, results);
+                    for (const auto result : results) {
+                        checksum += result == index->end()
+                            ? data->size() : static_cast<std::size_t>(result - data->data());
+                    }
+                    cursor += kBatchWidth;
+                    if (cursor == queries->size()) cursor = 0;
+                }
+                benchmark::DoNotOptimize(checksum);
+                state.SetItemsProcessed(state.iterations() * kBatchWidth);
+                state.counters["batch_width"] = static_cast<double>(kBatchWidth);
+                state.counters["index_bytes"] = static_cast<double>(index_bytes);
+                state.counters["backing_bytes"] = static_cast<double>(backing_bytes);
+                state.counters["total_bytes"] = static_cast<double>(index_bytes + backing_bytes);
+                state.counters["size"] = static_cast<double>(data->size());
+            })->Unit(benchmark::kNanosecond);
+    }
     register_build("JazzyIndex", config, distribution, std::move(data),
                    [](const Data& values) {
                        Index result;
@@ -148,7 +290,7 @@ void register_pgm(const std::string& distribution, std::shared_ptr<const Data> d
     const std::string config = "E" + std::to_string(Epsilon);
 
     register_lookup("PGM", config, distribution, data, queries,
-                    sizeof(Index) + index->size_in_bytes(),
+                    sizeof(Index) + index->size_in_bytes(), data->capacity() * sizeof(Key),
                     [index, data](Key key) {
                         const auto range = index->search(key);
                         return exact_lower_bound(*data, key, range.lo, range.hi);
@@ -175,6 +317,7 @@ void register_radix_spline(const std::string& distribution,
     const std::string config = "R" + std::to_string(RadixBits) +
                                "/E" + std::to_string(MaxError);
     register_lookup("RadixSpline", config, distribution, data, queries, index->GetSize(),
+                    data->capacity() * sizeof(Key),
                     [index, data](Key key) {
                         const auto range = index->GetSearchBound(key);
                         return exact_lower_bound(*data, key, range.begin, range.end);
@@ -185,10 +328,29 @@ void register_radix_spline(const std::string& distribution,
 void register_dataset(const std::string& distribution, Data values) {
     auto data = std::make_shared<const Data>(make_unique_keys(std::move(values)));
     auto queries = std::make_shared<const Data>(
-        qi::bench::make_random_queries(*data, qi::bench::kQueryCount));
+        qi::bench::make_random_queries(*data, kQueryCount));
 
     register_lookup("LowerBound", "", distribution, data, queries, 0,
+                    data->capacity() * sizeof(Key),
                     [data](Key key) { return exact_lower_bound(*data, key); });
+
+    using Alloc = CountingAllocator<Key>;
+    auto tree_counter = std::make_shared<AllocationCounter>();
+    auto tree = std::make_shared<std::set<Key, std::less<Key>, Alloc>>(
+        std::less<Key>{}, Alloc{tree_counter});
+    tree->insert(data->begin(), data->end());
+    register_contains("stdset", distribution, data, queries,
+                      sizeof(*tree) + tree_counter->live_bytes,
+                      [tree](Key key) { return tree->contains(key); });
+
+    auto hash_counter = std::make_shared<AllocationCounter>();
+    auto hash = std::make_shared<std::unordered_set<Key, std::hash<Key>, std::equal_to<Key>, Alloc>>(
+        0, std::hash<Key>{}, std::equal_to<Key>{}, Alloc{hash_counter});
+    hash->reserve(data->size());
+    hash->insert(data->begin(), data->end());
+    register_contains("stdunordered_set", distribution, data, queries,
+                      sizeof(*hash) + hash_counter->live_bytes,
+                      [hash](Key key) { return hash->contains(key); });
 
     register_jazzy<64>(distribution, data, queries);
     register_jazzy<256>(distribution, data, queries);
@@ -245,6 +407,7 @@ void consume_custom_flags(int& argc, char** argv) {
 
 int main(int argc, char** argv) {
     consume_custom_flags(argc, argv);
+    verify_counting_allocator();
     register_suites();
     benchmark::Initialize(&argc, argv);
     if (benchmark::ReportUnrecognizedArguments(argc, argv)) {

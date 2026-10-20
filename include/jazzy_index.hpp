@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cmath>
 #include <concepts>
 #include <cstddef>
@@ -162,7 +163,12 @@ struct alignas(64) Segment {  // Cache line aligned
     std::size_t end_idx;
 
     template <typename KeyExtractor = jazzy::identity>
-    [[nodiscard]] std::size_t predict(const T& value, KeyExtractor key_extract = KeyExtractor{}) const
+#if defined(__clang__) || defined(__GNUC__)
+    [[nodiscard]] inline __attribute__((always_inline)) std::size_t
+#else
+    [[nodiscard]] inline std::size_t
+#endif
+    predict(const T& value, KeyExtractor key_extract = KeyExtractor{}) const
         noexcept(std::is_nothrow_invocable_v<KeyExtractor, const T&>) {
         if (model_type == ModelType::CONSTANT) {
             DEBUG_LOG("predict[%zu-%zu]: CONSTANT - returning %zu",
@@ -249,6 +255,18 @@ struct SegmentAnalysis {
     std::size_t max_error;
     double mean_error;
     double inv_scale;  // See Segment::inv_scale.
+};
+
+template <typename T>
+struct BatchLookupState {
+    const Segment<T>* segment{nullptr};
+    const T* low{nullptr};
+    const T* high{nullptr};
+    const T* bounded_begin{nullptr};
+    const T* bounded_end{nullptr};
+    std::size_t left{0};
+    std::size_t right{0};
+    bool active{false};
 };
 
 // Fit linear model to segment: index = slope * value + intercept
@@ -813,6 +831,12 @@ class ParallelBuilder;
 template <typename T, SegmentCount Segments = SegmentCount::LARGE, typename Compare = std::less<>, typename KeyExtractor = jazzy::identity>
 class JazzyIndex {
     static constexpr std::size_t NumSegments = static_cast<std::size_t>(Segments);
+    static constexpr unsigned LogRadixMantissaBits = 14;
+    static constexpr bool supports_radix_routing =
+        std::is_integral_v<T> && std::is_unsigned_v<T> &&
+        sizeof(T) <= sizeof(std::uint64_t) &&
+        (std::is_same_v<Compare, std::less<>> || std::is_same_v<Compare, std::less<T>>) &&
+        std::is_same_v<KeyExtractor, jazzy::identity>;
 
     static_assert(NumSegments > 0 && NumSegments <= 4096,
                   "NumSegments must be in range [1, 4096]");
@@ -859,7 +883,10 @@ public:
           num_segments_(std::exchange(other.num_segments_, 0)),
           is_uniform_(std::exchange(other.is_uniform_, false)),
           built_(std::exchange(other.built_, false)),
+          is_dense_(std::exchange(other.is_dense_, false)),
           segment_scale_(std::exchange(other.segment_scale_, 0)),
+          radix_offsets_(std::move(other.radix_offsets_)),
+          has_adjacent_duplicates_(other.has_adjacent_duplicates_),
           segments_(std::move(other.segments_)) {}
 
     JazzyIndex& operator=(JazzyIndex&& other)
@@ -872,11 +899,14 @@ public:
         key_extract_ = std::move(other.key_extract_);
         comp_ = std::move(other.comp_);
         segments_ = std::move(other.segments_);
+        radix_offsets_ = std::move(other.radix_offsets_);
+        has_adjacent_duplicates_ = other.has_adjacent_duplicates_;
         base_ = std::exchange(other.base_, nullptr);
         size_ = std::exchange(other.size_, 0);
         num_segments_ = std::exchange(other.num_segments_, 0);
         is_uniform_ = std::exchange(other.is_uniform_, false);
         built_ = std::exchange(other.built_, false);
+        is_dense_ = std::exchange(other.is_dense_, false);
         segment_scale_ = std::exchange(other.segment_scale_, 0);
         return *this;
     }
@@ -971,6 +1001,7 @@ private:
             DEBUG_LOG("JazzyIndex::build: Data is NON-UNIFORM (is_uniform=%d, total_range=%.4f)",
                       is_uniform_, total_range);
         }
+        finalize_routing();
         built_ = true;
         DEBUG_LOG("JazzyIndex::build: Build complete with %zu segments", num_segments_);
     }
@@ -1003,6 +1034,12 @@ public:
         if (comp_(key, first_value) || comp_(last_value, key)) {
             DEBUG_LOG("JazzyIndex::find: Key out of bounds, returning end()");
             return end();
+        }
+        if constexpr (supports_radix_routing) {
+            if (is_dense_) {
+                return base_ + (static_cast<std::uint64_t>(key) -
+                                static_cast<std::uint64_t>(min_));
+            }
         }
 
         // Find segment using binary search
@@ -1070,6 +1107,147 @@ public:
         return end();
     }
 
+    // Throughput-oriented lookup for independent keys. Uniform indexes retain the
+    // scalar path because arithmetic segment routing is already optimal there.
+    template <std::size_t N>
+    void find_batch(const std::array<T, N>& keys,
+                    std::array<const_iterator, N>& results) const {
+        static_assert(N > 0);
+        if (!is_built() || size_ == 0 || is_uniform_ || is_dense_) {
+            for (std::size_t lane = 0; lane < N; ++lane) results[lane] = find(keys[lane]);
+            return;
+        }
+
+        std::array<detail::BatchLookupState<T>, N> lanes{};
+        for (std::size_t lane = 0; lane < N; ++lane) {
+            detail::validate_finite_key(keys[lane], key_extract_);
+            results[lane] = end();
+            if (!comp_(keys[lane], base_[0]) && !comp_(base_[size_ - 1], keys[lane])) {
+                lanes[lane].right = num_segments_;
+                if constexpr (supports_radix_routing) {
+                    if (!radix_offsets_.empty()) {
+                        const auto key = static_cast<std::uint64_t>(keys[lane]);
+                        const std::size_t bucket = radix_bucket(
+                            key - static_cast<std::uint64_t>(min_));
+                        lanes[lane].left = radix_offsets_[bucket];
+                        const std::size_t right = std::min<std::size_t>(num_segments_,
+                            static_cast<std::size_t>(radix_offsets_[bucket + 1]) + 1);
+                        lanes[lane].right = std::max<std::size_t>(1, right - lanes[lane].left);
+                    }
+                }
+                lanes[lane].active = true;
+            }
+        }
+
+        std::size_t routing_length = 0;
+        for (const auto& state : lanes) {
+            if (state.active) routing_length = std::max(routing_length, state.right);
+        }
+        while (routing_length > 1) {
+            for (std::size_t lane = 0; lane < N; ++lane) {
+                auto& state = lanes[lane];
+                if (!state.active) continue;
+                const std::size_t half = state.right / 2;
+                const std::size_t candidate = state.left + half;
+                state.left = comp_(segments_[candidate].max_val, keys[lane])
+                    ? candidate : state.left;
+                state.right -= half;
+            }
+            routing_length -= routing_length / 2;
+        }
+        for (std::size_t lane = 0; lane < N; ++lane) {
+            auto& state = lanes[lane];
+            if (!state.active) continue;
+            const std::size_t index = state.left +
+                static_cast<std::size_t>(comp_(segments_[state.left].max_val, keys[lane]));
+            state.segment = &segments_[std::min(index, num_segments_ - 1)];
+            state.active = false;
+        }
+
+        for (std::size_t lane = 0; lane < N; ++lane) {
+            auto& state = lanes[lane];
+            if (state.segment == nullptr) continue;
+            state.right = detail::clamp_value<std::size_t>(
+                state.segment->predict(keys[lane], key_extract_), state.segment->start_idx,
+                state.segment->end_idx - 1);
+        }
+        for (std::size_t lane = 0; lane < N; ++lane) {
+            auto& state = lanes[lane];
+            if (state.segment == nullptr) continue;
+            const std::size_t predicted = state.right;
+            if (equal(base_[predicted], keys[lane])) {
+                results[lane] = base_ + predicted;
+                state.segment = nullptr;
+                continue;
+            }
+            const std::size_t radius = std::max<std::size_t>(
+                state.segment->max_error + detail::SEARCH_RADIUS_MARGIN,
+                detail::MIN_SEARCH_RADIUS);
+            const std::size_t first = predicted - std::min(predicted - state.segment->start_idx,
+                                                            radius);
+            const std::size_t last = std::min(predicted + radius + 1, state.segment->end_idx);
+            state.low = base_ + first;
+            state.high = base_ + last;
+            state.bounded_begin = state.low;
+            state.bounded_end = state.high;
+            state.active = true;
+        }
+
+        const auto lower_bound_stage = [&lanes, &keys, this]() {
+            bool searching = true;
+            while (searching) {
+                searching = false;
+                for (std::size_t lane = 0; lane < N; ++lane) {
+                    auto& state = lanes[lane];
+                    if (!state.active) continue;
+                    if (state.low == state.high) {
+                        state.active = false;
+                        continue;
+                    }
+                    const T* mid = state.low + (state.high - state.low) / 2;
+                    if (comp_(*mid, keys[lane])) state.low = mid + 1;
+                    else state.high = mid;
+                    searching = true;
+                }
+            }
+        };
+        lower_bound_stage();
+
+        for (std::size_t lane = 0; lane < N; ++lane) {
+            auto& state = lanes[lane];
+            if (state.segment == nullptr) continue;
+            const T* found = state.low;
+            const T* segment_begin = base_ + state.segment->start_idx;
+            const T* segment_end = base_ + state.segment->end_idx;
+            if (found != state.bounded_end && equal(*found, keys[lane])) {
+                results[lane] = found;
+                state.segment = nullptr;
+            } else if (found == state.bounded_begin && state.bounded_begin > segment_begin) {
+                state.low = segment_begin;
+                state.high = state.bounded_begin;
+                state.left = 1;
+                state.active = true;
+            } else if (found == state.bounded_end && state.bounded_end < segment_end) {
+                state.low = state.bounded_end;
+                state.high = segment_end;
+                state.left = 2;
+                state.active = true;
+            } else {
+                state.segment = nullptr;
+            }
+        }
+        lower_bound_stage();
+        for (std::size_t lane = 0; lane < N; ++lane) {
+            auto& state = lanes[lane];
+            if (state.segment == nullptr) continue;
+            const T* fallback_end = state.left == 1 ? state.bounded_begin
+                                                     : base_ + state.segment->end_idx;
+            if (state.low != fallback_end && equal(*state.low, keys[lane])) {
+                results[lane] = state.low;
+            }
+        }
+    }
+
     // Find the range of elements equal to the given value
     // Returns a pair of iterators [lower, upper) where all elements in the range are equivalent to value
     // For missing values, returns [position, position) where position is where the value would be inserted
@@ -1103,7 +1281,8 @@ public:
 
     // Segments live on the heap now, so sizeof() no longer describes the index.
     [[nodiscard]] std::size_t size_in_bytes() const noexcept {
-        return segments_.capacity() * sizeof(detail::Segment<T>);
+        return segments_.capacity() * sizeof(detail::Segment<T>) +
+               radix_offsets_.capacity() * sizeof(std::uint32_t);
     }
     [[nodiscard]] bool is_built() const noexcept { return built_; }
 
@@ -1184,12 +1363,35 @@ private:
             // Fallback to binary search if arithmetic failed (rare)
         }
 
-        // Slow path: binary search over the segments. A radix table over the key range
-        // was tried here and measured flat on every distribution; the lookup is not
-        // what the time goes on, so the extra table is not worth its memory.
-        DEBUG_LOG("find_segment: Using binary search (non-uniform or fallback)");
         std::size_t left = 0;
         std::size_t right = num_segments_;
+        if constexpr (supports_radix_routing) {
+            if (!radix_offsets_.empty()) {
+                const auto key = static_cast<std::uint64_t>(value);
+                const std::size_t bucket = radix_bucket(
+                    key - static_cast<std::uint64_t>(min_));
+                left = radix_offsets_[bucket];
+                right = std::min<std::size_t>(
+                    num_segments_, static_cast<std::size_t>(radix_offsets_[bucket + 1]) + 1);
+                if (right <= left) {
+                    right = std::min(num_segments_, left + 1);
+                }
+                if (!has_adjacent_duplicates_) {
+                    const auto it = std::lower_bound(
+                        segments_.begin() + static_cast<std::ptrdiff_t>(left),
+                        segments_.begin() + static_cast<std::ptrdiff_t>(right), key,
+                        [](const detail::Segment<T>& segment, std::uint64_t value) {
+                            return static_cast<std::uint64_t>(segment.max_val) < value;
+                        });
+                    return it == segments_.begin() + static_cast<std::ptrdiff_t>(right)
+                        ? &segments_.back()
+                        : &*it;
+                }
+            }
+        }
+
+        // Duplicate keys may span segments, so keep the interval search semantics.
+        DEBUG_LOG("find_segment: Using binary search (non-uniform or fallback)");
         while (left < right) {
             const std::size_t mid = left + (right - left) / 2;
 
@@ -1233,6 +1435,48 @@ private:
         return !comp_(lhs, rhs) && !comp_(rhs, lhs);
     }
 
+    void finalize_routing() {
+        radix_offsets_.clear();
+        has_adjacent_duplicates_ = false;
+        is_dense_ = false;
+        if constexpr (supports_radix_routing) {
+            if (size_ == 0) return;
+            const std::uint64_t min_key = static_cast<std::uint64_t>(min_);
+            const std::uint64_t range = static_cast<std::uint64_t>(max_) - min_key;
+            if (is_uniform_ && range != size_ - 1) return;
+            for (std::size_t i = 1; i < size_; ++i) {
+                if (base_[i - 1] == base_[i]) {
+                    has_adjacent_duplicates_ = true;
+                    break;
+                }
+            }
+            is_dense_ = !has_adjacent_duplicates_ && range == size_ - 1;
+            if (is_dense_ || is_uniform_ || num_segments_ <= 1 ||
+                num_segments_ > std::numeric_limits<std::uint32_t>::max()) {
+                return;
+            }
+            const std::size_t final_bucket = radix_bucket(range);
+            radix_offsets_.assign(final_bucket + 2, static_cast<std::uint32_t>(num_segments_));
+            std::size_t next_bucket = 0;
+            for (std::size_t i = 0; i < num_segments_; ++i) {
+                const std::size_t segment_bucket = radix_bucket(
+                    static_cast<std::uint64_t>(segments_[i].max_val) - min_key);
+                while (next_bucket <= segment_bucket) {
+                    radix_offsets_[next_bucket++] = static_cast<std::uint32_t>(i);
+                }
+            }
+        }
+    }
+
+    // This preserves more directory precision near a dense low-key tail. At the
+    // full uint64_t range it produces at most 425,985 entries (about 1.625 MiB).
+    [[nodiscard]] static std::size_t radix_bucket(std::uint64_t delta) noexcept {
+        constexpr std::uint64_t mask = (std::uint64_t{1} << LogRadixMantissaBits) - 1;
+        const unsigned exponent = std::bit_width(delta | mask) - LogRadixMantissaBits;
+        return (static_cast<std::size_t>(exponent) << (LogRadixMantissaBits - 1)) +
+               static_cast<std::size_t>(delta >> exponent);
+    }
+
     const T* base_{nullptr};
     std::size_t size_{0};
     T min_{};
@@ -1242,7 +1486,10 @@ private:
     std::size_t num_segments_{0};
     bool is_uniform_{false};
     bool built_{false};
+    bool is_dense_{};
     double segment_scale_{0.0};
+    std::vector<std::uint32_t> radix_offsets_{};
+    bool has_adjacent_duplicates_{};
     // Heap-allocated because the final count is data-dependent: NumSegments only sets
     // the starting quantile split; refinement grows it subject to MIN_SPLIT_SIZE.
     std::vector<detail::Segment<T>> segments_{};

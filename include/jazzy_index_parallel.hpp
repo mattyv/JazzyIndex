@@ -150,6 +150,7 @@ public:
         if (is_uniform && total_range >= detail::ZERO_RANGE_THRESHOLD) {
             index.segment_scale_ = static_cast<double>(index.num_segments_) / total_range;
         }
+        index.finalize_routing();
         index.built_ = true;
     }
 
