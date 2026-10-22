@@ -25,15 +25,15 @@
         <h2>Headers (include/*.hpp)</h2>
         <pre>
 [1/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp.
-31500 warnings generated.
+31502 warnings generated.
 [2/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp.
-47090 warnings generated.
+47092 warnings generated.
 [3/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp.
-83228 warnings generated.
+83232 warnings generated.
 [4/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_parallel.hpp.
-125574 warnings generated.
+125580 warnings generated.
 [5/5] Processing file /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_utility.hpp.
-136213 warnings generated.
+136219 warnings generated.
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:26:8: warning: invalid case style for struct 'identity' [readability-identifier-naming]
    26 | struct identity {
       |        ^~~~~~~~
@@ -155,31 +155,37 @@
   850 |     using KeyTypeClean = typename std::remove_cv<typename std::remove_reference<KeyType>::type>::type;
       |                                                  ~~~~~~~~ ^                             ~~~~~~
       |                                                                                _t
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1080:18: warning: variable 'found' is not initialized [cppcoreguidelines-init-variables]
- 1080 |         const T* found;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1022:19: warning: function 'find' has inline specifier but is implicitly inlined [readability-redundant-inline-specifier]
+ 1022 |     [[nodiscard]] inline __attribute__((always_inline)) const_iterator
+      |                   ^~~~~~
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1085:18: warning: variable 'found' is not initialized [cppcoreguidelines-init-variables]
+ 1085 |         const T* found;
       |                  ^    
       |                        = nullptr
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1354:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
- 1354 |             const double key_val = static_cast<double>(std::invoke(key_extract_, value));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1350:19: warning: function 'find_segment' has inline specifier but is implicitly inlined [readability-redundant-inline-specifier]
+ 1350 |     [[nodiscard]] inline __attribute__((always_inline)) const detail::Segment<T>*
+      |                   ^~~~~~
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1364:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1364 |             const double key_val = static_cast<double>(std::invoke(key_extract_, value));
       |                   ^~~~~~
       |                   auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1355:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
- 1355 |             const double min_key = static_cast<double>(std::invoke(key_extract_, min_));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1365:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1365 |             const double min_key = static_cast<double>(std::invoke(key_extract_, min_));
       |                   ^~~~~~
       |                   auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1473:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
- 1473 |             const std::uint64_t min_key = static_cast<std::uint64_t>(min_);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1483:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1483 |             const std::uint64_t min_key = static_cast<std::uint64_t>(min_);
       |                   ^~~~~~~~~~~~~
       |                   auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1503:33: warning: invalid case style for constexpr variable 'mask' [readability-identifier-naming]
- 1503 |         constexpr std::uint64_t mask = (std::uint64_t{1} << LogRadixMantissaBits) - 1;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1513:33: warning: invalid case style for constexpr variable 'mask' [readability-identifier-naming]
+ 1513 |         constexpr std::uint64_t mask = (std::uint64_t{1} << LogRadixMantissaBits) - 1;
       |                                 ^~~~
       |                                 MASK
- 1504 |         const unsigned exponent = std::bit_width(delta | mask) - LogRadixMantissaBits;
+ 1514 |         const unsigned exponent = std::bit_width(delta | mask) - LogRadixMantissaBits;
       |                                                          ~~~~
       |                                                          MASK
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1520:46: warning: initializer for member 'radix_offsets_' is redundant [readability-redundant-member-init]
- 1520 |     std::vector<std::uint32_t> radix_offsets_{};
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1530:46: warning: initializer for member 'radix_offsets_' is redundant [readability-redundant-member-init]
+ 1530 |     std::vector<std::uint32_t> radix_offsets_{};
       |                                              ^~
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_export.hpp:58:16: warning: escaped string literal can be written as a raw string literal [modernize-raw-string-literal]
    58 |         oss << "      \"model_type\": \"";
@@ -197,71 +203,71 @@ Use -header-filter=.* to display errors from all non-system headers. Use -system
         <h2>Tests (tests/*.cpp)</h2>
         <pre>
 [1/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp.
-51516 warnings generated.
+51518 warnings generated.
 [2/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_binary_search_tests.cpp.
-103455 warnings generated.
+103459 warnings generated.
 [3/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp.
-154945 warnings generated.
+154951 warnings generated.
 [4/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_boundary_tests.cpp.
-206808 warnings generated.
+206816 warnings generated.
 [5/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp.
-258499 warnings generated.
+258509 warnings generated.
 [6/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp.
-310755 warnings generated.
+310767 warnings generated.
 [7/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp.
-361934 warnings generated.
+361948 warnings generated.
 [8/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_debug_logging_tests.cpp.
-413516 warnings generated.
+413532 warnings generated.
 [9/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_equal_range_tests.cpp.
-468153 warnings generated.
+468171 warnings generated.
 [10/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_equal_range_tests.cpp.
-523125 warnings generated.
+523145 warnings generated.
 [11/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp.
-574512 warnings generated.
+574534 warnings generated.
 [12/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_error_recovery_tests.cpp.
-626220 warnings generated.
+626244 warnings generated.
 [13/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp.
-677740 warnings generated.
+677766 warnings generated.
 [14/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_floating_point_tests.cpp.
-729513 warnings generated.
+729541 warnings generated.
 [15/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp.
-783143 warnings generated.
+783173 warnings generated.
 [16/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_iterator_tests.cpp.
-837046 warnings generated.
+837078 warnings generated.
 [17/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp.
-888879 warnings generated.
+888913 warnings generated.
 [18/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_key_value_tests.cpp.
-941132 warnings generated.
+941168 warnings generated.
 [19/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp.
-997479 warnings generated.
+997517 warnings generated.
 [20/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_selection_verification.cpp.
-1054401 warnings generated.
+1054441 warnings generated.
 [21/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp.
-1105909 warnings generated.
+1105951 warnings generated.
 [22/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_model_tests.cpp.
-1157743 warnings generated.
+1157787 warnings generated.
 [23/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp.
-1212722 warnings generated.
+1212768 warnings generated.
 [24/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_parallel_tests.cpp.
-1268133 warnings generated.
+1268181 warnings generated.
 [25/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_property_tests.cpp.
-1328672 warnings generated.
+1328722 warnings generated.
 [26/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_property_tests.cpp.
-1389412 warnings generated.
+1389464 warnings generated.
 [27/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_review_regressions.cpp.
-1447361 warnings generated.
+1447415 warnings generated.
 [28/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_review_regressions.cpp.
-1505933 warnings generated.
+1505989 warnings generated.
 [29/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp.
-1557435 warnings generated.
+1557493 warnings generated.
 [30/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_uniformity_tests.cpp.
-1609312 warnings generated.
+1609372 warnings generated.
 [31/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_unit_tests.cpp.
-1661140 warnings generated.
+1661202 warnings generated.
 [32/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_unit_tests.cpp.
-1713374 warnings generated.
+1713438 warnings generated.
 [33/17] Processing file /home/runner/work/JazzyIndex/JazzyIndex/tests/property_tests.cpp.
-1769574 warnings generated.
+1769640 warnings generated.
 /home/runner/work/JazzyIndex/JazzyIndex/build/_deps/rapidcheck-src/include/rapidcheck/Assertions.h:6:9: warning: variadic macro 'RC_INTERNAL_CONDITIONAL_RESULT' used; consider using a 'constexpr' variadic template function [cppcoreguidelines-macro-usage]
     6 | #define RC_INTERNAL_CONDITIONAL_RESULT(                                        \
       |         ^
@@ -5591,178 +5597,184 @@ note: this fix will not be applied because it overlaps with another fix
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1022:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1022 |         DEBUG_LOG("JazzyIndex::find: Called (size=%zu, is_built=%d)", size_, is_built());
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1022:19: warning: function 'find' has inline specifier but is implicitly inlined [readability-redundant-inline-specifier]
+ 1022 |     [[nodiscard]] inline __attribute__((always_inline)) const_iterator
+      |                   ^~~~~~
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1027:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1027 |         DEBUG_LOG("JazzyIndex::find: Called (size=%zu, is_built=%d)", size_, is_built());
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                        ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1026:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1026 |             DEBUG_LOG("JazzyIndex::find: Index not built or empty, returning end()");
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1031:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1031 |             DEBUG_LOG("JazzyIndex::find: Index not built or empty, returning end()");
       |             ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1035:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1035 |             DEBUG_LOG("JazzyIndex::find: Key out of bounds, returning end()");
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1040:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1040 |             DEBUG_LOG("JazzyIndex::find: Key out of bounds, returning end()");
       |             ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1048:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1048 |             DEBUG_LOG("JazzyIndex::find: find_segment returned nullptr, returning end()");
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1053:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1053 |             DEBUG_LOG("JazzyIndex::find: find_segment returned nullptr, returning end()");
       |             ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1057:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1057 |         DEBUG_LOG("JazzyIndex::find: Predicted index %zu for key in segment [%zu-%zu]",
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1062:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1062 |         DEBUG_LOG("JazzyIndex::find: Predicted index %zu for key in segment [%zu-%zu]",
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                        ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1064:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1064 |             DEBUG_LOG("JazzyIndex::find: Found exact match at predicted index %zu", predicted);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1069:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1069 |             DEBUG_LOG("JazzyIndex::find: Found exact match at predicted index %zu", predicted);
       |             ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1077:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1077 |         DEBUG_LOG("JazzyIndex::find: Bounded search [%zu-%zu) radius=%zu",
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1082:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1082 |         DEBUG_LOG("JazzyIndex::find: Bounded search [%zu-%zu) radius=%zu",
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1080:18: warning: variable 'found' is not initialized [cppcoreguidelines-init-variables]
- 1080 |         const T* found;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1085:18: warning: variable 'found' is not initialized [cppcoreguidelines-init-variables]
+ 1085 |         const T* found;
       |                  ^    
       |                        = nullptr
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1103:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1103 |             DEBUG_LOG("JazzyIndex::find: Found match at index %zu (bounded search)",
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1108:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1108 |             DEBUG_LOG("JazzyIndex::find: Found match at index %zu (bounded search)",
       |             ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1112:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1112 |             DEBUG_LOG("JazzyIndex::find: Window undershot, searching [%zu-%zu)",
-      |             ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
-   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
-      |                        ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1119:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1119 |             DEBUG_LOG("JazzyIndex::find: Window overshot, searching [%zu-%zu)",
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1117:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1117 |             DEBUG_LOG("JazzyIndex::find: Window undershot, searching [%zu-%zu)",
       |             ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                        ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1127:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1127 |         DEBUG_LOG("JazzyIndex::find: Not found, returning end()");
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1124:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1124 |             DEBUG_LOG("JazzyIndex::find: Window overshot, searching [%zu-%zu)",
+      |             ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
+   62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
+      |                        ^
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1132:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1132 |         DEBUG_LOG("JazzyIndex::find: Not found, returning end()");
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1276:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1276 |         DEBUG_LOG("JazzyIndex::equal_range: Called for value");
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1281:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1281 |         DEBUG_LOG("JazzyIndex::equal_range: Called for value");
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1284:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1284 |         DEBUG_LOG("JazzyIndex::find_lower_bound: Called");
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1289:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1289 |         DEBUG_LOG("JazzyIndex::find_lower_bound: Called");
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1292:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1292 |         DEBUG_LOG("JazzyIndex::find_upper_bound: Called");
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1297:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1297 |         DEBUG_LOG("JazzyIndex::find_upper_bound: Called");
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1345:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1345 |         DEBUG_LOG("find_segment: Called with is_uniform=%d, num_segments=%zu", is_uniform_, num_segments_);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1350:19: warning: function 'find_segment' has inline specifier but is implicitly inlined [readability-redundant-inline-specifier]
+ 1350 |     [[nodiscard]] inline __attribute__((always_inline)) const detail::Segment<T>*
+      |                   ^~~~~~
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1355:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1355 |         DEBUG_LOG("find_segment: Called with is_uniform=%d, num_segments=%zu", is_uniform_, num_segments_);
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1348:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1348 |             DEBUG_LOG("find_segment: No segments, returning nullptr");
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1358:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1358 |             DEBUG_LOG("find_segment: No segments, returning nullptr");
       |             ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1354:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
- 1354 |             const double key_val = static_cast<double>(std::invoke(key_extract_, value));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1364:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1364 |             const double key_val = static_cast<double>(std::invoke(key_extract_, value));
       |                   ^~~~~~
       |                   auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1355:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
- 1355 |             const double min_key = static_cast<double>(std::invoke(key_extract_, min_));
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1365:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1365 |             const double min_key = static_cast<double>(std::invoke(key_extract_, min_));
       |                   ^~~~~~
       |                   auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1366:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1366 |             DEBUG_LOG("find_segment: UNIFORM path - key_val=%.4f, offset=%.4f, segment_scale=%.6f, seg_idx=%zu",
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1376:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1376 |             DEBUG_LOG("find_segment: UNIFORM path - key_val=%.4f, offset=%.4f, segment_scale=%.6f, seg_idx=%zu",
       |             ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1372:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1372 |                 DEBUG_LOG("find_segment: Clamped seg_idx to %zu", seg_idx);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1382:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1382 |                 DEBUG_LOG("find_segment: Clamped seg_idx to %zu", seg_idx);
       |                 ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1378:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1378 |                 DEBUG_LOG("find_segment: UNIFORM succeeded, returning segment %zu [%zu-%zu]",
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1388:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1388 |                 DEBUG_LOG("find_segment: UNIFORM succeeded, returning segment %zu [%zu-%zu]",
       |                 ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                        ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1383:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1383 |             DEBUG_LOG("find_segment: UNIFORM verification failed, falling back to binary search");
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1393:13: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1393 |             DEBUG_LOG("find_segment: UNIFORM verification failed, falling back to binary search");
       |             ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1423:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1423 |         DEBUG_LOG("find_segment: Using binary search (non-uniform or fallback)");
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1433:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1433 |         DEBUG_LOG("find_segment: Using binary search (non-uniform or fallback)");
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1432:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1432 |                 DEBUG_LOG("find_segment: Found segment %zu [%zu-%zu]", mid,
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1442:17: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1442 |                 DEBUG_LOG("find_segment: Found segment %zu [%zu-%zu]", mid,
       |                 ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:24: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                        ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1440:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
- 1440 |         DEBUG_LOG("find_segment: Returning segment %zu (left=%zu)", left, left);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1450:9: warning: do not call c-style vararg functions [cppcoreguidelines-pro-type-vararg]
+ 1450 |         DEBUG_LOG("find_segment: Returning segment %zu (left=%zu)", left, left);
       |         ^
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:62:55: note: expanded from macro 'DEBUG_LOG'
    62 | #define DEBUG_LOG(...) jazzy::DebugLogger::instance().log(__VA_ARGS__)
       |                                                       ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1453:9: warning: replace loop by 'std::ranges::all_of()' [readability-use-anyofallof]
- 1453 |         for (const auto& seg : segments_) {
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1463:9: warning: replace loop by 'std::ranges::all_of()' [readability-use-anyofallof]
+ 1463 |         for (const auto& seg : segments_) {
       |         ^
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1464:37: warning: 1st argument 'rhs' (passed to 'lhs') looks like it might be swapped with the 2nd, 'lhs' (passed to 'rhs') [readability-suspicious-call-argument]
- 1464 |         return !comp_(lhs, rhs) && !comp_(rhs, lhs);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1474:37: warning: 1st argument 'rhs' (passed to 'lhs') looks like it might be swapped with the 2nd, 'lhs' (passed to 'rhs') [readability-suspicious-call-argument]
+ 1474 |         return !comp_(lhs, rhs) && !comp_(rhs, lhs);
       |                                     ^~~~~ ~~~
 /home/runner/work/JazzyIndex/JazzyIndex/tests/gtest_comparator_tests.cpp:21:10: note: in the call to 'operator()', declared here
    21 |     bool operator()(const T& lhs, const T& rhs) const {
       |          ^                   ~~~           ~~~
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1473:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
- 1473 |             const std::uint64_t min_key = static_cast<std::uint64_t>(min_);
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1483:19: warning: use auto when initializing with a cast to avoid duplicating the type name [modernize-use-auto]
+ 1483 |             const std::uint64_t min_key = static_cast<std::uint64_t>(min_);
       |                   ^~~~~~~~~~~~~
       |                   auto
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1503:33: warning: invalid case style for constexpr variable 'mask' [readability-identifier-naming]
- 1503 |         constexpr std::uint64_t mask = (std::uint64_t{1} << LogRadixMantissaBits) - 1;
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1513:33: warning: invalid case style for constexpr variable 'mask' [readability-identifier-naming]
+ 1513 |         constexpr std::uint64_t mask = (std::uint64_t{1} << LogRadixMantissaBits) - 1;
       |                                 ^~~~
       |                                 MASK
- 1504 |         const unsigned exponent = std::bit_width(delta | mask) - LogRadixMantissaBits;
+ 1514 |         const unsigned exponent = std::bit_width(delta | mask) - LogRadixMantissaBits;
       |                                                          ~~~~
       |                                                          MASK
-/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1520:46: warning: initializer for member 'radix_offsets_' is redundant [readability-redundant-member-init]
- 1520 |     std::vector<std::uint32_t> radix_offsets_{};
+/home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index.hpp:1530:46: warning: initializer for member 'radix_offsets_' is redundant [readability-redundant-member-init]
+ 1530 |     std::vector<std::uint32_t> radix_offsets_{};
       |                                              ^~
 /home/runner/work/JazzyIndex/JazzyIndex/include/jazzy_index_debug.hpp:38:9: warning: do not declare variables of type va_list; use variadic templates instead [cppcoreguidelines-pro-type-vararg]
    38 |         va_list args;
