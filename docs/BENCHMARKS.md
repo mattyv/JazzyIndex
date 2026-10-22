@@ -4,6 +4,7 @@ Performance analysis of JazzyIndex, `std::lower_bound`, PGM-index, and
 RadixSpline across multiple data distributions and index configurations.
 
 ## Table of Contents
+- [Measured single-key correction results](#measured-single-key-correction-results-2026-10-22)
 - [Overview](#overview)
 - [Measured small-bucket routing results](#measured-small-bucket-routing-results-2026-10-22)
 - [Measured routing and batch results](#measured-routing-and-batch-results-2026-10-20)
@@ -39,7 +40,7 @@ with 262,144 queries and a 90% target hit probability against:
 - `std::lower_bound`
 - `std::set` and `std::unordered_set` membership
 - Four independent JazzyIndex queries through `find_batch` (256 initial segments)
-- Four independent RadixSpline queries with interleaved bounded correction (R12/E16 and R18/E16)
+- A benchmark-side Batch4 wrapper around upstream RadixSpline's single-key `GetSearchBound`, followed by four interleaved bounded corrections (R12/E16 and R18/E16); this is not an upstream RadixSpline batch API
 
 Each lookup reports `index_bytes`, `backing_bytes`, and their sum, `total_bytes`.
 JazzyIndex counts its object and allocated metadata capacity. PGM and RadixSpline
@@ -84,6 +85,93 @@ The unique-key transform can also interact poorly with integer hashing: on the
 tested libc++ implementation, the one-million-key Zipf fixture causes heavy
 bucket collisions. Its hash-table result should not be generalized to other
 key encodings or hash functions.
+
+## Measured single-key correction results (2026-10-22)
+
+This change improves `find(key)` after a model's exact-position probe misses.
+For eligible nonuniform, duplicate-free unsigned identity keys, the bounded
+correction search now shrinks its range by the same amount for either comparison
+result. The prediction probe, final equality check, and recovery outside the
+model window remain in place. Other key types and duplicate/uniform indexes keep
+their existing correction search. `find_batch` is unchanged.
+
+On Apple Clang 21/M2, both the previous correction loop and the selected loop use
+conditional selects. The selected loop removes the comparison result from the
+dependency chain that updates the remaining range length. Assembly inspection
+confirmed this; the speed claims below come from timings, not hardware-counter
+attribution.
+
+The change adds no fields or allocations. The default index object remains
+120 bytes. All measured baseline/production pairs retain the same index and
+backing-array capacity as commit `0d8f247`.
+
+The independent final comparison covers 36 fixtures: nine distributions,
+original and unique encodings, and 10K and 1M keys. Its maximum coefficient of
+variation was 1.63%. At one million uniquely encoded keys, median CPU
+nanoseconds per lookup were:
+
+| Distribution | Previous ns | New ns | Lookup time reduction |
+|---|---:|---:|---:|
+| Uniform | 12.32 | 12.26 | 0.5% |
+| Exponential | 12.30 | 11.57 | 5.9% |
+| Clustered | 34.85 | 34.15 | 2.0% |
+| Lognormal | 13.14 | 12.00 | 8.7% |
+| Zipf | 29.50 | 27.58 | 6.5% |
+| Mixed | 11.57 | 11.28 | 2.4% |
+| Quadratic | 32.47 | 30.58 | 5.8% |
+| ExtremePoly | 33.40 | 30.83 | 7.7% |
+| InversePoly | 37.37 | 35.10 | 6.1% |
+
+At 10K keys the nonuniform unique cases improved by 1.9–7.1%, while Uniform
+was 1.3% slower (0.14 ns). Original encodings were mostly close, with measurable
+regressions for Exponential at 1M (6.23 to 6.43 ns) and Mixed at both 10K
+(6.30 to 6.56 ns) and 1M (6.19 to 6.43 ns). These paths keep the previous
+search algorithm; this run establishes the timing differences, not their cause.
+The first screen had smaller differences on those fixtures. The selected change
+therefore trades up to roughly 4% on these very short lookups for larger savings
+on the unique-key correction workloads.
+
+A separate final single-key competitor run compared default JazzyIndex against
+all six RadixSpline configurations on the same 1M unique-key query streams.
+The maximum CV across its 63 cases was 2.51%. Each RadixSpline column below uses
+the configuration with the lowest measured median for that distribution:
+
+| Distribution | Jazzy ns | RadixSpline ns | Jazzy total MB | RadixSpline total MB |
+|---|---:|---:|---:|---:|
+| Uniform | 12.68 | 15.09 | 8.017 | 8.015 |
+| Exponential | 11.92 | 17.58 | 8.398 | 8.013 |
+| Clustered | 34.59 | 25.17 | 9.028 | 9.000 |
+| Lognormal | 12.42 | 18.22 | 8.468 | 8.014 |
+| Zipf | 28.20 | 26.18 | 9.055 | 9.021 |
+| Mixed | 11.59 | 17.64 | 8.393 | 8.012 |
+| Quadratic | 31.09 | 25.55 | 8.934 | 9.029 |
+| ExtremePoly | 31.33 | 25.43 | 9.011 | 9.043 |
+| InversePoly | 35.24 | 27.74 | 9.011 | 9.043 |
+
+JazzyIndex still wins four of nine scalar comparisons. RadixSpline leads the
+other five; the closest remaining gap is Zipf, where JazzyIndex takes about
+7.7% longer. The selected RadixSpline settings are R12/E16 for Uniform,
+Exponential, Lognormal, and Mixed, and R18/E16 elsewhere. Close differences
+between RadixSpline configurations should not be overinterpreted. Total MB
+includes the 8 MB backing array; JazzyIndex reports retained allocation capacity
+while RadixSpline reports logical size, which can omit spare capacity. These
+figures exclude construction peaks and process RSS.
+
+Four alternatives were screened. Narrowing correction to one side of the failed
+probe produced small gains on some fixtures but regressed original Lognormal
+by about 18% and unique Mixed by about 6%. A conventional conditional-select
+lower-bound rewrite was effectively flat, and combining it with directional
+correction retained regressions. Only the comparison-independent shrink loop
+was selected. The screens and independent final comparison retain every raw
+repetition in the [scalar results artifact](benchmark-summary-2026-10-22-scalar.json).
+
+Validation passed 266/266 normal tests, 281/281 debug tests, and 266/266
+ASan/UBSan/float-cast-overflow tests. The new regression compares every key and
+gap across a million-value interval ending at `UINT64_MAX` against
+`std::lower_bound`. Benchmark preflight also verifies stored keys and query
+streams before timing. The methodology and hardware match the measurements
+below: 262,144 queries, 90% target hits, seven randomized repetitions, and
+0.1 seconds minimum per repetition, with builds/tests separated from timing.
 
 ## Measured small-bucket routing results (2026-10-22)
 
@@ -143,9 +231,9 @@ tested configuration independently from six scalar and two batch settings.
 | InversePoly | 38.53 | 28.21 | 32.67 | 20.52 |
 
 JazzyIndex wins four scalar comparisons; RadixSpline wins all nine batch
-comparisons. The new optimization changes scalar routing only. The separate
-JazzyIndex batch router remains an optimization target, and batching does not
-help every distribution. Clustered is the largest remaining batch gap here.
+comparisons. The new optimization changes scalar routing only. The measured
+batch results differ by distribution, and batching does not help every
+distribution. Clustered is the largest measured batch gap here.
 These are comparisons of the tested implementations, not upper bounds on what
 either index can achieve with further tuning.
 

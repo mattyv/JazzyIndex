@@ -43,7 +43,7 @@ That's a learned index. Build a lightweight model of your data's distribution, u
 
 ## Performance
 
-For current routing and batch measurements, see [Measured small-bucket routing results](docs/BENCHMARKS.md#measured-small-bucket-routing-results-2026-10-22).
+For current single-key measurements, see [Measured single-key correction results](docs/BENCHMARKS.md#measured-single-key-correction-results-2026-10-22).
 
 The following is a historical fixed-query snapshot comparing JazzyIndex with `std::lower_bound` (black X markers):
 

@@ -1077,7 +1077,28 @@ public:
         DEBUG_LOG("JazzyIndex::find: Bounded search [%zu-%zu) radius=%zu",
                   window_begin, window_end, radius);
 
-        const T* found = std::lower_bound(begin + window_begin, begin + window_end, key, comp_);
+        const T* found;
+        if constexpr (supports_radix_routing) {
+            if (!is_uniform_ && !has_adjacent_duplicates_) {
+                const T* cursor = begin + window_begin;
+                std::size_t length = window_end - window_begin;
+                if (length == 0) {
+                    found = cursor;
+                } else {
+                    // A fixed shrink count keeps the unique-key correction predictable.
+                    while (length > 1) {
+                        const std::size_t half = length / 2;
+                        cursor = comp_(cursor[half], key) ? cursor + half : cursor;
+                        length -= half;
+                    }
+                    found = cursor + static_cast<std::size_t>(comp_(*cursor, key));
+                }
+            } else {
+                found = std::lower_bound(begin + window_begin, begin + window_end, key, comp_);
+            }
+        } else {
+            found = std::lower_bound(begin + window_begin, begin + window_end, key, comp_);
+        }
         if (found != begin + window_end && equal(*found, key)) {
             DEBUG_LOG("JazzyIndex::find: Found match at index %zu (bounded search)",
                       static_cast<std::size_t>(found - begin));

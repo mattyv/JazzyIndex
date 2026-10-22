@@ -561,3 +561,22 @@ TEST(ReviewRegression, BatchLookupCoversLogRadixRangeWidthsAndBoundaries) {
                                          boundaries.back(), maximum, maximum - 1, 0},
                                      std::less<>{});
 }
+
+TEST(ReviewRegression, IrregularHighOriginFindMatchesLowerBoundAcrossEveryGap) {
+    // Squares create irregular, non-power-of-two learned-search windows while the
+    // high origin exercises end insertions without unsigned subtraction wraparound.
+    const auto data = radix_high_origin_data<std::uint64_t>();
+    jazzy::JazzyIndex<std::uint64_t, jazzy::SegmentCount::NANO> index(
+        data.begin(), data.end());
+    const auto origin = data.front();
+    ASSERT_EQ(data.back(), std::numeric_limits<std::uint64_t>::max());
+    for (std::uint64_t delta = 0; delta <= 1'000'000; ++delta) {
+        const std::uint64_t key = origin + delta;
+        const auto expected = std::lower_bound(data.begin(), data.end(), key);
+        const auto actual = index.find(key);
+        const bool hit = expected != data.end() && *expected == key;
+        ASSERT_EQ(actual != index.end(), hit) << "delta=" << delta;
+        if (hit) EXPECT_EQ(actual, data.data() + (expected - data.begin())) << "delta=" << delta;
+    }
+    EXPECT_EQ(index.find(origin - 1), index.end());
+}
