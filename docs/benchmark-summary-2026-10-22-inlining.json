@@ -1,0 +1,4823 @@
+{
+  "broad": {
+    "context": {
+      "caches": [],
+      "cpu_scaling_enabled": false,
+      "date": "2026-10-22T18:45:42+08:00",
+      "executable": "/private/tmp/jazzy-routing-inline-20261022/final/final_broad_benchmark",
+      "host_name": "Matthews-MacBook-Air.local",
+      "library_build_type": "release",
+      "load_avg": [
+        2.46143,
+        2.40283,
+        2.24902
+      ],
+      "mhz_per_cpu": 24,
+      "num_cpus": 8
+    },
+    "groups": [
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.4047107559206355,
+        "cpu_ns_per_lookup_median": 26.02713042912818,
+        "cpu_ns_per_lookup_samples": [
+          25.880393550526243,
+          25.932324360207232,
+          25.916430945143876,
+          26.113804983363238,
+          26.087192753490143,
+          26.144298163424086,
+          26.02713042912818
+        ],
+        "distribution": "Clustered",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 56392,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 56512,
+          "total_retained_bytes": 136512
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Clustered/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.3524978587142985,
+        "cpu_ns_per_lookup_median": 35.112753105949636,
+        "cpu_ns_per_lookup_samples": [
+          35.18818417271021,
+          35.23910695063226,
+          35.051482383849965,
+          35.112753105949636,
+          35.0035550634529,
+          34.9014371932871,
+          35.216232547716125
+        ],
+        "distribution": "Clustered",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 375276,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 375396,
+          "total_retained_bytes": 8375396
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Clustered/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.439507228484156,
+        "cpu_ns_per_lookup_median": 27.335393530597905,
+        "cpu_ns_per_lookup_samples": [
+          27.276488167214815,
+          27.224775868009637,
+          27.41937741502295,
+          27.557795298612138,
+          27.26599018166255,
+          27.457286807298054,
+          27.335393530597905
+        ],
+        "distribution": "Clustered",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 491208,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 491328,
+          "total_retained_bytes": 571328
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Clustered/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8038421536809537,
+        "cpu_ns_per_lookup_median": 33.96848093762788,
+        "cpu_ns_per_lookup_samples": [
+          33.65927881354392,
+          33.96848093762788,
+          33.69423209713572,
+          34.45929347925669,
+          34.093139501487954,
+          34.02763264832182,
+          33.83942265975164
+        ],
+        "distribution": "Clustered",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1027676,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1027796,
+          "total_retained_bytes": 9027796
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Clustered/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.5326005488750314,
+        "cpu_ns_per_lookup_median": 7.742653065809579,
+        "cpu_ns_per_lookup_samples": [
+          7.708839453744785,
+          7.7273234904548715,
+          7.6796745215703925,
+          7.745807527164959,
+          7.742653065809579,
+          7.778016237838888,
+          7.802809197258557
+        ],
+        "distribution": "Exponential",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 16428,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16548,
+          "total_retained_bytes": 96548
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Exponential/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 3.102563176947013,
+        "cpu_ns_per_lookup_median": 5.982935212823476,
+        "cpu_ns_per_lookup_samples": [
+          6.0290780893858305,
+          6.249438251293199,
+          5.982935212823476,
+          5.968069816836098,
+          6.420304378005257,
+          5.940444239899609,
+          5.922485466712545
+        ],
+        "distribution": "Exponential",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 19004,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 19124,
+          "total_retained_bytes": 8019124
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Exponential/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.3098626275207179,
+        "cpu_ns_per_lookup_median": 11.031987037843576,
+        "cpu_ns_per_lookup_samples": [
+          11.087380867035792,
+          10.994225837421022,
+          11.0187826948387,
+          11.036576352181116,
+          11.079570981234232,
+          11.031987037843576,
+          11.014998523367005
+        ],
+        "distribution": "Exponential",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 159700,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 159820,
+          "total_retained_bytes": 239820
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Exponential/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.02114292665169,
+        "cpu_ns_per_lookup_median": 11.511258150291527,
+        "cpu_ns_per_lookup_samples": [
+          11.248287812612542,
+          11.462382149925723,
+          11.566156372129955,
+          11.6103193296029,
+          11.511258150291527,
+          11.463691328507348,
+          11.535521593330088
+        ],
+        "distribution": "Exponential",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 397412,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 397532,
+          "total_retained_bytes": 8397532
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Exponential/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.22262389018714757,
+        "cpu_ns_per_lookup_median": 16.58593616547167,
+        "cpu_ns_per_lookup_samples": [
+          16.584044737011858,
+          16.5213911692748,
+          16.544679382188598,
+          16.621400449097276,
+          16.608042235598024,
+          16.611352235403015,
+          16.58593616547167
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 56392,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 56512,
+          "total_retained_bytes": 136512
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/ExtremePoly/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7907103605837849,
+        "cpu_ns_per_lookup_median": 16.79223886039105,
+        "cpu_ns_per_lookup_samples": [
+          16.533702518374714,
+          16.76881279747599,
+          16.79223886039105,
+          16.963868150349132,
+          16.755825291093444,
+          16.838119957706404,
+          16.866765298885987
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 358764,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 358884,
+          "total_retained_bytes": 8358884
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/ExtremePoly/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.5766495699927552,
+        "cpu_ns_per_lookup_median": 22.568359605122314,
+        "cpu_ns_per_lookup_samples": [
+          22.604275263455776,
+          22.297773310440743,
+          22.568359605122314,
+          22.578110462587976,
+          22.406170342603602,
+          22.635640521638944,
+          22.393819256479972
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 491208,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 491328,
+          "total_retained_bytes": 571328
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/ExtremePoly/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8450548248516918,
+        "cpu_ns_per_lookup_median": 30.4881870163978,
+        "cpu_ns_per_lookup_samples": [
+          29.96916778620607,
+          30.50275133153317,
+          30.380499352991222,
+          30.66229678366831,
+          30.488849030723483,
+          30.048388833674654,
+          30.4881870163978
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011228,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011348,
+          "total_retained_bytes": 9011348
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/ExtremePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.11127368306186976,
+        "cpu_ns_per_lookup_median": 15.948166317814856,
+        "cpu_ns_per_lookup_samples": [
+          15.927834904353695,
+          15.952963617620862,
+          15.926692690112903,
+          15.961301781567414,
+          15.948166317814856,
+          15.972952366810862,
+          15.932860647008022
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 56392,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 56512,
+          "total_retained_bytes": 136512
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/InversePoly/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7766072259019591,
+        "cpu_ns_per_lookup_median": 21.13196101960939,
+        "cpu_ns_per_lookup_samples": [
+          21.08473362060272,
+          21.429585634774607,
+          21.111414034325964,
+          21.2994036160859,
+          20.921431088325107,
+          21.13196101960939,
+          21.235155953150926
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 358892,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 359012,
+          "total_retained_bytes": 8359012
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/InversePoly/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8022066683461686,
+        "cpu_ns_per_lookup_median": 27.68017264780693,
+        "cpu_ns_per_lookup_samples": [
+          27.58350869038862,
+          27.36187916327685,
+          27.85954906363524,
+          27.82486962324158,
+          27.287138990015173,
+          27.68017264780693,
+          27.73318834404052
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 491208,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 491328,
+          "total_retained_bytes": 571328
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/InversePoly/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8696872382120364,
+        "cpu_ns_per_lookup_median": 34.599411911770744,
+        "cpu_ns_per_lookup_samples": [
+          33.97253080751876,
+          34.030302203401064,
+          34.62989554194181,
+          34.60654114786131,
+          34.599411911770744,
+          34.69282948809451,
+          34.41061007331789
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011356,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011476,
+          "total_retained_bytes": 9011476
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/InversePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.42415490118387744,
+        "cpu_ns_per_lookup_median": 9.460338070676107,
+        "cpu_ns_per_lookup_samples": [
+          9.460338070676107,
+          9.462094927858745,
+          9.431755355745628,
+          9.398780497858192,
+          9.513651929022405,
+          9.473919928125085,
+          9.407497212340733
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 16544,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16664,
+          "total_retained_bytes": 96664
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Lognormal/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8807523861295112,
+        "cpu_ns_per_lookup_median": 8.004528853352939,
+        "cpu_ns_per_lookup_samples": [
+          8.027273700344887,
+          8.00304300907697,
+          8.160599650175058,
+          7.998699771962711,
+          8.004528853352939,
+          7.924464706026603,
+          8.023273350370472
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 21476,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 21596,
+          "total_retained_bytes": 8021596
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Lognormal/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.5394309082871922,
+        "cpu_ns_per_lookup_median": 12.165939363567562,
+        "cpu_ns_per_lookup_samples": [
+          12.021989436610511,
+          12.598396894432215,
+          12.23808796990146,
+          12.165939363567562,
+          12.096134935779054,
+          12.131992185376477,
+          12.279762255149288
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 227736,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 227856,
+          "total_retained_bytes": 307856
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Lognormal/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.0248611483337313,
+        "cpu_ns_per_lookup_median": 11.973616153768463,
+        "cpu_ns_per_lookup_samples": [
+          11.759396011355502,
+          12.035396046498382,
+          11.973616153768463,
+          11.955671010948972,
+          11.849402118312295,
+          12.135496296290663,
+          11.99156129658895
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 468180,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 468300,
+          "total_retained_bytes": 8468300
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Lognormal/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7856711079930849,
+        "cpu_ns_per_lookup_median": 6.05484247986814,
+        "cpu_ns_per_lookup_samples": [
+          6.089272588503689,
+          6.037497336978522,
+          6.065162839887374,
+          5.994047754040327,
+          6.05484247986814,
+          6.1212743771349825,
+          5.991706159750301
+        ],
+        "distribution": "Mixed",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 16420,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16540,
+          "total_retained_bytes": 96540
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Mixed/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 2.6207991823692085,
+        "cpu_ns_per_lookup_median": 5.9036800219695,
+        "cpu_ns_per_lookup_samples": [
+          5.9525065568729065,
+          5.856084764902623,
+          6.239394292823361,
+          6.081833187582557,
+          5.9036800219695,
+          5.856636717036278,
+          5.790529834562326
+        ],
+        "distribution": "Mixed",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 18808,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 18928,
+          "total_retained_bytes": 8018928
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Mixed/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 2.2686582463988128,
+        "cpu_ns_per_lookup_median": 11.18572133879834,
+        "cpu_ns_per_lookup_samples": [
+          11.18572133879834,
+          11.219238346399969,
+          11.172362531472851,
+          11.222998010737305,
+          11.85190186220168,
+          11.133885966661644,
+          11.149884538308562
+        ],
+        "distribution": "Mixed",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 149700,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 149820,
+          "total_retained_bytes": 229820
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Mixed/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8859265848038916,
+        "cpu_ns_per_lookup_median": 11.278041524976015,
+        "cpu_ns_per_lookup_samples": [
+          11.067529278509333,
+          11.19716095490443,
+          11.310513703001966,
+          11.278041524976015,
+          11.117736920523265,
+          11.318139095731341,
+          11.283781989165488
+        ],
+        "distribution": "Mixed",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 393312,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 393432,
+          "total_retained_bytes": 8393432
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Mixed/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.31752319201472745,
+        "cpu_ns_per_lookup_median": 15.175677772364821,
+        "cpu_ns_per_lookup_samples": [
+          15.175677772364821,
+          15.108624773371071,
+          15.19249527211173,
+          15.200090271999445,
+          15.106780273398002,
+          15.236871771446596,
+          15.153435272698335
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 56196,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 56316,
+          "total_retained_bytes": 136316
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Quadratic/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.964224796667122,
+        "cpu_ns_per_lookup_median": 15.000278334574531,
+        "cpu_ns_per_lookup_samples": [
+          14.840983546976325,
+          15.024431334860129,
+          14.978540634317124,
+          15.187751622506207,
+          15.000278334574531,
+          14.75161744591912,
+          15.070207021116758
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 281204,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 281324,
+          "total_retained_bytes": 8281324
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Quadratic/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.9893466921533121,
+        "cpu_ns_per_lookup_median": 26.584804017299607,
+        "cpu_ns_per_lookup_samples": [
+          26.584804017299607,
+          26.94569404520013,
+          26.340213465691004,
+          26.475737568994052,
+          26.87107965124574,
+          26.383992319285543,
+          26.931799017755186
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 490968,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 491088,
+          "total_retained_bytes": 571088
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Quadratic/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.9333590336442117,
+        "cpu_ns_per_lookup_median": 30.684917458147563,
+        "cpu_ns_per_lookup_samples": [
+          30.196025666928566,
+          30.576664412490587,
+          30.554312569055547,
+          30.921584035698643,
+          30.684917458147563,
+          31.051531517633226,
+          30.871401955830283
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 933684,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 933804,
+          "total_retained_bytes": 8933804
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Quadratic/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.24215144436139915,
+        "cpu_ns_per_lookup_median": 2.9099220906052947,
+        "cpu_ns_per_lookup_samples": [
+          2.8981202406840327,
+          2.9099220906052947,
+          2.9156573755671533,
+          2.910439715602009,
+          2.8999422806719966,
+          2.9019920756583084,
+          2.913959565578489
+        ],
+        "distribution": "Uniform",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 96504
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Uniform/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.45253223762556627,
+        "cpu_ns_per_lookup_median": 2.9210576390107437,
+        "cpu_ns_per_lookup_samples": [
+          2.9210576390107437,
+          2.930758884757319,
+          2.924340172593104,
+          2.906923927535119,
+          2.9012578982305843,
+          2.9046867868135364,
+          2.9339577869104745
+        ],
+        "distribution": "Uniform",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 8016504
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Uniform/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.4491269391311738,
+        "cpu_ns_per_lookup_median": 11.25192000112518,
+        "cpu_ns_per_lookup_samples": [
+          11.25192000112518,
+          11.2672857011267,
+          11.16809970111678,
+          11.163546901116264,
+          11.296309801129398,
+          11.257854901126171,
+          11.22427800112209
+        ],
+        "distribution": "Uniform",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 96504
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Uniform/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.1155968434581898,
+        "cpu_ns_per_lookup_median": 12.215791038225523,
+        "cpu_ns_per_lookup_samples": [
+          11.990486490287037,
+          12.228974238104788,
+          12.215791038225523,
+          12.406855886477237,
+          12.184572488511607,
+          12.211579738263957,
+          12.372982386786834
+        ],
+        "distribution": "Uniform",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 8016504
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Uniform/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.4394432774304108,
+        "cpu_ns_per_lookup_median": 21.644535061093322,
+        "cpu_ns_per_lookup_samples": [
+          21.84313580182218,
+          21.6116674911985,
+          21.644535061093322,
+          21.56887763605281,
+          21.662829274525166,
+          21.699572737094414,
+          21.568257493223978
+        ],
+        "distribution": "Zipf",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 56388,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 56508,
+          "total_retained_bytes": 136508
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Zipf/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.364997682779529,
+        "cpu_ns_per_lookup_median": 20.296001902535554,
+        "cpu_ns_per_lookup_samples": [
+          20.396235196622452,
+          20.40032039638122,
+          20.296001902535554,
+          20.206273407830082,
+          20.242018905720002,
+          20.265071104360814,
+          20.318032801235052
+        ],
+        "distribution": "Zipf",
+        "encoding": "Original",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 402340,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 402460,
+          "total_retained_bytes": 8402460
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Zipf/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 2.0616769544895432,
+        "cpu_ns_per_lookup_median": 25.926595451776137,
+        "cpu_ns_per_lookup_samples": [
+          25.889328612866773,
+          27.3336503795745,
+          25.926595451776137,
+          25.983700856674982,
+          25.881356105040645,
+          25.81776144958724,
+          26.278683646253718
+        ],
+        "distribution": "Zipf",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 491204,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 491324,
+          "total_retained_bytes": 571324
+        },
+        "n": 10000,
+        "name": "FinalBroad/Baseline_e0e8765/Zipf/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.010660719253788,
+        "cpu_ns_per_lookup_median": 27.52091166464211,
+        "cpu_ns_per_lookup_samples": [
+          27.04219673085366,
+          27.997469341456153,
+          27.573666403351105,
+          27.52091166464211,
+          27.511498179668067,
+          27.560526747241834,
+          27.460704583661943
+        ],
+        "distribution": "Zipf",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1054740,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1054860,
+          "total_retained_bytes": 9054860
+        },
+        "n": 1000000,
+        "name": "FinalBroad/Baseline_e0e8765/Zipf/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.23982739442469583,
+        "cpu_ns_per_lookup_median": 21.468870238759333,
+        "cpu_ns_per_lookup_samples": [
+          21.50075462288739,
+          21.413459512945884,
+          21.49224180188236,
+          21.365787715318447,
+          21.502921522779996,
+          21.468870238759333,
+          21.439771868779705
+        ],
+        "distribution": "Clustered",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 56392,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 56512,
+          "total_retained_bytes": 136512
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Clustered/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.6583590046293811,
+        "cpu_ns_per_lookup_median": 31.138900791742497,
+        "cpu_ns_per_lookup_samples": [
+          30.650926939507553,
+          31.138900791742497,
+          31.171077330429295,
+          31.010638451320887,
+          31.17950980263945,
+          31.28025565480415,
+          31.042814990004533
+        ],
+        "distribution": "Clustered",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 375276,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 375396,
+          "total_retained_bytes": 8375396
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Clustered/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.14929749962438588,
+        "cpu_ns_per_lookup_median": 23.52140342754107,
+        "cpu_ns_per_lookup_samples": [
+          23.520222227584476,
+          23.543677483814868,
+          23.512966285009576,
+          23.6143807382053,
+          23.51988474188252,
+          23.53777148404402,
+          23.52140342754107
+        ],
+        "distribution": "Clustered",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 491208,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 491328,
+          "total_retained_bytes": 571328
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Clustered/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 2.6644612980359375,
+        "cpu_ns_per_lookup_median": 30.35820026262298,
+        "cpu_ns_per_lookup_samples": [
+          30.27701007949059,
+          29.74591802822602,
+          32.314125901075656,
+          30.35820026262298,
+          30.634896406739013,
+          30.365128491584205,
+          30.28307227983104
+        ],
+        "distribution": "Clustered",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1027676,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1027796,
+          "total_retained_bytes": 9027796
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Clustered/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.1080714512774446,
+        "cpu_ns_per_lookup_median": 6.129395017737545,
+        "cpu_ns_per_lookup_samples": [
+          6.1275594377198805,
+          6.285725249246654,
+          6.129395017737545,
+          6.221654765771098,
+          6.228472634408204,
+          6.117463747622531,
+          6.118774876206412
+        ],
+        "distribution": "Exponential",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 16428,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16548,
+          "total_retained_bytes": 96548
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Exponential/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 2.5813384901466443,
+        "cpu_ns_per_lookup_median": 4.0597725762932155,
+        "cpu_ns_per_lookup_samples": [
+          4.344428257274743,
+          4.047350677058281,
+          4.099781571844217,
+          4.0597725762932155,
+          4.05733751416009,
+          4.110107468230652,
+          4.052898919892522
+        ],
+        "distribution": "Exponential",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 19004,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 19124,
+          "total_retained_bytes": 8019124
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Exponential/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.29250890459685097,
+        "cpu_ns_per_lookup_median": 8.794815132851623,
+        "cpu_ns_per_lookup_samples": [
+          8.846060492012546,
+          8.794815132851623,
+          8.815817329228787,
+          8.817045149939736,
+          8.779435062889366,
+          8.770775695767435,
+          8.79281184642794
+        ],
+        "distribution": "Exponential",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 159700,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 159820,
+          "total_retained_bytes": 239820
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Exponential/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.6358794090509476,
+        "cpu_ns_per_lookup_median": 8.840058676699993,
+        "cpu_ns_per_lookup_samples": [
+          8.72164379878437,
+          8.805635747073325,
+          8.890503915389036,
+          8.838681759514401,
+          8.857082380079142,
+          8.87554558778761,
+          8.840058676699993
+        ],
+        "distribution": "Exponential",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 397412,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 397532,
+          "total_retained_bytes": 8397532
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Exponential/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.2233728935234364,
+        "cpu_ns_per_lookup_median": 13.525286010476172,
+        "cpu_ns_per_lookup_samples": [
+          13.478400238071213,
+          13.489540452589388,
+          13.525286010476172,
+          13.558900396891561,
+          13.538460525036946,
+          13.529160867700332,
+          13.488571738282829
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 56392,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 56512,
+          "total_retained_bytes": 136512
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/ExtremePoly/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8757044478868709,
+        "cpu_ns_per_lookup_median": 13.484550505097873,
+        "cpu_ns_per_lookup_samples": [
+          13.192774438350227,
+          13.484550505097873,
+          13.493447283526544,
+          13.438153327271017,
+          13.524059854463522,
+          13.446858777131128,
+          13.541757747038279
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 358764,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 358884,
+          "total_retained_bytes": 8358884
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/ExtremePoly/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.2508324226666644,
+        "cpu_ns_per_lookup_median": 18.891929100632215,
+        "cpu_ns_per_lookup_samples": [
+          18.86253958821228,
+          18.891929100632215,
+          18.860112931223377,
+          18.94949479697788,
+          18.99047833723313,
+          18.910533470881557,
+          18.88936762936602
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 491208,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 491328,
+          "total_retained_bytes": 571328
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/ExtremePoly/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.6940364412332476,
+        "cpu_ns_per_lookup_median": 25.94416451489325,
+        "cpu_ns_per_lookup_samples": [
+          25.585535910677574,
+          26.159154891694055,
+          25.979467018122694,
+          25.912784512025144,
+          25.94416451489325,
+          26.019065593171927,
+          25.814348431595718
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011228,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011348,
+          "total_retained_bytes": 9011348
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/ExtremePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.09421973974928408,
+        "cpu_ns_per_lookup_median": 12.931188921329753,
+        "cpu_ns_per_lookup_samples": [
+          12.928117800023497,
+          12.90634075803304,
+          12.919555886078488,
+          12.945055499350287,
+          12.931188921329753,
+          12.933701656944354,
+          12.93202649986707
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 56392,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 56512,
+          "total_retained_bytes": 136512
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/InversePoly/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.5804448141672081,
+        "cpu_ns_per_lookup_median": 17.69494074318659,
+        "cpu_ns_per_lookup_samples": [
+          17.471392333798406,
+          17.710283543831892,
+          17.590330738793103,
+          17.69494074318659,
+          17.765948746170743,
+          17.704197143576312,
+          17.574861138142793
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 358892,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 359012,
+          "total_retained_bytes": 8359012
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/InversePoly/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.4679072376988066,
+        "cpu_ns_per_lookup_median": 23.62016945428496,
+        "cpu_ns_per_lookup_samples": [
+          23.562894227729057,
+          23.53107465741876,
+          23.693019523148536,
+          23.659860181457834,
+          23.851949903268228,
+          23.62016945428496,
+          23.55586042797774
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 491208,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 491328,
+          "total_retained_bytes": 571328
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/InversePoly/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.575368009136949,
+        "cpu_ns_per_lookup_median": 30.274027249095056,
+        "cpu_ns_per_lookup_samples": [
+          29.872725314676437,
+          30.2803111346775,
+          30.274027249095056,
+          30.228089878630684,
+          30.279227706128513,
+          30.443908845522568,
+          30.268393420643235
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011356,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011476,
+          "total_retained_bytes": 9011476
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/InversePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7351367056027516,
+        "cpu_ns_per_lookup_median": 7.177945724539891,
+        "cpu_ns_per_lookup_samples": [
+          7.306101171151641,
+          7.177945724539891,
+          7.150339831643403,
+          7.203845635290988,
+          7.155767956651043,
+          7.173189653104228,
+          7.186320545980404
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 16544,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16664,
+          "total_retained_bytes": 96664
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Lognormal/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7105470165481553,
+        "cpu_ns_per_lookup_median": 6.416075260886905,
+        "cpu_ns_per_lookup_samples": [
+          6.439386996430502,
+          6.416075260886905,
+          6.427502582231752,
+          6.342894694994231,
+          6.430336557925282,
+          6.360218514152907,
+          6.333615710062204
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 21476,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 21596,
+          "total_retained_bytes": 8021596
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Lognormal/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.18098713890579637,
+        "cpu_ns_per_lookup_median": 9.81183358574448,
+        "cpu_ns_per_lookup_samples": [
+          9.785642364901841,
+          9.820657366028543,
+          9.816805715904868,
+          9.824649076156872,
+          9.793345665149443,
+          9.81183358574448,
+          9.781300504762386
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 227736,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 227856,
+          "total_retained_bytes": 307856
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Lognormal/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.6825244592606057,
+        "cpu_ns_per_lookup_median": 9.233190909668323,
+        "cpu_ns_per_lookup_samples": [
+          9.097704116477539,
+          9.251654560947491,
+          9.254645152351966,
+          9.298918907708469,
+          9.208160959870511,
+          9.210046332711814,
+          9.233190909668323
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 468180,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 468300,
+          "total_retained_bytes": 8468300
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Lognormal/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.31950658120127023,
+        "cpu_ns_per_lookup_median": 4.1455380099019585,
+        "cpu_ns_per_lookup_samples": [
+          4.1455380099019585,
+          4.160749638509723,
+          4.1724758842520036,
+          4.1556987870691415,
+          4.142820592752651,
+          4.138537707027825,
+          4.135879364164539
+        ],
+        "distribution": "Mixed",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 16420,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16540,
+          "total_retained_bytes": 96540
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Mixed/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.22003877927955148,
+        "cpu_ns_per_lookup_median": 4.049616467312998,
+        "cpu_ns_per_lookup_samples": [
+          4.067136817403373,
+          4.0484523244497925,
+          4.0433591994235645,
+          4.053603656619238,
+          4.049616467312998,
+          4.064401081674855,
+          4.0481030815908
+        ],
+        "distribution": "Mixed",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 18808,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 18928,
+          "total_retained_bytes": 8018928
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Mixed/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.20460058507362067,
+        "cpu_ns_per_lookup_median": 8.776937499999748,
+        "cpu_ns_per_lookup_samples": [
+          8.757187499999985,
+          8.766999999999967,
+          8.769125000000155,
+          8.813750000000065,
+          8.776937499999748,
+          8.781687499999968,
+          8.781125000000056
+        ],
+        "distribution": "Mixed",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 149700,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 149820,
+          "total_retained_bytes": 229820
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Mixed/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.0029540407829545,
+        "cpu_ns_per_lookup_median": 8.70305350331086,
+        "cpu_ns_per_lookup_samples": [
+          8.564152206450071,
+          8.70305350331086,
+          8.836386510297638,
+          8.71694363299709,
+          8.646636324586154,
+          8.746376022331956,
+          8.640272564729955
+        ],
+        "distribution": "Mixed",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 393312,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 393432,
+          "total_retained_bytes": 8393432
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Mixed/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.09719749130604344,
+        "cpu_ns_per_lookup_median": 12.507689987814574,
+        "cpu_ns_per_lookup_samples": [
+          12.498915645006045,
+          12.507689987814574,
+          12.520173073459645,
+          12.512393759217408,
+          12.53138975911172,
+          12.498191987867418,
+          12.502714844984714
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 56196,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 56316,
+          "total_retained_bytes": 136316
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Quadratic/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 2.0169860233020778,
+        "cpu_ns_per_lookup_median": 12.16756393262643,
+        "cpu_ns_per_lookup_samples": [
+          11.997438730772187,
+          12.16756393262643,
+          12.117808632083959,
+          12.013783030950297,
+          12.274569433794031,
+          12.56849593699681,
+          12.596850137305502
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 281204,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 281324,
+          "total_retained_bytes": 8281324
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Quadratic/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.36329234422388673,
+        "cpu_ns_per_lookup_median": 22.54427815228733,
+        "cpu_ns_per_lookup_samples": [
+          22.717778618959752,
+          22.652593415378732,
+          22.529738094347902,
+          22.54101072353776,
+          22.54427815228733,
+          22.477459234333846,
+          22.558001353041107
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 490968,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 491088,
+          "total_retained_bytes": 571088
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Quadratic/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.1233562279573646,
+        "cpu_ns_per_lookup_median": 26.47049638000652,
+        "cpu_ns_per_lookup_samples": [
+          25.939189612521574,
+          26.48199237930185,
+          26.382168785411224,
+          26.340399987967423,
+          26.47049638000652,
+          26.932635551722175,
+          26.58315717311177
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 933684,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 933804,
+          "total_retained_bytes": 8933804
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Quadratic/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.9808314795077867,
+        "cpu_ns_per_lookup_median": 1.6088105472238738,
+        "cpu_ns_per_lookup_samples": [
+          1.61505129009801,
+          1.600082718628824,
+          1.6088105472238738,
+          1.6069912900760903,
+          1.632967518718057,
+          1.6160875758150897,
+          1.581625318578651
+        ],
+        "distribution": "Uniform",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 96504
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Uniform/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7643771505029787,
+        "cpu_ns_per_lookup_median": 1.6344026682516049,
+        "cpu_ns_per_lookup_samples": [
+          1.6559892946193928,
+          1.645761595362447,
+          1.6344026682516049,
+          1.6350440861069369,
+          1.6338195611104127,
+          1.632560049685339,
+          1.615416699733591
+        ],
+        "distribution": "Uniform",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 8016504
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Uniform/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.14287092943510435,
+        "cpu_ns_per_lookup_median": 8.77774552347463,
+        "cpu_ns_per_lookup_samples": [
+          8.761976443873452,
+          8.79245081595901,
+          8.771550527916826,
+          8.761037808182857,
+          8.782188399075881,
+          8.789947787451272,
+          8.77774552347463
+        ],
+        "distribution": "Uniform",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 96504
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Uniform/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.5432936905404068,
+        "cpu_ns_per_lookup_median": 9.38895155517098,
+        "cpu_ns_per_lookup_samples": [
+          9.319976155868307,
+          9.422357004834346,
+          9.382385905237465,
+          9.440971704646504,
+          9.466945704383695,
+          9.352732255536987,
+          9.38895155517098
+        ],
+        "distribution": "Uniform",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 8016504
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Uniform/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.27605768640450007,
+        "cpu_ns_per_lookup_median": 17.49512440898189,
+        "cpu_ns_per_lookup_samples": [
+          17.49512440898189,
+          17.5313764798814,
+          17.50349988743149,
+          17.470372995057904,
+          17.44249640260733,
+          17.40661935313086,
+          17.541752072587364
+        ],
+        "distribution": "Zipf",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 56388,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 56508,
+          "total_retained_bytes": 136508
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Zipf/Original/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.48949297561774324,
+        "cpu_ns_per_lookup_median": 16.748135022826297,
+        "cpu_ns_per_lookup_samples": [
+          16.85578408981117,
+          16.748135022826297,
+          16.759169665228754,
+          16.686095811103478,
+          16.85970751822051,
+          16.661451776406135,
+          16.678616775696813
+        ],
+        "distribution": "Zipf",
+        "encoding": "Original",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 402340,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 402460,
+          "total_retained_bytes": 8402460
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Zipf/Original/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.28614753203124493,
+        "cpu_ns_per_lookup_median": 22.05858926470834,
+        "cpu_ns_per_lookup_samples": [
+          22.00474586552786,
+          22.12533596369505,
+          22.179975862864097,
+          22.066554264588664,
+          22.032145465112528,
+          22.015737565360343,
+          22.05858926470834
+        ],
+        "distribution": "Zipf",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 80000,
+          "backing_capacity": 10000,
+          "index_dynamic_bytes": 491204,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 491324,
+          "total_retained_bytes": 571324
+        },
+        "n": 10000,
+        "name": "FinalBroad/InlineBoth/Zipf/Unique/N10000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 2.380971234966694,
+        "cpu_ns_per_lookup_median": 23.345491216486586,
+        "cpu_ns_per_lookup_samples": [
+          23.30691463104058,
+          23.345491216486586,
+          23.71384639964429,
+          23.30213523107423,
+          23.456441572860996,
+          23.264753495619257,
+          24.82864144190364
+        ],
+        "distribution": "Zipf",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1054740,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1054860,
+          "total_retained_bytes": 9054860
+        },
+        "n": 1000000,
+        "name": "FinalBroad/InlineBoth/Zipf/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      }
+    ],
+    "metadata_records": 72
+  },
+  "competitors": {
+    "context": {
+      "caches": [],
+      "cpu_scaling_enabled": false,
+      "date": "2026-10-22T18:47:26+08:00",
+      "executable": "/private/tmp/jazzy-routing-inline-20261022/final/benchmark_competitors_inlineboth",
+      "host_name": "Matthews-MacBook-Air.local",
+      "library_build_type": "release",
+      "load_avg": [
+        2.25684,
+        2.3501,
+        2.24414
+      ],
+      "mhz_per_cpu": 24,
+      "num_cpus": 8
+    },
+    "excluded_batch4_group_count": 27,
+    "groups": [
+      {
+        "configuration": "S256",
+        "cpu_ns_per_lookup_cv_percent": 1.3948958703586285,
+        "cpu_ns_per_lookup_median": 32.15576691014123,
+        "cpu_ns_per_lookup_samples": [
+          31.630630422271906,
+          32.61310727976142,
+          32.141028623566314,
+          32.12288919393094,
+          33.066593020578246,
+          32.20587708450756,
+          32.15576691014123
+        ],
+        "distribution": "Clustered",
+        "implementation": "JazzyIndex",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 1027796,
+          "total_bytes": 9027796
+        },
+        "n": 1000000,
+        "name": "Lookup/JazzyIndex/S256/Clustered/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "S256",
+        "cpu_ns_per_lookup_cv_percent": 1.3561277606755888,
+        "cpu_ns_per_lookup_median": 10.615842747873458,
+        "cpu_ns_per_lookup_samples": [
+          10.42017000252102,
+          10.602518248190243,
+          10.435468502157484,
+          10.656227496914632,
+          10.637967997348227,
+          10.615842747873458,
+          10.844497742444764
+        ],
+        "distribution": "Exponential",
+        "implementation": "JazzyIndex",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 397532,
+          "total_bytes": 8397532
+        },
+        "n": 1000000,
+        "name": "Lookup/JazzyIndex/S256/Exponential/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "S256",
+        "cpu_ns_per_lookup_cv_percent": 2.3980651103133024,
+        "cpu_ns_per_lookup_median": 28.426163664780276,
+        "cpu_ns_per_lookup_samples": [
+          28.023541778024857,
+          28.34169041755939,
+          28.426163664780276,
+          28.35186791722272,
+          30.117664109127347,
+          28.452421613915178,
+          28.514504361872113
+        ],
+        "distribution": "ExtremePoly",
+        "implementation": "JazzyIndex",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 1011348,
+          "total_bytes": 9011348
+        },
+        "n": 1000000,
+        "name": "Lookup/JazzyIndex/S256/ExtremePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "S256",
+        "cpu_ns_per_lookup_cv_percent": 1.4360872700318126,
+        "cpu_ns_per_lookup_median": 32.55268833933878,
+        "cpu_ns_per_lookup_samples": [
+          32.1634988369868,
+          32.22260144448779,
+          32.372110016818084,
+          33.48151034494358,
+          32.99864437774088,
+          32.61109012540418,
+          32.55268833933878
+        ],
+        "distribution": "InversePoly",
+        "implementation": "JazzyIndex",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 1011476,
+          "total_bytes": 9011476
+        },
+        "n": 1000000,
+        "name": "Lookup/JazzyIndex/S256/InversePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "S256",
+        "cpu_ns_per_lookup_cv_percent": 1.0526862683159872,
+        "cpu_ns_per_lookup_median": 11.075421866004591,
+        "cpu_ns_per_lookup_samples": [
+          10.926520277193069,
+          11.295731992012634,
+          11.081337366127068,
+          10.979083721143748,
+          11.089534559154373,
+          11.036464072337289,
+          11.075421866004591
+        ],
+        "distribution": "Lognormal",
+        "implementation": "JazzyIndex",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 468300,
+          "total_bytes": 8468300
+        },
+        "n": 1000000,
+        "name": "Lookup/JazzyIndex/S256/Lognormal/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "S256",
+        "cpu_ns_per_lookup_cv_percent": 1.2135907719803152,
+        "cpu_ns_per_lookup_median": 10.395493479063438,
+        "cpu_ns_per_lookup_samples": [
+          10.20388862099007,
+          10.391773764759769,
+          10.16890747796361,
+          10.506768336747003,
+          10.45073519361746,
+          10.395493479063438,
+          10.40380347910419
+        ],
+        "distribution": "Mixed",
+        "implementation": "JazzyIndex",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 393432,
+          "total_bytes": 8393432
+        },
+        "n": 1000000,
+        "name": "Lookup/JazzyIndex/S256/Mixed/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "S256",
+        "cpu_ns_per_lookup_cv_percent": 0.8566139764217967,
+        "cpu_ns_per_lookup_median": 28.641440867530854,
+        "cpu_ns_per_lookup_samples": [
+          28.02310233412253,
+          28.676831951070465,
+          28.686886236167602,
+          28.46689847826332,
+          28.705386120743427,
+          28.633598525155698,
+          28.641440867530854
+        ],
+        "distribution": "Quadratic",
+        "implementation": "JazzyIndex",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 933804,
+          "total_bytes": 8933804
+        },
+        "n": 1000000,
+        "name": "Lookup/JazzyIndex/S256/Quadratic/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "S256",
+        "cpu_ns_per_lookup_cv_percent": 1.0160773141740664,
+        "cpu_ns_per_lookup_median": 11.061048169023582,
+        "cpu_ns_per_lookup_samples": [
+          10.856492039703578,
+          11.06953245476918,
+          10.913591282769762,
+          11.065035783323458,
+          11.061048169023582,
+          11.068090126191898,
+          10.820518668144148
+        ],
+        "distribution": "Uniform",
+        "implementation": "JazzyIndex",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 16504,
+          "total_bytes": 8016504
+        },
+        "n": 1000000,
+        "name": "Lookup/JazzyIndex/S256/Uniform/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "S256",
+        "cpu_ns_per_lookup_cv_percent": 1.1642749180018472,
+        "cpu_ns_per_lookup_median": 25.41582205415924,
+        "cpu_ns_per_lookup_samples": [
+          25.02204325022034,
+          25.411095254110347,
+          25.467816854678386,
+          25.466907854669003,
+          26.03339666033363,
+          25.41582205415924,
+          25.412731454128387
+        ],
+        "distribution": "Zipf",
+        "implementation": "JazzyIndex",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 1054860,
+          "total_bytes": 9054860
+        },
+        "n": 1000000,
+        "name": "Lookup/JazzyIndex/S256/Zipf/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.8369884973768534,
+        "cpu_ns_per_lookup_median": 27.653391043403932,
+        "cpu_ns_per_lookup_samples": [
+          27.332378076565615,
+          27.773875130959585,
+          27.73614568485602,
+          27.420343967479557,
+          28.03068550443068,
+          27.653391043403932,
+          27.633796745430097
+        ],
+        "distribution": "Clustered",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 61564,
+          "total_bytes": 8061564
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E16/Clustered/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.9649769229261853,
+        "cpu_ns_per_lookup_median": 17.526654043530687,
+        "cpu_ns_per_lookup_samples": [
+          17.2641731642218,
+          17.423342360335656,
+          17.564469085462203,
+          17.801245622537905,
+          17.50428632264497,
+          17.649861876234954,
+          17.526654043530687
+        ],
+        "distribution": "Exponential",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 13180,
+          "total_bytes": 8013180
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E16/Exponential/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.9665565758033798,
+        "cpu_ns_per_lookup_median": 30.11251593946905,
+        "cpu_ns_per_lookup_samples": [
+          30.384967211455198,
+          30.512397176461963,
+          30.272768774251848,
+          29.603654193689916,
+          30.11251593946905,
+          30.10715272545499,
+          30.070682870150833
+        ],
+        "distribution": "ExtremePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 104220,
+          "total_bytes": 8104220
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E16/ExtremePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.503356316159808,
+        "cpu_ns_per_lookup_median": 32.729523734376755,
+        "cpu_ns_per_lookup_samples": [
+          32.682321754992486,
+          32.637468132793884,
+          33.0456126112416,
+          32.729523734376755,
+          32.82087482880477,
+          32.78236177100161,
+          32.52192895937274
+        ],
+        "distribution": "InversePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 104524,
+          "total_bytes": 8104524
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E16/InversePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E16",
+        "cpu_ns_per_lookup_cv_percent": 1.6992322922151983,
+        "cpu_ns_per_lookup_median": 18.33214625732314,
+        "cpu_ns_per_lookup_samples": [
+          18.08087278433297,
+          18.37893421209507,
+          18.266851646343223,
+          18.064972699423542,
+          18.679732539718838,
+          18.9211010417809,
+          18.33214625732314
+        ],
+        "distribution": "Lognormal",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 14408,
+          "total_bytes": 8014408
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E16/Lognormal/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.8248780815948511,
+        "cpu_ns_per_lookup_median": 17.619472302212188,
+        "cpu_ns_per_lookup_samples": [
+          17.349499891643056,
+          17.398701063697153,
+          17.66233311704184,
+          17.619472302212188,
+          17.658528902708433,
+          17.584219916052056,
+          17.740826739465867
+        ],
+        "distribution": "Mixed",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 12172,
+          "total_bytes": 8012172
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E16/Mixed/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.9549292070606763,
+        "cpu_ns_per_lookup_median": 27.185686158059116,
+        "cpu_ns_per_lookup_samples": [
+          26.718213290182167,
+          27.094349744469575,
+          27.300723792904687,
+          27.43734302758135,
+          27.185686158059116,
+          27.251009036139877,
+          26.8276628322093
+        ],
+        "distribution": "Quadratic",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 94432,
+          "total_bytes": 8094432
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E16/Quadratic/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.9282851387198523,
+        "cpu_ns_per_lookup_median": 15.10219847016061,
+        "cpu_ns_per_lookup_samples": [
+          15.138751199350489,
+          15.066101226691584,
+          14.842913222909692,
+          15.181339114359469,
+          15.205024371900459,
+          15.10219847016061,
+          14.89745763811938
+        ],
+        "distribution": "Uniform",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 15036,
+          "total_bytes": 8015036
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E16/Uniform/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E16",
+        "cpu_ns_per_lookup_cv_percent": 1.3109087992763673,
+        "cpu_ns_per_lookup_median": 38.03791309500084,
+        "cpu_ns_per_lookup_samples": [
+          37.48426716108323,
+          39.103420364046904,
+          38.120410892605335,
+          37.95729024733713,
+          38.31969128681174,
+          38.03791309500084,
+          37.884702899450154
+        ],
+        "distribution": "Zipf",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 82680,
+          "total_bytes": 8082680
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E16/Zipf/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.5305635154076225,
+        "cpu_ns_per_lookup_median": 36.68576887571409,
+        "cpu_ns_per_lookup_samples": [
+          35.940048847752394,
+          36.15531885582217,
+          36.320633862023094,
+          36.68576887571409,
+          36.861383882302704,
+          36.908763884076926,
+          37.60787641029234
+        ],
+        "distribution": "Clustered",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 16508,
+          "total_bytes": 8016508
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E256/Clustered/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E256",
+        "cpu_ns_per_lookup_cv_percent": 0.9171337861916253,
+        "cpu_ns_per_lookup_median": 33.801994815540404,
+        "cpu_ns_per_lookup_samples": [
+          33.657589316820925,
+          33.18625178865914,
+          33.801994815540404,
+          34.10090409959732,
+          33.88454830868888,
+          33.88429585152392,
+          33.4374466684229
+        ],
+        "distribution": "Exponential",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 13084,
+          "total_bytes": 8013084
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E256/Exponential/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.6549704791495474,
+        "cpu_ns_per_lookup_median": 39.97262195597018,
+        "cpu_ns_per_lookup_samples": [
+          38.575765687314586,
+          40.25300972123967,
+          39.911066535197456,
+          39.108869514930575,
+          39.97262195597018,
+          40.06213144397664,
+          40.36708490469066
+        ],
+        "distribution": "ExtremePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 18828,
+          "total_bytes": 8018828
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E256/ExtremePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.6620029326284664,
+        "cpu_ns_per_lookup_median": 40.0888574169032,
+        "cpu_ns_per_lookup_samples": [
+          39.5001727846006,
+          40.0888574169032,
+          40.54791822151755,
+          41.62736206170872,
+          40.41489813633175,
+          39.99404522852758,
+          40.01696996661088
+        ],
+        "distribution": "InversePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 18924,
+          "total_bytes": 8018924
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E256/InversePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.7381533104966251,
+        "cpu_ns_per_lookup_median": 34.449528421740894,
+        "cpu_ns_per_lookup_samples": [
+          32.93397199182152,
+          34.46950706574115,
+          34.66106700531618,
+          34.37878051767352,
+          34.449528421740894,
+          34.59008405838209,
+          34.334357415125325
+        ],
+        "distribution": "Lognormal",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 14040,
+          "total_bytes": 8014040
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E256/Lognormal/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E256",
+        "cpu_ns_per_lookup_cv_percent": 2.3474043014588353,
+        "cpu_ns_per_lookup_median": 33.97610998255215,
+        "cpu_ns_per_lookup_samples": [
+          32.29200332184433,
+          33.97610998255215,
+          34.82117727031015,
+          34.47990455492307,
+          33.808023896510704,
+          33.9863110691523,
+          33.82587579806056
+        ],
+        "distribution": "Mixed",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 12092,
+          "total_bytes": 8012092
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E256/Mixed/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E256",
+        "cpu_ns_per_lookup_cv_percent": 0.9786353434357439,
+        "cpu_ns_per_lookup_median": 36.40576917379312,
+        "cpu_ns_per_lookup_samples": [
+          35.96008413915079,
+          36.69533563560986,
+          35.965751810111904,
+          36.682454565244925,
+          36.80018754838602,
+          36.16875747907098,
+          36.40576917379312
+        ],
+        "distribution": "Quadratic",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 16016,
+          "total_bytes": 8016016
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E256/Quadratic/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.226630264015483,
+        "cpu_ns_per_lookup_median": 30.2415198967323,
+        "cpu_ns_per_lookup_samples": [
+          29.427343813360345,
+          30.127260685031754,
+          30.2415198967323,
+          30.598236733260624,
+          30.066857478845897,
+          30.391894312132898,
+          30.311004703843935
+        ],
+        "distribution": "Uniform",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 15036,
+          "total_bytes": 8015036
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E256/Uniform/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.609944170098681,
+        "cpu_ns_per_lookup_median": 50.36463982578757,
+        "cpu_ns_per_lookup_samples": [
+          48.394148275064815,
+          50.76921689008648,
+          49.92258907114548,
+          49.86707249285514,
+          50.5301486248195,
+          50.55894784980932,
+          50.36463982578757
+        ],
+        "distribution": "Zipf",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 21736,
+          "total_bytes": 8021736
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E256/Zipf/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E64",
+        "cpu_ns_per_lookup_cv_percent": 0.8240438209653512,
+        "cpu_ns_per_lookup_median": 27.999677589577036,
+        "cpu_ns_per_lookup_samples": [
+          27.678458338180572,
+          28.118000626557883,
+          28.209720833072215,
+          28.34849231436237,
+          27.999677589577036,
+          27.85614142223336,
+          27.86904578029726
+        ],
+        "distribution": "Clustered",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 19308,
+          "total_bytes": 8019308
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E64/Clustered/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.1005141216881387,
+        "cpu_ns_per_lookup_median": 24.531067575963217,
+        "cpu_ns_per_lookup_samples": [
+          24.04361201296006,
+          24.682632287629843,
+          24.531067575963217,
+          24.38536543562372,
+          24.650560573897398,
+          24.906099712336633,
+          24.508307004929183
+        ],
+        "distribution": "Exponential",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 13116,
+          "total_bytes": 8013116
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E64/Exponential/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.3093543489466246,
+        "cpu_ns_per_lookup_median": 33.419366852104126,
+        "cpu_ns_per_lookup_samples": [
+          32.652602158094986,
+          33.442001111179536,
+          33.20259131931834,
+          32.694837218842615,
+          33.83751728778904,
+          33.49310320125367,
+          33.419366852104126
+        ],
+        "distribution": "ExtremePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 32924,
+          "total_bytes": 8032924
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E64/ExtremePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E64",
+        "cpu_ns_per_lookup_cv_percent": 0.6746367546235297,
+        "cpu_ns_per_lookup_median": 34.410769598022846,
+        "cpu_ns_per_lookup_samples": [
+          34.04515790584289,
+          34.53207294536698,
+          34.76933159667743,
+          34.40274753297298,
+          34.6446249490114,
+          34.35072565656028,
+          34.410769598022846
+        ],
+        "distribution": "InversePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 33116,
+          "total_bytes": 8033116
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E64/InversePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.5956186026941896,
+        "cpu_ns_per_lookup_median": 25.16598738161768,
+        "cpu_ns_per_lookup_samples": [
+          24.835505061526856,
+          25.611575496264134,
+          25.111472991337106,
+          25.16598738161768,
+          25.10217873463173,
+          26.057699818030557,
+          25.295570768344984
+        ],
+        "distribution": "Lognormal",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 14216,
+          "total_bytes": 8014216
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E64/Lognormal/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.1069150318842975,
+        "cpu_ns_per_lookup_median": 24.222430776404007,
+        "cpu_ns_per_lookup_samples": [
+          23.898302022965073,
+          24.330645737079305,
+          23.811936505861215,
+          24.222430776404007,
+          24.12866741620002,
+          24.60643044608282,
+          24.257527520406214
+        ],
+        "distribution": "Mixed",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 12124,
+          "total_bytes": 8012124
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E64/Mixed/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E64",
+        "cpu_ns_per_lookup_cv_percent": 2.432175975002594,
+        "cpu_ns_per_lookup_median": 27.780379184059417,
+        "cpu_ns_per_lookup_samples": [
+          27.58614818142492,
+          27.564962944645693,
+          27.480221997523167,
+          28.430785752510616,
+          27.87264386012997,
+          29.38055753603444,
+          27.780379184059417
+        ],
+        "distribution": "Quadratic",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 17136,
+          "total_bytes": 8017136
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E64/Quadratic/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E64",
+        "cpu_ns_per_lookup_cv_percent": 0.7468190953285688,
+        "cpu_ns_per_lookup_median": 21.341908355988007,
+        "cpu_ns_per_lookup_samples": [
+          21.295164115481924,
+          21.269092245363705,
+          21.5603566878675,
+          21.341908355988007,
+          21.47519886357602,
+          21.518394861403472,
+          21.111272581866153
+        ],
+        "distribution": "Uniform",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 15036,
+          "total_bytes": 8015036
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E64/Uniform/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R12/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.8188161524032158,
+        "cpu_ns_per_lookup_median": 43.831769037560505,
+        "cpu_ns_per_lookup_samples": [
+          41.98162916398094,
+          44.05077746487524,
+          43.34682180565937,
+          43.944883280243204,
+          43.514688155162204,
+          43.831769037560505,
+          44.440058927707575
+        ],
+        "distribution": "Zipf",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 35928,
+          "total_bytes": 8035928
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R12/E64/Zipf/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E16",
+        "cpu_ns_per_lookup_cv_percent": 1.4482117752574712,
+        "cpu_ns_per_lookup_median": 25.169025514814447,
+        "cpu_ns_per_lookup_samples": [
+          24.711677104142407,
+          25.65986028131484,
+          25.7558425632728,
+          25.10975287427564,
+          25.282198653240943,
+          25.169025514814447,
+          25.00231002133865
+        ],
+        "distribution": "Clustered",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 1000336,
+          "total_bytes": 9000336
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E16/Clustered/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.8442683633934257,
+        "cpu_ns_per_lookup_median": 18.83772420521918,
+        "cpu_ns_per_lookup_samples": [
+          18.54547707175084,
+          18.83772420521918,
+          18.958681675717227,
+          18.76683191290659,
+          18.998600311124477,
+          18.93371584019335,
+          18.72477716322785
+        ],
+        "distribution": "Exponential",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 812988,
+          "total_bytes": 8812988
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E16/Exponential/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E16",
+        "cpu_ns_per_lookup_cv_percent": 1.6706811496009726,
+        "cpu_ns_per_lookup_median": 25.558493451898833,
+        "cpu_ns_per_lookup_samples": [
+          24.89818960370101,
+          26.205786386826077,
+          25.558493451898833,
+          26.031404007650337,
+          25.513497376855714,
+          25.627704282180353,
+          25.394049964799766
+        ],
+        "distribution": "ExtremePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 1042992,
+          "total_bytes": 9042992
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E16/ExtremePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E16",
+        "cpu_ns_per_lookup_cv_percent": 1.4027153890258346,
+        "cpu_ns_per_lookup_median": 28.062600973858896,
+        "cpu_ns_per_lookup_samples": [
+          27.28516035503571,
+          28.062600973858896,
+          28.471884310824866,
+          28.166206997321616,
+          28.167986490089355,
+          27.708679634160486,
+          27.743676325291286
+        ],
+        "distribution": "InversePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 1043296,
+          "total_bytes": 9043296
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E16/InversePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.8209363951961096,
+        "cpu_ns_per_lookup_median": 18.323122183804944,
+        "cpu_ns_per_lookup_samples": [
+          18.02806989710946,
+          18.512052122152134,
+          18.336923448804203,
+          18.315082611960683,
+          18.434336260989074,
+          18.303693218514418,
+          18.323122183804944
+        ],
+        "distribution": "Lognormal",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 860356,
+          "total_bytes": 8860356
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E16/Lognormal/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.8420843708448301,
+        "cpu_ns_per_lookup_median": 18.873282826822347,
+        "cpu_ns_per_lookup_samples": [
+          18.486916759771965,
+          18.928305013947245,
+          18.873282826822347,
+          18.950636757377055,
+          18.82727405421352,
+          18.913910456434333,
+          18.827408582786152
+        ],
+        "distribution": "Mixed",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 750456,
+          "total_bytes": 8750456
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E16/Mixed/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.9448491885861132,
+        "cpu_ns_per_lookup_median": 25.432916696692534,
+        "cpu_ns_per_lookup_samples": [
+          25.104841142268196,
+          25.565993701384233,
+          25.166943744456628,
+          25.672274247986493,
+          25.432916696692534,
+          25.09832308489269,
+          25.530144385835033
+        ],
+        "distribution": "Quadratic",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 1028564,
+          "total_bytes": 9028564
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E16/Quadratic/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.707537146446127,
+        "cpu_ns_per_lookup_median": 15.361010522308023,
+        "cpu_ns_per_lookup_samples": [
+          15.361010522308023,
+          15.55556453669878,
+          15.285456655206698,
+          15.389413387651231,
+          15.291406662572165,
+          15.441167225293071,
+          15.236733953391596
+        ],
+        "distribution": "Uniform",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 953808,
+          "total_bytes": 8953808
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E16/Uniform/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E16",
+        "cpu_ns_per_lookup_cv_percent": 0.8578494464671276,
+        "cpu_ns_per_lookup_median": 26.256428368166098,
+        "cpu_ns_per_lookup_samples": [
+          25.917964953843292,
+          26.678790957464912,
+          26.28012654059736,
+          26.165075735728944,
+          26.256428368166098,
+          26.27611314042952,
+          26.21017870906349
+        ],
+        "distribution": "Zipf",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 1021340,
+          "total_bytes": 9021340
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E16/Zipf/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.013105289233329,
+        "cpu_ns_per_lookup_median": 38.53489747336265,
+        "cpu_ns_per_lookup_samples": [
+          37.55775958631041,
+          38.53489747336265,
+          38.69973216386171,
+          38.60045365960175,
+          38.5761735906209,
+          38.32635865870036,
+          38.51898053925545
+        ],
+        "distribution": "Clustered",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 955280,
+          "total_bytes": 8955280
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E256/Clustered/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.670100263245263,
+        "cpu_ns_per_lookup_median": 35.881078612358415,
+        "cpu_ns_per_lookup_samples": [
+          35.12830928007974,
+          35.881078612358415,
+          34.9317809107801,
+          36.32213071106848,
+          36.04198937231128,
+          35.5557205922285,
+          36.53810983157513
+        ],
+        "distribution": "Exponential",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 812892,
+          "total_bytes": 8812892
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E256/Exponential/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E256",
+        "cpu_ns_per_lookup_cv_percent": 2.095417866573356,
+        "cpu_ns_per_lookup_median": 38.788965944335864,
+        "cpu_ns_per_lookup_samples": [
+          36.8921205908895,
+          38.788965944335864,
+          39.017729871710806,
+          39.314562412242864,
+          39.13384691769587,
+          38.760403820381626,
+          38.730507017741296
+        ],
+        "distribution": "ExtremePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 957600,
+          "total_bytes": 8957600
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E256/ExtremePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.2720798001067173,
+        "cpu_ns_per_lookup_median": 39.50191052078013,
+        "cpu_ns_per_lookup_samples": [
+          38.546303995852604,
+          39.97154502274537,
+          39.44376002230697,
+          38.808535053256534,
+          39.66722408072847,
+          39.565599161966894,
+          39.50191052078013
+        ],
+        "distribution": "InversePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 957696,
+          "total_bytes": 8957696
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E256/InversePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E256",
+        "cpu_ns_per_lookup_cv_percent": 0.9229319734047589,
+        "cpu_ns_per_lookup_median": 35.416267891704415,
+        "cpu_ns_per_lookup_samples": [
+          35.416267891704415,
+          35.282013654052854,
+          34.928167336604716,
+          35.63984772113161,
+          35.66297666900957,
+          35.953284842293634,
+          35.36230034666779
+        ],
+        "distribution": "Lognormal",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 859988,
+          "total_bytes": 8859988
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E256/Lognormal/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.2469261475354625,
+        "cpu_ns_per_lookup_median": 35.96026244672022,
+        "cpu_ns_per_lookup_samples": [
+          35.45233845433354,
+          36.39054842935483,
+          36.75353133210449,
+          36.21510669302308,
+          35.9406008728208,
+          35.60635411653788,
+          35.96026244672022
+        ],
+        "distribution": "Mixed",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 750376,
+          "total_bytes": 8750376
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E256/Mixed/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.2061307757103825,
+        "cpu_ns_per_lookup_median": 38.250677930116446,
+        "cpu_ns_per_lookup_samples": [
+          37.37233560749705,
+          38.45411751219317,
+          38.07737754538389,
+          38.77273188412094,
+          37.78325127129521,
+          38.33813542240861,
+          38.250677930116446
+        ],
+        "distribution": "Quadratic",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 950148,
+          "total_bytes": 8950148
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E256/Quadratic/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E256",
+        "cpu_ns_per_lookup_cv_percent": 1.3117326720695346,
+        "cpu_ns_per_lookup_median": 30.088751560809065,
+        "cpu_ns_per_lookup_samples": [
+          29.687020068256132,
+          29.652086894990234,
+          30.336052866671423,
+          30.62403853895912,
+          30.37716324740531,
+          30.088751560809065,
+          29.696392383034492
+        ],
+        "distribution": "Uniform",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 953808,
+          "total_bytes": 8953808
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E256/Uniform/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E256",
+        "cpu_ns_per_lookup_cv_percent": 0.9839283174410647,
+        "cpu_ns_per_lookup_median": 41.52270113267755,
+        "cpu_ns_per_lookup_samples": [
+          40.70760017936305,
+          41.52270113267755,
+          41.93127670934719,
+          41.887929623078044,
+          41.39500295961167,
+          41.663286277336,
+          41.494876989464
+        ],
+        "distribution": "Zipf",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 960396,
+          "total_bytes": 8960396
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E256/Zipf/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.1436728388687167,
+        "cpu_ns_per_lookup_median": 29.439063186157096,
+        "cpu_ns_per_lookup_samples": [
+          29.12039194258297,
+          29.431101642925828,
+          30.212380451144416,
+          29.60960782276136,
+          29.695508683950884,
+          29.437177557498668,
+          29.439063186157096
+        ],
+        "distribution": "Clustered",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 958080,
+          "total_bytes": 8958080
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E64/Clustered/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.357116776078172,
+        "cpu_ns_per_lookup_median": 26.426384903180114,
+        "cpu_ns_per_lookup_samples": [
+          25.7283322581911,
+          26.426384903180114,
+          26.40389705173076,
+          26.184594037596405,
+          26.91033833437121,
+          26.486972007084503,
+          26.483069156834897
+        ],
+        "distribution": "Exponential",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 812924,
+          "total_bytes": 8812924
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E64/Exponential/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.0454038501549225,
+        "cpu_ns_per_lookup_median": 30.60399874022843,
+        "cpu_ns_per_lookup_samples": [
+          30.079670244098413,
+          30.428789960579557,
+          30.92651267905748,
+          30.276942351552783,
+          30.905098272657977,
+          30.73118733582264,
+          30.60399874022843
+        ],
+        "distribution": "ExtremePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 971696,
+          "total_bytes": 8971696
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E64/ExtremePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.7337846839567326,
+        "cpu_ns_per_lookup_median": 31.9811234813505,
+        "cpu_ns_per_lookup_samples": [
+          31.038733571563146,
+          31.383154645734383,
+          32.07401620102927,
+          31.82473163203382,
+          32.759492671123034,
+          31.9811234813505,
+          32.1130580687191
+        ],
+        "distribution": "InversePoly",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 971888,
+          "total_bytes": 8971888
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E64/InversePoly/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.096357000959008,
+        "cpu_ns_per_lookup_median": 25.512624446542493,
+        "cpu_ns_per_lookup_samples": [
+          24.8815465308046,
+          25.333734797086947,
+          25.691694610278105,
+          25.676892439484497,
+          25.512624446542493,
+          25.57652650093966,
+          25.47507747672853
+        ],
+        "distribution": "Lognormal",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 860164,
+          "total_bytes": 8860164
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E64/Lognormal/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.8111377731656835,
+        "cpu_ns_per_lookup_median": 26.291736356284297,
+        "cpu_ns_per_lookup_samples": [
+          25.857460645284057,
+          26.46537179782424,
+          27.294443609738856,
+          26.291736356284297,
+          26.20098938522483,
+          26.314189215105706,
+          25.911908827921064
+        ],
+        "distribution": "Mixed",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 750408,
+          "total_bytes": 8750408
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E64/Mixed/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.1319528499631148,
+        "cpu_ns_per_lookup_median": 29.18181002605664,
+        "cpu_ns_per_lookup_samples": [
+          29.18181002605664,
+          29.074844087504403,
+          29.546752639948572,
+          29.760481545636043,
+          29.68639697718735,
+          28.94210077855932,
+          29.07606191602665
+        ],
+        "distribution": "Quadratic",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 951268,
+          "total_bytes": 8951268
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E64/Quadratic/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.1563636505372472,
+        "cpu_ns_per_lookup_median": 21.772710486698017,
+        "cpu_ns_per_lookup_samples": [
+          21.556797178068898,
+          21.948178939243814,
+          22.04182433679041,
+          21.51153005068336,
+          21.772710486698017,
+          21.978045909888518,
+          21.420840238773888
+        ],
+        "distribution": "Uniform",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 953808,
+          "total_bytes": 8953808
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E64/Uniform/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      },
+      {
+        "configuration": "R18/E64",
+        "cpu_ns_per_lookup_cv_percent": 1.428087637388675,
+        "cpu_ns_per_lookup_median": 33.49388866795476,
+        "cpu_ns_per_lookup_samples": [
+          32.88488294230062,
+          34.066049784909985,
+          33.4777245815582,
+          33.49388866795476,
+          34.382913419689274,
+          33.46013425224127,
+          33.59990605813046
+        ],
+        "distribution": "Zipf",
+        "implementation": "RadixSpline",
+        "memory": {
+          "backing_bytes": 8000000,
+          "index_bytes": 974588,
+          "total_bytes": 8974588
+        },
+        "n": 1000000,
+        "name": "Lookup/RadixSpline/R18/E64/Zipf/N1000000/RandomMixed",
+        "query_pattern": "RandomMixed"
+      }
+    ],
+    "raw_group_count": 90,
+    "selected_scalar_group_count": 63,
+    "selection": "excluded exactly the 27 expected /Batch4/ groups; retained exact scalar lookup groups only"
+  },
+  "environment": {
+    "compiler": "Apple clang 21.0.0 (clang-2100.1.1.101)",
+    "cpu": "Apple M2",
+    "language_mode": "C++20",
+    "optimization": "-O3 -DNDEBUG"
+  },
+  "matrix": {
+    "context": {
+      "caches": [],
+      "cpu_scaling_enabled": false,
+      "date": "2026-10-22T18:41:44+08:00",
+      "executable": "/private/tmp/jazzy-routing-inline-20261022/routing_inline_benchmark",
+      "host_name": "Matthews-MacBook-Air.local",
+      "library_build_type": "release",
+      "load_avg": [
+        2.04395,
+        2.12354,
+        2.12158
+      ],
+      "mhz_per_cpu": 24,
+      "num_cpus": 8
+    },
+    "groups": [
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7530272630074939,
+        "cpu_ns_per_lookup_median": 34.294234471137834,
+        "cpu_ns_per_lookup_samples": [
+          33.79095915439967,
+          34.294234471137834,
+          33.839041228793036,
+          34.32132640137939,
+          34.415293907172156,
+          34.41407354995282,
+          34.497790055113555,
+          34.050407098964705,
+          34.28910897082095
+        ],
+        "distribution": "Clustered",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1027676,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1027796,
+          "total_retained_bytes": 9027796
+        },
+        "n": 1000000,
+        "name": "RoutingInline/Baseline_e0e8765/Clustered/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8637046789885642,
+        "cpu_ns_per_lookup_median": 11.573439483279337,
+        "cpu_ns_per_lookup_samples": [
+          11.351325368918001,
+          11.571326626068142,
+          11.677145558078621,
+          11.573439483279337,
+          11.547645018155372,
+          11.646421092794368,
+          11.509085374045437,
+          11.609358055875592,
+          11.665172700546224
+        ],
+        "distribution": "Exponential",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 397412,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 397532,
+          "total_retained_bytes": 8397532
+        },
+        "n": 1000000,
+        "name": "RoutingInline/Baseline_e0e8765/Exponential/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8880070532458664,
+        "cpu_ns_per_lookup_median": 30.540463065049167,
+        "cpu_ns_per_lookup_samples": [
+          30.22293274531405,
+          30.03109151047335,
+          30.82668136714443,
+          30.821389195148107,
+          30.71664829107073,
+          30.53472987872256,
+          30.540463065049167,
+          30.448952590959482,
+          30.707166482910832
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011228,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011348,
+          "total_retained_bytes": 9011348
+        },
+        "n": 1000000,
+        "name": "RoutingInline/Baseline_e0e8765/ExtremePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.560630906402972,
+        "cpu_ns_per_lookup_median": 34.65060929804409,
+        "cpu_ns_per_lookup_samples": [
+          34.19292294452787,
+          34.83057334966927,
+          34.599014665958194,
+          34.61678889327994,
+          34.733802556477606,
+          34.65060929804409,
+          34.47336075337089,
+          34.792309388075566,
+          34.71602832915586
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011356,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011476,
+          "total_retained_bytes": 9011476
+        },
+        "n": 1000000,
+        "name": "RoutingInline/Baseline_e0e8765/InversePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7472989766151131,
+        "cpu_ns_per_lookup_median": 12.01016447741002,
+        "cpu_ns_per_lookup_samples": [
+          11.8528783736499,
+          12.015983641570568,
+          12.01016447741002,
+          11.882564544439811,
+          12.00164657045029,
+          12.04507946237332,
+          11.991020270678694,
+          12.15437854573719,
+          12.05098296224643
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 468180,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 468300,
+          "total_retained_bytes": 8468300
+        },
+        "n": 1000000,
+        "name": "RoutingInline/Baseline_e0e8765/Lognormal/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.3605687665252226,
+        "cpu_ns_per_lookup_median": 11.389658840370059,
+        "cpu_ns_per_lookup_samples": [
+          11.170816958140705,
+          11.59647172239805,
+          11.34558114677575,
+          11.343604953885988,
+          11.703357981327722,
+          11.338449668084815,
+          11.394642283310736,
+          11.389658840370059,
+          11.39000252608983
+        ],
+        "distribution": "Mixed",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 393312,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 393432,
+          "total_retained_bytes": 8393432
+        },
+        "n": 1000000,
+        "name": "RoutingInline/Baseline_e0e8765/Mixed/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8238412355030147,
+        "cpu_ns_per_lookup_median": 30.569307332465907,
+        "cpu_ns_per_lookup_samples": [
+          29.984969533276473,
+          30.892640914683305,
+          30.578180610156423,
+          30.569307332465907,
+          30.46174589313308,
+          30.58056124563474,
+          30.256794820603453,
+          30.581643352670618,
+          30.446379973228826
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 933684,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 933804,
+          "total_retained_bytes": 8933804
+        },
+        "n": 1000000,
+        "name": "RoutingInline/Baseline_e0e8765/Quadratic/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.6935547616056973,
+        "cpu_ns_per_lookup_median": 12.323141856366894,
+        "cpu_ns_per_lookup_samples": [
+          12.16695191198972,
+          12.327493056210216,
+          12.293771257424316,
+          12.323141856366894,
+          12.477790750799732,
+          12.362846554937763,
+          12.320694306454742,
+          12.358132755107121,
+          12.242282059278459
+        ],
+        "distribution": "Uniform",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 8016504
+        },
+        "n": 1000000,
+        "name": "RoutingInline/Baseline_e0e8765/Uniform/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.5936172485831378,
+        "cpu_ns_per_lookup_median": 27.324208962853476,
+        "cpu_ns_per_lookup_samples": [
+          27.216306738503786,
+          27.146021803376975,
+          27.291937288415117,
+          27.54872478379447,
+          27.4673526476334,
+          27.29708491746669,
+          27.324208962853476,
+          27.514473252029013,
+          27.62059360478351
+        ],
+        "distribution": "Zipf",
+        "encoding": "Unique",
+        "implementation": "Baseline_e0e8765",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1054740,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1054860,
+          "total_retained_bytes": 9054860
+        },
+        "n": 1000000,
+        "name": "RoutingInline/Baseline_e0e8765/Zipf/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7303702395213779,
+        "cpu_ns_per_lookup_median": 30.28645227890356,
+        "cpu_ns_per_lookup_samples": [
+          29.97008775667037,
+          30.28645227890356,
+          30.57767672306848,
+          30.094675754174187,
+          30.548087073660945,
+          30.283782536099537,
+          30.580791423006904,
+          30.512935460078165,
+          30.284894928933166
+        ],
+        "distribution": "Clustered",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1027676,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1027796,
+          "total_retained_bytes": 9027796
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineBoth/Clustered/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7316136890694234,
+        "cpu_ns_per_lookup_median": 8.848278801481678,
+        "cpu_ns_per_lookup_samples": [
+          8.72920213537523,
+          8.828577703801653,
+          8.823481520805489,
+          8.866488333407604,
+          8.920184700587782,
+          8.901850871515919,
+          8.74871678733646,
+          8.877923670862382,
+          8.848278801481678
+        ],
+        "distribution": "Exponential",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 397412,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 397532,
+          "total_retained_bytes": 8397532
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineBoth/Exponential/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8289302032157093,
+        "cpu_ns_per_lookup_median": 25.824721022754463,
+        "cpu_ns_per_lookup_samples": [
+          25.61751459743887,
+          25.81344959436025,
+          26.01445673405844,
+          26.028921733830988,
+          26.108573161150538,
+          25.824721022754463,
+          25.611878883242767,
+          25.51381745621161,
+          25.981393877434858
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011228,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011348,
+          "total_retained_bytes": 9011348
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineBoth/ExtremePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.0592061579589263,
+        "cpu_ns_per_lookup_median": 30.259793743672837,
+        "cpu_ns_per_lookup_samples": [
+          30.03393276936037,
+          29.951567513770218,
+          30.078547282804536,
+          30.259793743672837,
+          30.936089709490727,
+          30.393637284005727,
+          29.852686308490924,
+          30.27201983629981,
+          30.337011170789054
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011356,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011476,
+          "total_retained_bytes": 9011476
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineBoth/InversePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.5640467322982582,
+        "cpu_ns_per_lookup_median": 9.234259096048598,
+        "cpu_ns_per_lookup_samples": [
+          9.148821668438956,
+          9.158502411187147,
+          9.22061509620219,
+          9.214702696268786,
+          9.319176752235567,
+          9.264405838566436,
+          9.242705381667944,
+          9.249202524451935,
+          9.234259096048598
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 468180,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 468300,
+          "total_retained_bytes": 8468300
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineBoth/Lognormal/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.5648238005950437,
+        "cpu_ns_per_lookup_median": 8.6204872193919,
+        "cpu_ns_per_lookup_samples": [
+          8.570640447632602,
+          8.665796892614917,
+          8.593877749596716,
+          8.684558408184976,
+          8.577200846867724,
+          8.577384783294852,
+          8.6204872193919,
+          8.68308691676752,
+          8.669107748303647
+        ],
+        "distribution": "Mixed",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 393312,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 393432,
+          "total_retained_bytes": 8393432
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineBoth/Mixed/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.617535615093116,
+        "cpu_ns_per_lookup_median": 26.357124869850615,
+        "cpu_ns_per_lookup_samples": [
+          26.03063238584479,
+          26.459225203238063,
+          26.070824867831544,
+          26.357124869850615,
+          26.398460266016908,
+          26.367601583165307,
+          26.396174437657834,
+          26.107398121580836,
+          26.32112307318974
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 933684,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 933804,
+          "total_retained_bytes": 8933804
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineBoth/Quadratic/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.698717716338372,
+        "cpu_ns_per_lookup_median": 9.41847570668186,
+        "cpu_ns_per_lookup_samples": [
+          9.26256506868017,
+          9.462815276729483,
+          9.413348492555425,
+          9.411109849768264,
+          9.41847570668186,
+          9.433929563343161,
+          9.432340849106831,
+          9.389589993296052,
+          9.503110846902738
+        ],
+        "distribution": "Uniform",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 8016504
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineBoth/Uniform/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.4997687293287276,
+        "cpu_ns_per_lookup_median": 23.422099087940573,
+        "cpu_ns_per_lookup_samples": [
+          22.503177575236172,
+          23.472213146555085,
+          23.360848571855723,
+          23.782723784247,
+          23.134188908055865,
+          23.422099087940573,
+          23.42259040223948,
+          23.42996011674283,
+          23.248665139989768
+        ],
+        "distribution": "Zipf",
+        "encoding": "Unique",
+        "implementation": "InlineBoth",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1054740,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1054860,
+          "total_retained_bytes": 9054860
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineBoth/Zipf/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.6128006093477096,
+        "cpu_ns_per_lookup_median": 33.22348935359252,
+        "cpu_ns_per_lookup_samples": [
+          32.712310133866836,
+          33.22348935359252,
+          33.31002278308535,
+          33.23515678228846,
+          33.206717424843916,
+          33.44638585596463,
+          33.15348478141991,
+          33.32849621185251,
+          33.210606567741266
+        ],
+        "distribution": "Clustered",
+        "encoding": "Unique",
+        "implementation": "InlineFind",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1027676,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1027796,
+          "total_retained_bytes": 9027796
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineFind/Clustered/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.5834103851766336,
+        "cpu_ns_per_lookup_median": 10.777774032916533,
+        "cpu_ns_per_lookup_samples": [
+          10.608031171317972,
+          10.777774032916533,
+          10.70857117395685,
+          10.711917066902073,
+          10.765614568311454,
+          10.781364747296859,
+          10.794829926221384,
+          10.804133140751013,
+          10.784873854531089
+        ],
+        "distribution": "Exponential",
+        "encoding": "Unique",
+        "implementation": "InlineFind",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 397412,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 397532,
+          "total_retained_bytes": 8397532
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineFind/Exponential/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.8985165076632962,
+        "cpu_ns_per_lookup_median": 29.30242972968566,
+        "cpu_ns_per_lookup_samples": [
+          28.88531778584702,
+          28.954976743168192,
+          29.319476181477192,
+          29.49057204945917,
+          29.30242972968566,
+          29.58590590947881,
+          29.675136718855985,
+          29.300746129508475,
+          29.231297622209826
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Unique",
+        "implementation": "InlineFind",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011228,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011348,
+          "total_retained_bytes": 9011348
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineFind/ExtremePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 2.2898252033171205,
+        "cpu_ns_per_lookup_median": 33.440026068768525,
+        "cpu_ns_per_lookup_samples": [
+          32.870966293122606,
+          34.2076117359143,
+          33.44337066862414,
+          35.53876247894081,
+          33.385556871097705,
+          33.368833871812804,
+          33.440026068768525,
+          33.398218570556494,
+          33.63401286046499
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Unique",
+        "implementation": "InlineFind",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011356,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011476,
+          "total_retained_bytes": 9011476
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineFind/InversePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.1228562561623554,
+        "cpu_ns_per_lookup_median": 11.253004706347557,
+        "cpu_ns_per_lookup_samples": [
+          11.047306717644462,
+          11.29729763556212,
+          11.31152013576865,
+          11.044624760462554,
+          10.985296616743684,
+          11.187743748256164,
+          11.263732535074901,
+          11.253004706347557,
+          11.275516892389245
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Unique",
+        "implementation": "InlineFind",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 468180,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 468300,
+          "total_retained_bytes": 8468300
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineFind/Lognormal/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.762957308315734,
+        "cpu_ns_per_lookup_median": 10.698640866769686,
+        "cpu_ns_per_lookup_samples": [
+          10.533205870376126,
+          10.698640866769686,
+          10.785554764875142,
+          10.657968067656116,
+          10.734794465981718,
+          10.710584466509552,
+          10.652722567770237,
+          10.558142169832918,
+          10.70671086659403
+        ],
+        "distribution": "Mixed",
+        "encoding": "Unique",
+        "implementation": "InlineFind",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 393312,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 393432,
+          "total_retained_bytes": 8393432
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineFind/Mixed/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7456668065932777,
+        "cpu_ns_per_lookup_median": 29.181235835212284,
+        "cpu_ns_per_lookup_samples": [
+          29.04915285916247,
+          29.432489829716832,
+          29.309085382542158,
+          28.94966728425352,
+          29.56266776284221,
+          29.181235835212284,
+          28.994118285808863,
+          29.448153515979058,
+          29.157316962945618
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Unique",
+        "implementation": "InlineFind",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 933684,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 933804,
+          "total_retained_bytes": 8933804
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineFind/Quadratic/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.9287948970652892,
+        "cpu_ns_per_lookup_median": 11.462675581307982,
+        "cpu_ns_per_lookup_samples": [
+          11.306754122425938,
+          11.292235815786196,
+          11.449703603185917,
+          11.542826942815868,
+          11.462675581307982,
+          11.485784601935306,
+          11.636208003864809,
+          11.472984438093176,
+          11.441800146316782
+        ],
+        "distribution": "Uniform",
+        "encoding": "Unique",
+        "implementation": "InlineFind",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 8016504
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineFind/Uniform/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.6683890293426674,
+        "cpu_ns_per_lookup_median": 26.28737763580384,
+        "cpu_ns_per_lookup_samples": [
+          25.96357583752954,
+          26.31010710610864,
+          25.975499494083117,
+          26.28737763580384,
+          26.38407103816466,
+          26.27545397925159,
+          26.330787197943227,
+          26.48728519020377,
+          26.200185897257395
+        ],
+        "distribution": "Zipf",
+        "encoding": "Unique",
+        "implementation": "InlineFind",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1054740,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1054860,
+          "total_retained_bytes": 9054860
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineFind/Zipf/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.374881439090014,
+        "cpu_ns_per_lookup_median": 33.73995196164304,
+        "cpu_ns_per_lookup_samples": [
+          32.38690960611209,
+          33.75624246128037,
+          33.82722249541119,
+          33.61311878590156,
+          33.370157619893114,
+          33.73995196164304,
+          33.8481674235144,
+          33.77136935379939,
+          33.69387311981602
+        ],
+        "distribution": "Clustered",
+        "encoding": "Unique",
+        "implementation": "InlineSegment",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1027676,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1027796,
+          "total_retained_bytes": 9027796
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineSegment/Clustered/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.9671911697950415,
+        "cpu_ns_per_lookup_median": 11.041864428947168,
+        "cpu_ns_per_lookup_samples": [
+          10.837583903943386,
+          10.829230425225727,
+          11.114851894509647,
+          11.08245052251432,
+          10.918924848223822,
+          11.05722132921551,
+          11.041864428947168,
+          11.014947664190018,
+          11.057811979226754
+        ],
+        "distribution": "Exponential",
+        "encoding": "Unique",
+        "implementation": "InlineSegment",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 397412,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 397532,
+          "total_retained_bytes": 8397532
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineSegment/Exponential/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.5889654918358258,
+        "cpu_ns_per_lookup_median": 29.82108017904038,
+        "cpu_ns_per_lookup_samples": [
+          28.440979519730817,
+          29.7696724180919,
+          29.873944840096726,
+          29.843349937831807,
+          29.90245845649337,
+          29.864370925102406,
+          29.82108017904038,
+          29.712228928124894,
+          29.380680089295147
+        ],
+        "distribution": "ExtremePoly",
+        "encoding": "Unique",
+        "implementation": "InlineSegment",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011228,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011348,
+          "total_retained_bytes": 9011348
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineSegment/ExtremePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.7997325089384753,
+        "cpu_ns_per_lookup_median": 33.803713419670196,
+        "cpu_ns_per_lookup_samples": [
+          33.05502835244141,
+          33.59809206690013,
+          33.803713419670196,
+          33.894750028039454,
+          33.87897034925562,
+          33.87120189200789,
+          33.72748543292699,
+          33.91077247111166,
+          33.77336788354654
+        ],
+        "distribution": "InversePoly",
+        "encoding": "Unique",
+        "implementation": "InlineSegment",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1011356,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1011476,
+          "total_retained_bytes": 9011476
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineSegment/InversePoly/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.9597778649011778,
+        "cpu_ns_per_lookup_median": 11.543331355498136,
+        "cpu_ns_per_lookup_samples": [
+          11.311382835791667,
+          11.58274569927682,
+          11.463257067912586,
+          11.548936555629526,
+          11.543331355498136,
+          11.557477812971618,
+          11.501336840231087,
+          11.545110784111401,
+          11.283890663720753
+        ],
+        "distribution": "Lognormal",
+        "encoding": "Unique",
+        "implementation": "InlineSegment",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 468180,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 468300,
+          "total_retained_bytes": 8468300
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineSegment/Lognormal/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.9880035977123018,
+        "cpu_ns_per_lookup_median": 10.780126649381856,
+        "cpu_ns_per_lookup_samples": [
+          10.626795361542715,
+          10.780126649381856,
+          10.866486579150076,
+          10.610476647030813,
+          10.682779862318434,
+          10.880624079345589,
+          10.8441089359828,
+          10.864628507696143,
+          10.7384412202327
+        ],
+        "distribution": "Mixed",
+        "encoding": "Unique",
+        "implementation": "InlineSegment",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 393312,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 393432,
+          "total_retained_bytes": 8393432
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineSegment/Mixed/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 0.6786669423198163,
+        "cpu_ns_per_lookup_median": 29.74320318312578,
+        "cpu_ns_per_lookup_samples": [
+          29.317175992446472,
+          29.760944838691103,
+          29.74320318312578,
+          30.068694325605087,
+          29.56032765653521,
+          29.66109116185807,
+          29.72477915619268,
+          29.786420036425593,
+          29.798930178169172
+        ],
+        "distribution": "Quadratic",
+        "encoding": "Unique",
+        "implementation": "InlineSegment",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 933684,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 933804,
+          "total_retained_bytes": 8933804
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineSegment/Quadratic/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.0457114985167466,
+        "cpu_ns_per_lookup_median": 11.580030069546273,
+        "cpu_ns_per_lookup_samples": [
+          11.338549774338336,
+          11.598228584547662,
+          11.580030069546273,
+          11.808298942806497,
+          11.582654855363652,
+          11.56060665449718,
+          11.534796260624898,
+          11.50408626656024,
+          11.580992491012118
+        ],
+        "distribution": "Uniform",
+        "encoding": "Unique",
+        "implementation": "InlineSegment",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 16384,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 16504,
+          "total_retained_bytes": 8016504
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineSegment/Uniform/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      },
+      {
+        "cpu_ns_per_lookup_cv_percent": 1.383488830064353,
+        "cpu_ns_per_lookup_median": 26.545825934138097,
+        "cpu_ns_per_lookup_samples": [
+          25.495431668246233,
+          26.263353054295607,
+          26.58281423957761,
+          26.675192992463955,
+          26.63875675128595,
+          26.49135559379072,
+          26.57066882585139,
+          26.498900472014448,
+          26.545825934138097
+        ],
+        "distribution": "Zipf",
+        "encoding": "Unique",
+        "implementation": "InlineSegment",
+        "memory": {
+          "backing_bytes": 8000000,
+          "backing_capacity": 1000000,
+          "index_dynamic_bytes": 1054740,
+          "index_object_bytes": 120,
+          "index_retained_bytes": 1054860,
+          "total_retained_bytes": 9054860
+        },
+        "n": 1000000,
+        "name": "RoutingInline/InlineSegment/Zipf/Unique/N1000000/Hit90",
+        "target_hits_percent": 90
+      }
+    ],
+    "metadata_records": 36
+  },
+  "method": {
+    "actual_competitor_filter": "^Lookup/(JazzyIndex/S256|RadixSpline/(R12|R18)/E(16|64|256))/.*/N1000000/RandomMixed$",
+    "broad_and_competitors": "7 repetitions, randomized interleaving, min 0.1 seconds",
+    "cv_definition": "sample standard deviation divided by arithmetic mean, times 100",
+    "lookup": "single-key, 262144 deterministic queries with 90 percent target hits",
+    "matrix": "9 repetitions, randomized interleaving, min 0.1 seconds",
+    "profile": "CPU Counters, 12-second xctrace limit launching a 20-second driver; xctrace exit 54 is the expected saved time-limit termination"
+  },
+  "profile_code_size_observation": {
+    "baseline": {
+      "text_bytes": 22056,
+      "text_segment_bytes": 32768
+    },
+    "inline_both": {
+      "text_bytes": 21884,
+      "text_segment_bytes": 32768
+    },
+    "scope": "these two standalone profile drivers only; this is not a general caller-size promise and no allocation changed"
+  },
+  "profiles": {
+    "jazzy_baseline": {
+      "core_types_by_cycles": {
+        "Performance": 36953998055
+      },
+      "cycle_weighted_percent": {
+        "delivery": 3.17494872156325,
+        "discarded": 48.31118044263985,
+        "processing": 23.62499073171693,
+        "useful": 24.888879904815923
+      },
+      "duration_weighted_percent": {
+        "delivery": 3.1749449260887306,
+        "discarded": 48.31095544723039,
+        "processing": 23.625629713747863,
+        "useful": 24.888469713671086
+      },
+      "excluded": {
+        "bucket_count": 0,
+        "buckets": [],
+        "core_types_by_bucket": {},
+        "metric_row_count": 0,
+        "missing_or_sentinel_metrics": {}
+      },
+      "filter": {
+        "bucket": [
+          "timestamp",
+          "duration",
+          "thread",
+          "process",
+          "core"
+        ],
+        "startup_excluded_before_timestamp_ns": 2000000000,
+        "thread": "profile-driver main thread"
+      },
+      "interpretation": "discarded, delivery, processing, and useful are fractions of sustainable instruction bandwidth from Instruments; they are not literal branch-miss rates or wall-time shares.",
+      "matched_cycle_samples": 22956,
+      "matched_fraction_samples_per_metric": 22956,
+      "matched_metric_rows": 114780,
+      "matched_samples": 22956,
+      "source": "/private/tmp/jazzy-routing-inline-20261022/profile/ji-baseline-metrics.xml",
+      "total_cycles": 36953998055,
+      "total_duration_ns": 10930611624
+    },
+    "jazzy_inline_both": {
+      "core_types_by_cycles": {
+        "Performance": 36663381940
+      },
+      "cycle_weighted_percent": {
+        "delivery": 5.691424899078358,
+        "discarded": 46.927905320397876,
+        "processing": 24.108966124186097,
+        "useful": 23.2717034564893
+      },
+      "duration_weighted_percent": {
+        "delivery": 5.6914143665051595,
+        "discarded": 46.92768830665117,
+        "processing": 24.109626933620643,
+        "useful": 23.27127019337475
+      },
+      "excluded": {
+        "bucket_count": 0,
+        "buckets": [],
+        "core_types_by_bucket": {},
+        "metric_row_count": 0,
+        "missing_or_sentinel_metrics": {}
+      },
+      "filter": {
+        "bucket": [
+          "timestamp",
+          "duration",
+          "thread",
+          "process",
+          "core"
+        ],
+        "startup_excluded_before_timestamp_ns": 2000000000,
+        "thread": "profile-driver main thread"
+      },
+      "interpretation": "discarded, delivery, processing, and useful are fractions of sustainable instruction bandwidth from Instruments; they are not literal branch-miss rates or wall-time shares.",
+      "matched_cycle_samples": 22773,
+      "matched_fraction_samples_per_metric": 22773,
+      "matched_metric_rows": 113865,
+      "matched_samples": 22773,
+      "source": "/private/tmp/jazzy-routing-inline-20261022/profile/ji-inline-metrics.xml",
+      "total_cycles": 36663381940,
+      "total_duration_ns": 10843437459
+    },
+    "radix_spline_r18_e16": {
+      "core_types_by_cycles": {
+        "Performance": 37091968586
+      },
+      "cycle_weighted_percent": {
+        "delivery": 1.3830020322402745,
+        "discarded": 19.307353499662185,
+        "processing": 60.49274031225062,
+        "useful": 18.816903957129384
+      },
+      "duration_weighted_percent": {
+        "delivery": 1.3830198431556884,
+        "discarded": 19.307378937084785,
+        "processing": 60.49281693619458,
+        "useful": 18.816784084847672
+      },
+      "excluded": {
+        "bucket_count": 0,
+        "buckets": [],
+        "core_types_by_bucket": {},
+        "metric_row_count": 0,
+        "missing_or_sentinel_metrics": {}
+      },
+      "filter": {
+        "bucket": [
+          "timestamp",
+          "duration",
+          "thread",
+          "process",
+          "core"
+        ],
+        "startup_excluded_before_timestamp_ns": 2000000000,
+        "thread": "profile-driver main thread"
+      },
+      "interpretation": "discarded, delivery, processing, and useful are fractions of sustainable instruction bandwidth from Instruments; they are not literal branch-miss rates or wall-time shares.",
+      "matched_cycle_samples": 22827,
+      "matched_fraction_samples_per_metric": 22827,
+      "matched_metric_rows": 114135,
+      "matched_samples": 22827,
+      "source": "/private/tmp/jazzy-routing-inline-20261022/profile/rs-metrics.xml",
+      "total_cycles": 37091968586,
+      "total_duration_ns": 10865332123
+    }
+  },
+  "provenance": {
+    "broad.json": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/final/broad.json",
+      "sha256": "b605eef4527765dada6b63382cd701ae053a22fca5626418297e976baab33d76"
+    },
+    "broad.log": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/final/broad.log",
+      "sha256": "681a63e97b22dbfcb3fe0559733884588848398e8c1ba63f9f5e8f4dc626019d"
+    },
+    "competitors.json": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/final/competitors.json",
+      "sha256": "c14820369026105462ddedf03c1b534d1c21e269d62ee7df4fd67a3e38281e05"
+    },
+    "competitors.log": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/final/competitors.log",
+      "sha256": "a0a8df83534a3a23d947371a3107e64ddff2c62e81c379aaefd2229fac88764e"
+    },
+    "debug-build.log": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/validation/debug-build.log",
+      "sha256": "2bf3c11201b4c7a1c0ee4d76f7ae8b806ea8286200d9e85115ae6efb919a8a59"
+    },
+    "debug-test.log": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/validation/debug-test.log",
+      "sha256": "4c2370dfa1d55b6ca5233f83edf953a1dc4d321f887be4c00b2a459c9199dcb7"
+    },
+    "ji-baseline-metrics.xml": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/profile/ji-baseline-metrics.xml",
+      "sha256": "9a22ce61d5c755005e50291c0e7ca11bab7b8276564f2aaeb0be3010941fd3c0"
+    },
+    "ji-baseline-summary.json": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/profile/ji-baseline-summary.json",
+      "sha256": "97de822a14d70f171b463a4a887c219724bd93e12c7677c1ec5db45ec9f02f29"
+    },
+    "ji-inline-metrics.xml": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/profile/ji-inline-metrics.xml",
+      "sha256": "8c7ae19c5139d9abc07db57ea98c6f182b41636a0d07dee57722a680295bda88"
+    },
+    "ji-inline-summary.json": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/profile/ji-inline-summary.json",
+      "sha256": "15db1a53bb3de6b86e13f59120bebe3333b1e7dbc2a54ddc2ac0a1153aea34bf"
+    },
+    "normal-build.log": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/validation/normal-build.log",
+      "sha256": "da2d622f5511f2d154f3a6b101f04be1259189969d75c95384b45063ecd85f4d"
+    },
+    "normal-test.log": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/validation/normal-test.log",
+      "sha256": "f35907151829b82c79c206872c0ad704d89a49e715671b8fff11b0beb7390433"
+    },
+    "raw-all-iterations.json": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/raw-all-iterations.json",
+      "sha256": "4cd194bc644a0ca00eee1aaa123d92908cea445a1198e2ab884c58406eeae4d4"
+    },
+    "raw-all-iterations.log": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/raw-all-iterations.log",
+      "sha256": "0a7b2e67b2719624f5780d2654db7074401a0d9699f40090e0d01ce6373c3d23"
+    },
+    "rs-metrics.xml": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/profile/rs-metrics.xml",
+      "sha256": "0f9712ed01f1f05baa21c29119d72c6c46c5b0b2e7288552ca8bc9363a775f2f"
+    },
+    "rs-summary.json": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/profile/rs-summary.json",
+      "sha256": "1b8cefdb85517207ddf910997a38448785f4b8f8394b246250e2a4cef23e6998"
+    },
+    "sanitizer-build.log": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/validation/sanitizer-build.log",
+      "sha256": "676d86889ba95f03a66bff1eba266150a7fd649ef432317945be75c1c88c148d"
+    },
+    "sanitizer-test.log": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/validation/sanitizer-test.log",
+      "sha256": "f108bf1974a344f5da55e4890a6deb3a83a6c493c0d856f1587360743a2912cd"
+    },
+    "source-sha256.log": {
+      "path": "/private/tmp/jazzy-routing-inline-20261022/validation/source-sha256.log",
+      "sha256": "7b0948297621f232596963f57f0ef99f28b96dd0529e10aa3ce5b59b2ef8dadc"
+    }
+  },
+  "schema": "jazzy-routing-inline-results-v1",
+  "source_metadata": {
+    "baseline_header_sha256": "7e09adc685183ede85f4d63047cdbc432f00c5ad6ab5bb0a4b64f3d17a0e9f7d",
+    "baseline_revision": "e0e8765b4271b7747cc872a4be0a4e740e90e039",
+    "radix_spline_revision": "ab96aa59d429e7423beba2350bdcdf88952df282",
+    "selected_header_sha256": "e869605319269048f73cb3257e5e461f37678bff6013cfc931762de1a59c75a0"
+  },
+  "validation": {
+    "checks": [
+      {
+        "configuration": "normal",
+        "passed_tests": 266
+      },
+      {
+        "configuration": "debug",
+        "passed_tests": 281
+      },
+      {
+        "configuration": "asan_ubsan_float_cast_overflow",
+        "passed_tests": 266
+      }
+    ],
+    "selected_header_sha256_verified": true
+  }
+}

@@ -4,6 +4,7 @@ Performance analysis of JazzyIndex, `std::lower_bound`, PGM-index, and
 RadixSpline across multiple data distributions and index configurations.
 
 ## Table of Contents
+- [Measured scalar inlining results](#measured-scalar-inlining-results-2026-10-22)
 - [Measured single-key correction results](#measured-single-key-correction-results-2026-10-22)
 - [Overview](#overview)
 - [Measured small-bucket routing results](#measured-small-bucket-routing-results-2026-10-22)
@@ -85,6 +86,75 @@ The unique-key transform can also interact poorly with integer hashing: on the
 tested libc++ implementation, the one-million-key Zipf fixture causes heavy
 bucket collisions. Its hash-table result should not be generalized to other
 key encodings or hash functions.
+
+## Measured scalar inlining results (2026-10-22)
+
+`find` and its private `find_segment` helper now use the existing GCC/Clang
+always-inline annotation pattern. Other compilers retain ordinary inline
+definitions. Lookup algorithms, validation, and memory layout are unchanged.
+The rejected `ilp_for` correction experiment added no production dependency.
+
+On Apple Clang 21/M2, forcing either function inline alone gave smaller gains
+than inlining both. Assembly of the actual timed callback shows that the combined
+change removes both calls and lets the caller keep invariant index fields across
+queries. This exposes the whole routing, prediction, and correction path to the
+optimizer; the measurements do not isolate call overhead from other optimizations.
+
+A separate final comparison against `e0e8765` covered nine distributions, original
+and unique encodings, and 10K and 1M keys. All 36 pairs improved: median lookup time
+fell 10.6–44.7%. At 1M uniquely encoded keys, reductions were 10.6–23.2%.
+Each implementation ran seven randomized interleaved repetitions of at least
+0.1 seconds; the largest sample coefficient of variation was 3.10%.
+
+The separate competitor harness produced these fresh 1M-key scalar medians:
+
+| Distribution | Jazzy S256 (ns) | Fastest tested RadixSpline | RadixSpline (ns) |
+|---|---:|---|---:|
+| Uniform | 11.06 | R12/E16 | 15.10 |
+| Exponential | 10.62 | R12/E16 | 17.53 |
+| Clustered | 32.16 | R18/E16 | 25.17 |
+| Lognormal | 11.08 | R18/E16 | 18.32 |
+| Zipf | 25.42 | R18/E16 | 26.26 |
+| Mixed | 10.40 | R12/E16 | 17.62 |
+| Quadratic | 28.64 | R18/E16 | 25.43 |
+| ExtremePoly | 28.43 | R18/E16 | 25.56 |
+| InversePoly | 32.55 | R18/E16 | 28.06 |
+
+Jazzy leads five of nine distributions, with a small lead on Zipf. RadixSpline
+still leads the other four. Compare times within each harness: different caller
+shapes change the optimizations available after inlining. These remain
+repeated-stream single-key API measurements, not dependent-query latency or
+cold-cache measurements. The raw competitor run also contains 27 auxiliary batch
+groups; the comparison above selects only the 63 scalar groups.
+
+All baseline/selected pairs retain identical index and backing-array memory; the
+index object remains 120 bytes. In the small profiling driver, the machine-code
+section changed from 22,056 to 21,884 bytes, with the same 32 KiB text segment.
+Inlining can change code size differently in other callers. RadixSpline memory
+figures remain logical sizes rather than retained vector capacities.
+
+Separate CPU Counters recordings compared the previous code, selected code, and
+RadixSpline R18/E16 on Clustered/Unique with the same queries. After excluding
+the first two seconds, all samples were complete and on Performance cores:
+
+| Sustainable instruction bandwidth fraction | Previous | Selected | RadixSpline |
+|---|---:|---:|---:|
+| Discarded | 48.31% | 46.93% | 19.31% |
+| Instruction delivery | 3.17% | 5.69% | 1.38% |
+| Instruction processing | 23.62% | 24.11% | 60.49% |
+| Useful | 24.89% | 23.27% | 18.82% |
+
+These are cycle-weighted fractions, not branch-miss rates or wall-time shares.
+They do not isolate a specific cause of the remaining gap. The lower discarded
+fraction for RadixSpline motivates examining control flow next. The unprofiled
+timings establish speed; the useful fraction alone does not rank the containers.
+
+Validation passed 266 normal tests, 281 debug tests, and 266 tests under ASan,
+UBSan, and float-cast-overflow instrumentation. The selected header SHA-256 is
+`e869605319269048f73cb3257e5e461f37678bff6013cfc931762de1a59c75a0`.
+Raw timing samples, memory checks, source hashes, and profile summaries are
+retained in [the inlining result artifact](benchmark-summary-2026-10-22-inlining.json).
+x86 measurements remain outstanding.
 
 ## Measured single-key correction results (2026-10-22)
 

@@ -1018,7 +1018,12 @@ public:
         build(std::to_address(first), std::to_address(last), comp, key_extract);
     }
 
-    [[nodiscard]] const_iterator find(const T& key) const {
+#if defined(__clang__) || defined(__GNUC__)
+    [[nodiscard]] inline __attribute__((always_inline)) const_iterator
+#else
+    [[nodiscard]] inline const_iterator
+#endif
+    find(const T& key) const {
         DEBUG_LOG("JazzyIndex::find: Called (size=%zu, is_built=%d)", size_, is_built());
 
         // Return end iterator if index not built or empty
@@ -1341,7 +1346,12 @@ public:
     friend class parallel::ParallelBuilder;
 
 private:
-    [[nodiscard]] const detail::Segment<T>* find_segment(const T& value) const {
+#if defined(__clang__) || defined(__GNUC__)
+    [[nodiscard]] inline __attribute__((always_inline)) const detail::Segment<T>*
+#else
+    [[nodiscard]] inline const detail::Segment<T>*
+#endif
+    find_segment(const T& value) const {
         DEBUG_LOG("find_segment: Called with is_uniform=%d, num_segments=%zu", is_uniform_, num_segments_);
 
         if (num_segments_ == 0) {
