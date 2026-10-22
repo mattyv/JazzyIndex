@@ -298,6 +298,38 @@ TEST(ReviewRegression, LogRadixRoutingHandlesHighUnsignedOrigins) {
     expect_routed_lookup(radix_high_origin_data<std::uint64_t>());
 }
 
+TEST(ReviewRegression, RadixSingleCandidateHandlesGapsAndFinalBucket) {
+    const auto data = radix_high_origin_data<std::uint64_t>();
+    jazzy::JazzyIndex<std::uint64_t, jazzy::SegmentCount::NANO> index(
+        data.begin(), data.end());
+    ASSERT_GT(index.size_in_bytes(),
+              index.num_segments() * sizeof(jazzy::detail::Segment<std::uint64_t>));
+
+    const auto origin = data.front();
+    EXPECT_EQ(index.find(origin), data.data());
+    EXPECT_EQ(index.find(origin + 2), index.end());
+    EXPECT_EQ(index.find(std::numeric_limits<std::uint64_t>::max() - 1), index.end());
+    EXPECT_EQ(index.find(std::numeric_limits<std::uint64_t>::max()), data.data() + data.size() - 1);
+}
+
+TEST(ReviewRegression, RadixSmallCandidateScanHandlesSharedHighBucket) {
+    std::vector<std::uint64_t> data;
+    data.reserve(512);
+    for (std::uint64_t i = 0; i < 128; ++i) data.push_back(i * 2);
+    const std::uint64_t high = std::uint64_t{1} << 63;
+    for (std::uint64_t i = 0; i < 384; ++i) data.push_back(high + i * 2);
+
+    jazzy::JazzyIndex<std::uint64_t, jazzy::SegmentCount::PICO> index(
+        data.begin(), data.end());
+    ASSERT_GT(index.size_in_bytes(),
+              index.num_segments() * sizeof(jazzy::detail::Segment<std::uint64_t>));
+    for (std::size_t i = 128; i < data.size(); ++i) {
+        EXPECT_EQ(index.find(data[i]), data.data() + i);
+        EXPECT_EQ(index.find(data[i] + 1), index.end());
+    }
+    EXPECT_EQ(index.find(data.back()), data.data() + data.size() - 1);
+}
+
 TEST(ReviewRegression, RadixRoutingSkipsUnsupportedComparatorAndExtractor) {
     const auto data = radix_data<std::uint64_t>();
     jazzy::JazzyIndex<std::uint64_t, jazzy::SegmentCount::NANO> routed(data.begin(), data.end());

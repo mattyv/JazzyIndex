@@ -1377,6 +1377,14 @@ private:
                     right = std::min(num_segments_, left + 1);
                 }
                 if (!has_adjacent_duplicates_) {
+                    // One directory candidate still lets its local search reject in-range gaps.
+                    if (right - left == 1) return &segments_[left];
+                    if (right - left <= 4) {
+                        auto it = segments_.begin() + static_cast<std::ptrdiff_t>(left);
+                        const auto last = segments_.begin() + static_cast<std::ptrdiff_t>(right);
+                        while (it != last && static_cast<std::uint64_t>(it->max_val) < key) ++it;
+                        return it == last ? &segments_.back() : &*it;
+                    }
                     const auto it = std::lower_bound(
                         segments_.begin() + static_cast<std::ptrdiff_t>(left),
                         segments_.begin() + static_cast<std::ptrdiff_t>(right), key,

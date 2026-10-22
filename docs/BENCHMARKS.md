@@ -5,6 +5,7 @@ RadixSpline across multiple data distributions and index configurations.
 
 ## Table of Contents
 - [Overview](#overview)
+- [Measured small-bucket routing results](#measured-small-bucket-routing-results-2026-10-22)
 - [Measured routing and batch results](#measured-routing-and-batch-results-2026-10-20)
 - [Benchmark Setup](#benchmark-setup)
 - [Performance by Segment Group](#performance-by-segment-group)
@@ -38,6 +39,7 @@ with 262,144 queries and a 90% target hit probability against:
 - `std::lower_bound`
 - `std::set` and `std::unordered_set` membership
 - Four independent JazzyIndex queries through `find_batch` (256 initial segments)
+- Four independent RadixSpline queries with interleaved bounded correction (R12/E16 and R18/E16)
 
 Each lookup reports `index_bytes`, `backing_bytes`, and their sum, `total_bytes`.
 JazzyIndex counts its object and allocated metadata capacity. PGM and RadixSpline
@@ -83,7 +85,116 @@ tested libc++ implementation, the one-million-key Zipf fixture causes heavy
 bucket collisions. Its hash-table result should not be generalized to other
 key encodings or hash functions.
 
+## Measured small-bucket routing results (2026-10-22)
+
+RadixSpline's small-range scan suggested a narrower optimization for JazzyIndex:
+return the segment immediately when the directory identifies just one candidate,
+and scan intervals of two to four candidates. Larger intervals retain binary
+search. This applies to the existing unsigned, identity-key, duplicate-free
+routing path; the selected segment still verifies the key and rejects gaps.
+
+The change adds no index fields or allocations. Retained index storage and backing
+array capacity are identical to commit `f74d418` on every measured fixture. The
+default `uint64_t` index object remains 120 bytes.
+
+Final measurements use the same M2, compiler, optimization flags, deterministic
+query streams, and seven randomized repetitions described below. The broad
+comparison covers 10K and 1M elements, all nine distributions, and both original
+and uniquely encoded keys. The competitive comparison uses one million uniquely
+encoded keys and now includes **RadixSpline Batch4**, with all four search bounds
+computed before interleaving their exact corrections. Batch results are throughput
+per query, not isolated lookup latency.
+
+The initial broad run included noisy repetitions (up to 47% CV), so the entire
+72-row comparison was repeated with the same settings. Both runs are preserved
+separately in the summary. The confirmation run had at most 7.1% CV and measured
+these scalar results at one million uniquely encoded keys:
+
+| Distribution | Previous ns | New ns | Lookup time reduction |
+|---|---:|---:|---:|
+| Uniform | 12.50 | 12.58 | -0.6% |
+| Exponential | 14.72 | 12.59 | 14.5% |
+| Clustered | 39.55 | 36.39 | 8.0% |
+| Lognormal | 15.21 | 13.33 | 12.4% |
+| Zipf | 32.76 | 29.65 | 9.5% |
+| Mixed | 14.14 | 11.86 | 16.1% |
+| Quadratic | 37.18 | 33.82 | 9.0% |
+| ExtremePoly | 38.16 | 33.82 | 11.4% |
+| InversePoly | 40.89 | 37.64 | 8.0% |
+
+The nonuniform unique fixtures improve by roughly 8–16%; Uniform is effectively
+unchanged within run variation. The broad and competitor runs use different
+executables and ran separately, so compare implementations within each table.
+
+The competitive run measured the following median CPU nanoseconds per query.
+JazzyIndex uses 256 initial segments. RadixSpline columns select the fastest
+tested configuration independently from six scalar and two batch settings.
+
+| Distribution | Jazzy scalar | RadixSpline scalar | Jazzy Batch4 | RadixSpline Batch4 |
+|---|---:|---:|---:|---:|
+| Uniform | 12.94 | 15.37 | 12.30 | 10.89 |
+| Exponential | 12.74 | 17.92 | 12.98 | 11.37 |
+| Clustered | 35.93 | 25.57 | 36.19 | 18.51 |
+| Lognormal | 13.66 | 18.47 | 13.21 | 11.85 |
+| Zipf | 30.38 | 26.84 | 26.84 | 23.89 |
+| Mixed | 12.05 | 17.67 | 12.09 | 11.39 |
+| Quadratic | 34.30 | 25.83 | 26.84 | 19.53 |
+| ExtremePoly | 34.45 | 25.90 | 29.86 | 20.38 |
+| InversePoly | 38.53 | 28.21 | 32.67 | 20.52 |
+
+JazzyIndex wins four scalar comparisons; RadixSpline wins all nine batch
+comparisons. The new optimization changes scalar routing only. The separate
+JazzyIndex batch router remains an optimization target, and batching does not
+help every distribution. Clustered is the largest remaining batch gap here.
+These are comparisons of the tested implementations, not upper bounds on what
+either index can achieve with further tuning.
+
+Both winning RadixSpline columns use R12/E16 for Uniform, Exponential, and Mixed,
+and R18/E16 elsewhere. Their total reported storage, including the key array,
+compares as follows (decimal MB):
+
+| Distribution | JazzyIndex | Winning RadixSpline |
+|---|---:|---:|
+| Uniform | 8.017 | 8.015 |
+| Exponential | 8.398 | 8.013 |
+| Clustered | 9.028 | 9.000 |
+| Lognormal | 8.468 | 8.860 |
+| Zipf | 9.055 | 9.021 |
+| Mixed | 8.393 | 8.012 |
+| Quadratic | 8.934 | 9.029 |
+| ExtremePoly | 9.011 | 9.043 |
+| InversePoly | 9.011 | 9.043 |
+
+JazzyIndex scalar also beats the tested PGM, binary search, tree set, and hash
+set on all nine fixtures. The fastest PGM settings report 8.00–8.03 MB total;
+the hash and tree sets retain 32 and 40 MB. PGM and RadixSpline report logical
+storage that may omit spare capacity, while JazzyIndex counts allocated capacity.
+These figures exclude peak construction memory and process RSS. The Zipf hash
+result retains the encoding/collision limitation described above.
+
+All seven samples, coefficients of variation, and memory counters are retained
+in the [machine-readable summary](benchmark-summary-2026-10-22.json). Some
+competitor cases had noticeable variation, including 12% CV for the winning
+Clustered RadixSpline batch; close timing differences should not be treated as
+conclusive.
+
+All results are checked against exact lookup before timing. Normal tests passed
+265/265, debug tests 280/280, and ASan/UBSan/float-cast-overflow tests 265/265.
+New regressions cover high-origin gaps, the final unsigned bucket, and several
+segment boundaries sharing one high-key bucket.
+
+The experiment also tested packed routing keys, skipping the initial prediction
+probe, cached endpoint checks, and cached spline slopes. None was promoted. The
+packed-key variant added memory and was slower; cached endpoint checks did not
+show a consistent benefit over the selected routing change. Noisy prediction and
+spline runs were excluded from fine-grained comparisons. The retained change was
+supported by separate routing and combined screens before final measurement.
+
 ## Measured routing and batch results (2026-10-20)
+
+This earlier snapshot predates the small-bucket optimization and the RadixSpline
+batch comparator. Its batch-versus-scalar comparisons do not establish a lead
+over batched RadixSpline.
 
 These measurements use an Apple M2 with 8 GiB RAM, macOS 27.0.1, Apple Clang
 21.0.0, the Xcode 26.5 SDK, C++20, `-O3`, and `-DNDEBUG`. Each case uses

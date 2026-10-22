@@ -43,7 +43,7 @@ That's a learned index. Build a lightweight model of your data's distribution, u
 
 ## Performance
 
-For current routing and batch measurements, see [Measured routing and batch results](docs/BENCHMARKS.md#measured-routing-and-batch-results-2026-10-20).
+For current routing and batch measurements, see [Measured small-bucket routing results](docs/BENCHMARKS.md#measured-small-bucket-routing-results-2026-10-22).
 
 The following is a historical fixed-query snapshot comparing JazzyIndex with `std::lower_bound` (black X markers):
 
@@ -138,7 +138,8 @@ The lookup process has three stages:
 - Newly built uniform indexes and indexes with a custom extractor or comparator use
   the existing segment search and allocate no routing storage.
 - Duplicate keys use interval search within the directory bucket. Unique keys
-  use lower-bound search over the candidate segments' maximum keys.
+  return a sole candidate directly, scan up to four candidates, or use lower-bound
+  search over larger sets of candidate segments' maximum keys.
 
 **Stage 2: Predict within segment**
 - Use the segment's model (constant/linear/quadratic) to predict the index.

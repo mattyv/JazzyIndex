@@ -322,6 +322,83 @@ void register_radix_spline(const std::string& distribution,
                         const auto range = index->GetSearchBound(key);
                         return exact_lower_bound(*data, key, range.begin, range.end);
                     });
+    if constexpr ((RadixBits == 12 || RadixBits == 18) && MaxError == 16) {
+        constexpr std::size_t kBatchWidth = 4;
+        static_assert(kQueryCount % kBatchWidth == 0,
+                      "Batch4 requires the deterministic query fixture to divide evenly");
+        using BatchKeys = std::array<Key, kBatchWidth>;
+        using BatchResults = std::array<std::size_t, kBatchWidth>;
+        const auto batch_find = [index, data](const BatchKeys& keys) {
+            std::array<std::size_t, kBatchWidth> left{};
+            std::array<std::size_t, kBatchWidth> right{};
+            std::array<std::size_t, kBatchWidth> end{};
+            for (std::size_t lane = 0; lane < kBatchWidth; ++lane) {
+                const auto range = index->GetSearchBound(keys[lane]);
+                if (range.begin > range.end || range.end > data->size()) {
+                    throw std::out_of_range("RadixSpline returned an invalid search bound");
+                }
+                left[lane] = range.begin;
+                right[lane] = range.end;
+                end[lane] = range.end;
+            }
+
+            bool active = true;
+            while (active) {
+                active = false;
+                for (std::size_t lane = 0; lane < kBatchWidth; ++lane) {
+                    if (left[lane] == right[lane]) continue;
+                    active = true;
+                    const std::size_t middle = left[lane] + (right[lane] - left[lane]) / 2;
+                    if ((*data)[middle] < keys[lane]) {
+                        left[lane] = middle + 1;
+                    } else {
+                        right[lane] = middle;
+                    }
+                }
+            }
+
+            BatchResults results{};
+            for (std::size_t lane = 0; lane < kBatchWidth; ++lane) {
+                results[lane] = left[lane] != end[lane] && (*data)[left[lane]] == keys[lane]
+                    ? left[lane] : data->size();
+            }
+            return results;
+        };
+        for (std::size_t offset = 0; offset < queries->size(); offset += kBatchWidth) {
+            BatchKeys keys{};
+            for (std::size_t lane = 0; lane < kBatchWidth; ++lane) keys[lane] = (*queries)[offset + lane];
+            const BatchResults results = batch_find(keys);
+            for (std::size_t lane = 0; lane < kBatchWidth; ++lane) {
+                if (results[lane] != exact_lower_bound(*data, keys[lane])) {
+                    throw std::logic_error("RadixSpline Batch4 returned an incorrect exact result");
+                }
+            }
+        }
+        const std::string batch_name = "Lookup/RadixSpline/" + config + "/Batch4/" + distribution +
+                                       "/N" + std::to_string(data->size()) + "/RandomMixed";
+        const std::size_t index_bytes = index->GetSize();
+        const std::size_t backing_bytes = data->capacity() * sizeof(Key);
+        benchmark::RegisterBenchmark(batch_name.c_str(),
+            [batch_find, queries, index_bytes, backing_bytes, size = data->size()](benchmark::State& state) {
+                std::size_t cursor = 0, checksum = 0;
+                BatchKeys keys{};
+                for (auto _ : state) {
+                    for (std::size_t lane = 0; lane < kBatchWidth; ++lane) {
+                        keys[lane] = (*queries)[cursor + lane];
+                    }
+                    for (const std::size_t result : batch_find(keys)) checksum += result;
+                    cursor += kBatchWidth;
+                    if (cursor == queries->size()) cursor = 0;
+                }
+                benchmark::DoNotOptimize(checksum);
+                state.SetItemsProcessed(state.iterations() * kBatchWidth);
+                state.counters["batch_width"] = static_cast<double>(kBatchWidth);
+                state.counters["index_bytes"] = static_cast<double>(index_bytes);
+                state.counters["backing_bytes"] = static_cast<double>(backing_bytes);
+                state.counters["total_bytes"] = static_cast<double>(index_bytes + backing_bytes);
+                state.counters["size"] = static_cast<double>(size);
+            })->Unit(benchmark::kNanosecond);
+    }
     register_build("RadixSpline", config, distribution, std::move(data), std::move(build));
 }
 
